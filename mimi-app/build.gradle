@@ -138,12 +138,12 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     kapt 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation 'com.github.franmontiel:PersistentCookieJar:1.0.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.google.code.gson:gson:$gson_version"
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
@@ -190,6 +190,7 @@ dependencies {
 
     // Test helpers
     testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
     testImplementation "androidx.room:room-testing:$room_version"
 
     implementation 'com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1'
