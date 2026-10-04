@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
-import androidx.work.Configuration
 import com.emogoth.android.phone.mimi.BuildConfig
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.autorefresh.RefreshScheduler2
@@ -22,7 +21,7 @@ import java.io.IOException
 import java.net.SocketException
 
 
-open class MimiApplication : Application(), Configuration.Provider, LifecycleObserver {
+open class MimiApplication : Application(), LifecycleObserver {
     var background = false
         private set
 
@@ -114,11 +113,6 @@ open class MimiApplication : Application(), Configuration.Provider, LifecycleObs
             Log.w(LOG_TAG, "Unknown exception received, not sure what to do", e)
         }
     }
-
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-                .setMinimumLoggingLevel(Log.VERBOSE)
-                .build()
 
     companion object {
         private val LOG_TAG = MimiApplication::class.java.simpleName

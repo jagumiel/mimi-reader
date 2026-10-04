@@ -1,5 +1,6 @@
 package com.emogoth.android.phone.mimi.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,7 +17,7 @@ import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.app.MimiApplication
 import com.emogoth.android.phone.mimi.databinding.ActivityGallery2Binding
 import com.emogoth.android.phone.mimi.fourchan.FourChanConnector
-import com.emogoth.android.phone.mimi.service.DownloadService
+import com.emogoth.android.phone.mimi.service.BatchDownloadWorker
 import com.emogoth.android.phone.mimi.util.*
 import com.emogoth.android.phone.mimi.util.GalleryScrollReceiver.Companion.SCROLL_ID_FLAG
 import com.emogoth.android.phone.mimi.view.gallery.GalleryGrid
@@ -481,10 +482,8 @@ class GalleryActivity2 : AppCompatActivity() {
 
             if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT
                     || requestCode == REQUEST_CODE_BATCH_DOWNLOAD) {
-                    val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     try {
-                        contentResolver.takePersistableUriPermission(uriTree, takeFlags)
+                        persistDirectoryPermission(uriTree, data)
                         if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT) {
                             MimiUtil.setSaveDir(this, uriTree.toString())
                         }
@@ -537,6 +536,18 @@ class GalleryActivity2 : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("WrongConstant")
+    private fun persistDirectoryPermission(uri: Uri, resultData: Intent) {
+        val takeFlags = resultData.flags and
+                (Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        if (takeFlags != 0) {
+            contentResolver.takePersistableUriPermission(uri, takeFlags)
+        } else {
+            Log.w(LOG_TAG, "Directory picker returned no persistable URI permissions")
+        }
+    }
+
     private fun chooseSaveLocation(requestCode: Int) {
         openLocationDialog(requestCode)
     }
@@ -569,17 +580,12 @@ class GalleryActivity2 : AppCompatActivity() {
 
     private fun startBatchDownload(path: Uri, selectedPosts: LongArray) {
         if (selectedPosts.isNotEmpty()) {
-            val downloadIntent = Intent(this@GalleryActivity2, DownloadService::class.java)
-            val extras = Bundle()
-
-            extras.putString(DownloadService.COMMAND_SAVE, path.toString())
-            extras.putString(Extras.EXTRAS_BOARD_NAME, viewModel.boardName)
-            extras.putLongArray(Extras.EXTRAS_POST_LIST, selectedPosts)
-            extras.putLong(Extras.EXTRAS_THREAD_ID, viewModel.threadId)
-            extras.putInt(DownloadService.DOWNLOAD_TYPE_KEY, DownloadService.DOWNLOAD_BATCH)
-
-            downloadIntent.putExtras(extras)
-            startService(downloadIntent)
+            BatchDownloadWorker.enqueue(
+                    this,
+                    path,
+                    viewModel.boardName,
+                    viewModel.threadId,
+                    selectedPosts)
 
             galleryGrid?.selectItems(false)
             actionMode?.finish()

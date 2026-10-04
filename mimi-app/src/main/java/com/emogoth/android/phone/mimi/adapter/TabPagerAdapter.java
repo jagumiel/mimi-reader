@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -31,22 +32,20 @@ import com.emogoth.android.phone.mimi.fragment.BoardItemListFragment;
 import com.emogoth.android.phone.mimi.fragment.HistoryFragment;
 import com.emogoth.android.phone.mimi.fragment.PostItemsListFragment;
 import com.emogoth.android.phone.mimi.fragment.ThreadDetailFragment;
-import com.emogoth.android.phone.mimi.interfaces.TabInterface;
-;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
     private static final String LOG_TAG = TabPagerAdapter.class.getSimpleName();
-    private List<TabItem> tabItems = new ArrayList<>();
-    private FragmentManager fm;
+    private final List<TabItem> tabItems = new ArrayList<>();
+    private final Map<Long, Fragment> activeFragments = new HashMap<>();
 
     public TabPagerAdapter(FragmentManager fm) {
-        super(fm);
-        this.fm = fm;
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
         setup();
 
@@ -55,10 +54,11 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public TabPagerAdapter(FragmentManager fm, List<TabItem> items) {
-        super(fm);
-        this.fm = fm;
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-        tabItems.addAll(items);
+        if (items != null) {
+            tabItems.addAll(items);
+        }
     }
 
     private void setup() {
@@ -96,11 +96,24 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         return new Fragment();
     }
 
-//    @Override
-//    public long getItemId(int position) {
-//        // give an ID different from position when position has been changed
-//        return tabItems.get(position).id;
-//    }
+    private long getStableItemId(int position) {
+        return tabItems.get(position).getStableId();
+    }
+
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        final Object item = super.instantiateItem(container, position);
+        if (item instanceof Fragment) {
+            activeFragments.put(getStableItemId(position), (Fragment) item);
+        }
+        return item;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        activeFragments.values().remove(object);
+        super.destroyItem(container, position, object);
+    }
 
     @Override
     public int getCount() {
@@ -109,7 +122,32 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
+        Long stableId = null;
+        for (Map.Entry<Long, Fragment> entry : activeFragments.entrySet()) {
+            if (entry.getValue() == object) {
+                stableId = entry.getKey();
+                break;
+            }
+        }
+
+        if (stableId == null) {
+            return POSITION_NONE;
+        }
+
+        for (int position = 0; position < tabItems.size(); position++) {
+            if (tabItems.get(position).getStableId() == stableId) {
+                return position;
+            }
+        }
+
         return POSITION_NONE;
+    }
+
+    public Fragment getActiveFragment(int position) {
+        if (position < 0 || position >= tabItems.size()) {
+            return null;
+        }
+        return activeFragments.get(getStableItemId(position));
     }
 
     public int getIndex(long threadId) {
@@ -187,15 +225,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         tabItems.remove(i);
-
-        final List<Fragment> fragments = fm.getFragments();
-        for (Fragment fragment : fragments) {
-            if (fragment instanceof TabInterface && ((TabInterface) fragment).getTabId() == id) {
-                Log.d(LOG_TAG, "Removing fragment: id=" + id);
-                fm.beginTransaction().remove(fragment).commitAllowingStateLoss();
-            }
-        }
-
+        notifyDataSetChanged();
     }
 
     public List<TabItem> getItems() {
@@ -247,6 +277,14 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
 
         public long getId() {
             return id;
+        }
+
+        public long getStableId() {
+            long result = 1125899906842597L;
+            result = 31L * result + (tabType == null ? 0 : tabType.ordinal());
+            result = 31L * result + id;
+            result = 31L * result + (title == null ? 0 : title.hashCode());
+            return result;
         }
 
         @Override

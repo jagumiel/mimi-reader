@@ -44,7 +44,6 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     private val appbar get() = binding.appbar
 
     private var tabPagerAdapter: TabPagerAdapter? = null
-    private var postListFragment: MimiFragmentBase? = null
     private var currentFragment: MimiFragmentBase? = null
     private var closeTabOnBack = false
     override val pageName: String? = "tabs_activity"
@@ -76,24 +75,12 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         tabs_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                if (currentFragment == null) {
-                    return
-                }
-                tabs_pager.post {
-                    if (position < tabPagerAdapter?.count ?: 0) {
-                        currentFragment = tabPagerAdapter?.instantiateItem(tabs_pager, position) as MimiFragmentBase
-                        currentFragment?.initMenu()
-                    }
-                }
-                setFabVisibility(currentFragment?.showFab() ?: false)
+                updateCurrentFragment(position)
             }
 
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        tabs_pager.post(Runnable {
-            currentFragment = tabPagerAdapter?.instantiateItem(tabs_pager, 0) as MimiFragmentBase
-            currentFragment?.initMenu()
-        })
+        updateCurrentFragment(tabs_pager.currentItem)
 
         // Hack to stop crashing
         // https://code.google.com/p/android/issues/detail?id=201827
@@ -210,16 +197,17 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
                 tab_layout.addTab(newTab, 1)
             }
             tabPagerAdapter?.setItemAtIndex(1, tabItem)
-            if (postListFragment == null) {
-                postListFragment = tabPagerAdapter?.instantiateItem(tabs_pager, 1) as PostItemsListFragment
-            }
-            if (postListFragment is PostItemsListFragment) {
-                val frag = postListFragment as PostItemsListFragment
-                frag.setBoard(board.name)
-                frag.refreshBoard(true)
-            }
         }
         tabs_pager.setCurrentItem(1, true)
+    }
+
+    private fun updateCurrentFragment(position: Int) {
+        tabs_pager.post {
+            val fragment = tabPagerAdapter?.getActiveFragment(position) as? MimiFragmentBase
+            currentFragment = fragment
+            fragment?.initMenu()
+            setFabVisibility(fragment?.showFab() ?: false)
+        }
     }
 
     private fun setFabVisibility(shouldShow: Boolean) {
@@ -480,9 +468,6 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
                 tab_layout.addTab(newTab, 1)
             }
             tabPagerAdapter?.setItemAtIndex(1, tabItem)
-            if (postListFragment == null) {
-                postListFragment = tabPagerAdapter?.instantiateItem(tabs_pager, 1) as MimiFragmentBase
-            }
         }
         tabs_pager.setCurrentItem(1, false)
     }

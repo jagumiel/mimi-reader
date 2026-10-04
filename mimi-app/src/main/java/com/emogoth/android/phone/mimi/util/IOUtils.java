@@ -37,7 +37,6 @@ import androidx.documentfile.provider.DocumentFile;
 
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
-import com.emogoth.android.phone.mimi.service.DownloadService;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.Closeable;
@@ -598,9 +597,9 @@ public class IOUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 String channelName = context.getString(R.string.mimi_file_downloader);
 
-                NotificationChannel saveFileChannel = new NotificationChannel(DownloadService.DOWNLOADER_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW);
+                NotificationChannel saveFileChannel = new NotificationChannel(NotificationUtils.DOWNLOADER_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW);
 
-                builder.setChannelId(DownloadService.DOWNLOADER_CHANNEL_ID);
+                builder.setChannelId(NotificationUtils.DOWNLOADER_CHANNEL_ID);
                 notificationManager.createNotificationChannel(saveFileChannel);
             }
 
