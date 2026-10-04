@@ -34,7 +34,11 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 1. Red y compatibilidad con la API
 
-- Actualizar OkHttp, Retrofit, Gson, Jsoup y Conscrypt de forma incremental.
+- [ ] Actualizar OkHttp, Retrofit, Gson, Jsoup y Conscrypt de forma incremental.
+  - [x] Gson actualizado de 2.8.6 a 2.14.0 y unificado entre los módulos.
+  - [ ] Actualizar Retrofit sin mezclar el cambio con la migración principal de OkHttp.
+  - [ ] Actualizar OkHttp, Jsoup y Conscrypt en incrementos independientes.
+- [x] Añadir contratos de deserialización para catálogo, hilos, MP4, WebM, campos opcionales y JSON malformado.
 - Centralizar errores HTTP, límites de peticiones y tiempos de espera.
 - Probar catálogo, hilo, miniaturas y multimedia ante respuestas incompletas o cambios de la API.
 - Añadir caché y estados de error recuperables para evitar pantallas vacías.

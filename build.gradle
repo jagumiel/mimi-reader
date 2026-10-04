@@ -19,6 +19,7 @@ buildscript {
     ext.kotlin_version = '1.9.24'
     ext.room_version = "2.6.1"
     ext.canary_version = "2.4"
+    ext.gson_version = "2.14.0"
 
     repositories {
         google()
