@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 4 de octubre de 2026.
+Última revisión: 5 de octubre de 2026.
 
 ## Objetivo
 
@@ -27,10 +27,8 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Reanudar lotes omitiendo archivos que ya se descargaron correctamente.
 - [x] Validar la APK en el Motorola Edge 20 con Android 12 abriendo diez hilos y restaurándolos tras matar el proceso.
 - [x] Validar una descarga SAF por lotes en un dispositivo real (105 archivos, finalización correcta).
-- [ ] Validar la cancelación durante una descarga lenta y la reanudación después de matar el proceso.
-  - Prueba del 4 de octubre de 2026: la cancelación detiene el trabajo y elimina el archivo en curso; WorkManager también recupera el lote después de matar el proceso.
-  - Corrección implementada: las descargas usan un archivo temporal, validan los tamaños esperados y recibidos, y solo adoptan el nombre definitivo cuando están completas.
-  - Pendiente: repetir la prueba real de cancelación y recuperación para cerrar esta tarea; la última ejecución terminó en `SUCCESS`, pero 1 de 151 archivos quedó truncado.
+- [x] Validar la cancelación durante una descarga lenta y la reanudación después de matar el proceso.
+  - Prueba final del 5 de octubre de 2026: cancelación sin temporales residuales y recuperación de 151 archivos con cero diferencias de tamaño.
 
 ## Siguientes fases
 
