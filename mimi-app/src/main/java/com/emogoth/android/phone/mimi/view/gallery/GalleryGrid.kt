@@ -17,6 +17,7 @@ import com.emogoth.android.phone.mimi.app.MimiApplication
 import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.MimiPrefs
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.Utils
 import com.emogoth.android.phone.mimi.viewmodel.GalleryItem
 import java.util.*
 import kotlin.collections.ArrayList
@@ -188,7 +189,7 @@ class GalleryGridItemViewHolder(private val root: View, private val preloadEnabl
     var itemClicked: ((GalleryItem) -> (Unit))? = null
 
     fun bind(item: GalleryItem, mode: Int, itemSelected: Boolean) {
-        val useThumbnail = (item.downloadUrl.endsWith("webm") || item.size >= 400000) || !preloadEnabled
+        val useThumbnail = Utils.isVideoExtension(item.ext) || item.size >= 400000 || !preloadEnabled
         val url = if (useThumbnail) item.thumbnailUrl else item.downloadUrl
         GlideApp.with(root)
                 .load(url)

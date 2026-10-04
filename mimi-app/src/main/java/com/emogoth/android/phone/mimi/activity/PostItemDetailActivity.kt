@@ -93,7 +93,6 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
             }
         }
 
-//        setAdContainer(R.id.advert_container, MimiUtil.adsEnabled(this));
         initDrawers(R.id.nav_drawer, R.id.nav_drawer_container, false)
         createDrawers(R.id.nav_drawer)
 
@@ -156,7 +155,7 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
         return MimiUtil.getInstance().cacheDir
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {}
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {}
     override fun onResume() {
         super.onResume()
         SimpleChromeCustomTabs.getInstance().connectTo(this)

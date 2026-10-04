@@ -16,8 +16,10 @@
 
 package com.emogoth.android.phone.mimi.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -1167,7 +1169,12 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
 
             return Unit.INSTANCE;
         });
-        getActivity().registerReceiver(scrollReceiver, new IntentFilter(scrollReceiver.getIntentFilter()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getActivity().registerReceiver(scrollReceiver,
+                    new IntentFilter(scrollReceiver.getIntentFilter()), Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            getActivity().registerReceiver(scrollReceiver, new IntentFilter(scrollReceiver.getIntentFilter()));
+        }
 
         if (recyclerView != null) {
             createRecyclerViewScrollListeners();

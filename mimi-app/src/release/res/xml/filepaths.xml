@@ -17,7 +17,4 @@
 
 <paths>
     <cache-path path="full_images/" name="shareableimages" />
-    <external-path
-        path="Android/data/com.emogoth.android.phone.mimi/files/mounted/cache/full_images/"
-        name="externalshareableimages" />
 </paths>

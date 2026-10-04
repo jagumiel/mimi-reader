@@ -16,7 +16,6 @@
 
 package com.emogoth.android.phone.mimi.util;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
@@ -31,10 +30,6 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
-import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,7 +64,6 @@ import com.emogoth.android.phone.mimi.db.PostTableConnection;
 import com.emogoth.android.phone.mimi.db.models.History;
 import com.emogoth.android.phone.mimi.viewmodel.GalleryItem;
 import com.franmontiel.persistentcookiejar.persistence.CookiePersistor;
-import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.appbar.AppBarLayout;
 ;
 import com.google.gson.Gson;
@@ -82,9 +76,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -344,18 +335,6 @@ public class MimiUtil {
         return loaderId;
     }
 
-    private static File getPicturesDirectoryAsFile() {
-        return new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_PICTURES);
-    }
-
-    public static DocumentFile getPicturesDirectory() {
-        return DocumentFile.fromFile(getPicturesDirectoryAsFile());
-    }
-
-    public static boolean canWriteToPicturesFolder() {
-        return getPicturesDirectory().canWrite();
-    }
-
     @Nullable
     public static DocumentFile getSaveDir() {
         final Context context = MimiApplication.getInstance().getApplicationContext();
@@ -368,37 +347,15 @@ public class MimiUtil {
             try {
                 if (dir.startsWith(Utils.SCHEME_CONTENT)) {
                     return DocumentFile.fromTreeUri(context, Uri.parse(dir));
-                } else {
-                    return DocumentFile.fromFile(new File(dir));
                 }
+                Log.w(LOG_TAG, "Ignoring legacy filesystem save path; a SAF directory must be selected");
+                return null;
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Error creating DocumentFile from " + dir, e);
                 return null;
             }
-        } else {
-            DocumentFile defaultDir = DocumentFile.fromFile(new File(getPicturesDirectoryAsFile(), "/Mimi"));
-            if (!defaultDir.exists()) {
-                DocumentFile externalStorageDir = getPicturesDirectory();
-                DocumentFile mimiFolder = externalStorageDir.createDirectory("Mimi");
-            }
-            return defaultDir;
         }
-    }
-
-    public static boolean createSaveDir() {
-        try {
-            DocumentFile saveDir = getSaveDir();
-            if (!saveDir.canWrite()) {
-                return false;
-            }
-
-            return saveDir.exists();
-
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Error creating dir", e);
-        }
-
-        return false;
+        return null;
     }
 
     public static void setSaveDir(final Context context, final String path) {
@@ -741,7 +698,7 @@ public class MimiUtil {
     }
 
     public static boolean isCrappySamsung() {
-        if (Util.SDK_INT <= 19 && "samsung".equals(Util.MANUFACTURER)) {
+        if (Build.VERSION.SDK_INT <= 19 && "samsung".equals(Build.MANUFACTURER)) {
             return true;
         }
 
@@ -846,93 +803,6 @@ public class MimiUtil {
         void onOperationComplete();
 
         void onOperationFailed();
-    }
-
-    private static Object[] volumes;
-
-    private static List<StorageVolume> volumesNougat;
-
-    public static Uri getDocumentFileRealPath(DocumentFile documentFile) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
-        return getDocumentFileRealPath(documentFile.getUri());
-    }
-
-    public static Uri getDocumentFileRealPath(Uri documentUri) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
-        if ("file".equals(documentUri.getScheme())) {
-            return documentUri;
-        }
-
-        if (PostUtil.isDownloadsDocument(documentUri)) {
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            return Uri.fromFile(path);
-        }
-
-        final String docId = DocumentsContract.getDocumentId(documentUri);
-        final String[] split = docId.split(":");
-        final String type = split[0];
-
-        if (split.length != 2) {
-            return null;
-        }
-
-        if (type.equalsIgnoreCase("primary")) {
-            File file = new File(Environment.getExternalStorageDirectory(), split[1]);
-            return Uri.fromFile(file);
-        } else {
-            StorageManager sm = (StorageManager) MimiApplication.getInstance().getSystemService(Context.STORAGE_SERVICE);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                return getFileUri(sm, type, split);
-            } else {
-                return getFileUriNougat(sm, type, split);
-            }
-        }
-    }
-
-    @TargetApi(24)
-    private static Uri getFileUriNougat(StorageManager sm, String type, String[] split) throws NoSuchFieldException, IllegalAccessException {
-        if (volumesNougat == null) {
-            volumesNougat = sm.getStorageVolumes();
-        }
-
-        for (StorageVolume volume : volumesNougat) {
-            String uuid = volume.getUuid();
-
-            if (uuid != null && uuid.equalsIgnoreCase(type)) {
-                Field f = volume.getClass().getDeclaredField("mPath");
-                f.setAccessible(true);
-
-                final File pathFile = (File) f.get(volume);
-                final File file;
-                if (split.length > 1) {
-                    file = new File(pathFile, split[1]);
-                } else {
-                    file = pathFile;
-                }
-                return Uri.fromFile(file);
-            }
-        }
-
-        return null;
-    }
-
-    private static Uri getFileUri(StorageManager sm, String type, String[] split) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (volumes == null) {
-            Method getVolumeListMethod = sm.getClass().getMethod("getVolumeList", new Class[0]);
-            volumes = (Object[]) getVolumeListMethod.invoke(sm);
-        }
-
-        for (Object volume : volumes) {
-            Method getUuidMethod = volume.getClass().getMethod("getUuid", new Class[0]);
-            String uuid = (String) getUuidMethod.invoke(volume);
-
-            if (uuid != null && uuid.equalsIgnoreCase(type)) {
-                Method getPathMethod = volume.getClass().getMethod("getPath", new Class[0]);
-                String path = (String) getPathMethod.invoke(volume);
-                File file = new File(path, split[1]);
-                return Uri.fromFile(file);
-            }
-        }
-
-        return null;
     }
 
     public static void deleteRecursive(File fileOrDirectory, boolean keepDir) {

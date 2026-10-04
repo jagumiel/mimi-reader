@@ -20,9 +20,6 @@ package com.emogoth.android.phone.mimi.util;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -52,100 +49,29 @@ public class PostUtil {
         return instance;
     }
 
-    /**
-     * Get a file path from a Uri. This will get the the path for Storage Access
-     * Framework Documents, as well as the _data field for the MediaStore and
-     * other file-based ContentProviders.
-     *
-     * @param context The context.
-     * @param uri     The Uri to query.
-     * @author paulburke
-     */
+    /** Copies content represented by a Uri into the app cache when a File is required. */
     public static Pair<String, Boolean> getPath(final Context context, final Uri uri) {
-
-        // DocumentProvider
-
-        // ExternalStorageProvider
-        if (isExternalStorageDocument(uri)) {
-            final String docId = DocumentsContract.getDocumentId(uri);
-            final String[] split = docId.split(":");
-            final String type = split[0];
-
-            if ("primary".equalsIgnoreCase(type)) {
-                return new Pair<>(Environment.getExternalStorageDirectory() + "/" + split[1], false);
-            }
-        } else if (isMediaDocument(uri)) { // MediaProvider
-            final String docId = DocumentsContract.getDocumentId(uri);
-            final String[] split = docId.split(":");
-            final String type = split[0];
-
-            Uri contentUri = null;
-            if ("image".equals(type)) {
-                contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            } else if ("video".equals(type)) {
-                contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-            } else if ("audio".equals(type)) {
-                contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            }
-
-            final String selection = "_id=?";
-            final String[] selectionArgs = new String[]{
-                    split[1]
-            };
-
-            return new Pair<>(getDataColumn(context, contentUri, selection, selectionArgs), false);
-        }
-
         return new Pair<>(getImagePathFromInputStreamUri(uri), true);
-    }
-
-    /**
-     * Get the value of the data column for this Uri. This is useful for
-     * MediaStore Uris, and other file-based ContentProviders.
-     *
-     * @param context       The context.
-     * @param uri           The Uri to query.
-     * @param selection     (Optional) Filter used in the query.
-     * @param selectionArgs (Optional) Selection arguments used in the query.
-     * @return The value of the _data column, which is typically a file path.
-     */
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
-
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {
-                column
-        };
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
     }
 
     public static String getFileName(Uri uri) {
         String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = MimiApplication.getInstance().getContentResolver().query(uri, null, null, null, null);
-            try {
+        if ("content".equals(uri.getScheme())) {
+            try (Cursor cursor = MimiApplication.getInstance().getContentResolver()
+                    .query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    int nameColumn = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameColumn >= 0) {
+                        result = cursor.getString(nameColumn);
+                    }
                 }
-            } finally {
-                cursor.close();
             }
         }
         if (result == null) {
             result = uri.getPath();
+            if (result == null) {
+                return null;
+            }
             int cut = result.lastIndexOf('/');
             if (cut != -1) {
                 result = result.substring(cut + 1);
@@ -154,30 +80,6 @@ public class PostUtil {
         return result;
     }
 
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    public static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    public static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    public static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
 
     public static String getImagePathFromInputStreamUri(Uri uri) {
         InputStream inputStream = null;
@@ -213,17 +115,11 @@ public class PostUtil {
             byte[] buffer = new byte[8 * 1024];
 
             targetFile = createTemporalFile(filename);
-            OutputStream outputStream = new FileOutputStream(targetFile);
-
-            while ((read = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-            outputStream.flush();
-
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
             }
         }
 
@@ -235,7 +131,7 @@ public class PostUtil {
         if (TextUtils.isEmpty(filename)) {
             name = "temp_file.jpg";
         } else {
-            name = filename;
+            name = new File(filename).getName();
         }
 
         return new File(MimiUtil.getInstance().getCacheDir(), name); // context needed

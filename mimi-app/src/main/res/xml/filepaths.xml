@@ -2,10 +2,4 @@
 <paths>
     <files-path name="mimi_files" path="provided/" />
     <cache-path name="shareableimages" path="full_images/" />
-    <external-path
-        name="externalshareableimages"
-        path="mimi_images/" />
-    <external-path
-        name="external_files"
-        path="." />
 </paths>

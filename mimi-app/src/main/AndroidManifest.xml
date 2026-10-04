@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.emogoth.android.phone.mimi"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:remove="android:maxSdkVersion" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         tools:node="remove" />
@@ -23,26 +19,27 @@
     <uses-permission
         android:name="android.permission.READ_PHONE_STATE"
         tools:node="remove" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
         android:name=".app.MimiApplication"
         android:allowBackup="false"
-        android:extractNativeLibs="false"
         android:fullBackupContent="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_title"
         android:largeHeap="true"
+        android:enableOnBackInvokedCallback="false"
         android:testOnly="false"
         android:theme="@style/Theme.Mimi.Light.Toolbar.Default"
         tools:replace="android:theme, icon, label, allowBackup">
         <activity
             android:name=".prefs.SettingsActivity"
+            android:exported="false"
             android:label="@string/title_activity_settings"/>
         <activity
             android:name=".activity.GalleryActivity2"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:label="@string/gallery"
             android:theme="@style/Theme.Mimi.Gallery" />
 
@@ -56,16 +53,22 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-        <service android:name=".service.DownloadService" />
+        <service
+            android:name=".service.DownloadService"
+            android:exported="false" />
 
-        <activity android:name=".activity.FilterActivity" />
+        <activity
+            android:name=".activity.FilterActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.PostItemListActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:label="@string/app_title" />
         <activity
             android:name=".activity.StartupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:label="@string/app_title"
             android:theme="@style/Theme.Mimi.Launch">
             <intent-filter>
@@ -77,23 +80,30 @@
         <activity
             android:name=".activity.TabsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:label="@string/app_title"
             android:launchMode="singleTask" />
         <activity
             android:name=".activity.SlidingPanelActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:label="@string/app_title"
             android:launchMode="singleTask" />
         <activity
             android:name=".activity.PostItemDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:parentActivityName=".activity.PostItemListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.emogoth.android.phone.mimi.activity.PostItemListActivity" />
         </activity>
-        <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.UrlRouterActivity">
+        <activity
+            android:name=".activity.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.UrlRouterActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -112,6 +122,7 @@
         </activity>
         <activity
             android:name=".activity.ThemeSettingsActivity"
+            android:exported="false"
             android:label="@string/appearance_title">
             <intent-filter>
                 <action android:name="com.emogoth.android.phone.mimi.activity.ThemeSettingsActivity" />
@@ -119,10 +130,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.EditFiltersActivity" />
+        <activity
+            android:name=".activity.EditFiltersActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activity.WebActivity"
+            android:exported="false"
             android:label="@string/title_activity_web" />
     </application>
 

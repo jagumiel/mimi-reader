@@ -18,5 +18,4 @@
 <resources>
     <dimen name="thread_header_image_height">250dp</dimen>
     <bool name="two_pane">true</bool>
-    <dimen name="advert_height">90dp</dimen>
 </resources>

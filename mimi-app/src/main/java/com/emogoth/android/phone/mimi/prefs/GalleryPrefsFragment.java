@@ -16,22 +16,15 @@
 
 package com.emogoth.android.phone.mimi.prefs;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceScreen;
 
 import com.emogoth.android.phone.mimi.BuildConfig;
 import com.emogoth.android.phone.mimi.R;
@@ -44,7 +37,6 @@ public class GalleryPrefsFragment extends PreferenceFragmentCompat {
     private static final String DIR_CHOOSER_TAG = "directory_chooser_tag";
     public static final int REQUEST_CODE_DIR_CHOOSER = 41;
 
-    public static final int PERMISSIONS_CODE = 1;
     private Preference saveLocation;
 
     public GalleryPrefsFragment() {
@@ -64,37 +56,12 @@ public class GalleryPrefsFragment extends PreferenceFragmentCompat {
 
     private void setupPrefs() {
         saveLocation = findPreference(getString(R.string.image_file_location_pref));
-        if (MimiUtil.isSamsung()) {
-            PreferenceScreen galleryScreen = (PreferenceScreen) findPreference(getString(R.string.gallery_prefs_screen));
-            galleryScreen.removePreference(saveLocation);
-            return;
-        }
-
         DocumentFile saveDir = MimiUtil.getSaveDir();
         if (saveDir != null) {
             saveLocation.setSummary(saveDir.getName());
         }
         saveLocation.setOnPreferenceClickListener(preference -> {
-
-            final int res;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                res = getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else {
-                res = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-            if (res == PackageManager.PERMISSION_GRANTED) {
-                showDirChooser();
-            } else {
-                String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(perms, PERMISSIONS_CODE);
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(), perms, PERMISSIONS_CODE);
-                }
-            }
-
+            showDirChooser();
             return true;
         });
     }
@@ -105,26 +72,6 @@ public class GalleryPrefsFragment extends PreferenceFragmentCompat {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, REQUEST_CODE_DIR_CHOOSER);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSIONS_CODE) {
-            for (int i = 0; i < permissions.length; i++) {
-                String permission = permissions[i];
-                int grantResult = grantResults[i];
-
-                if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                        showDirChooser();
-                    } else if (getActivity() != null) {
-                        Toast.makeText(getActivity(), R.string.save_file_permission_denied, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -145,6 +92,10 @@ public class GalleryPrefsFragment extends PreferenceFragmentCompat {
                 }
                 resolver.takePersistableUriPermission(uriTree, flags);
                 MimiUtil.setSaveDir(getActivity(), uriTree.toString());
+                DocumentFile selectedDirectory = DocumentFile.fromTreeUri(getActivity(), uriTree);
+                if (selectedDirectory != null) {
+                    saveLocation.setSummary(selectedDirectory.getName());
+                }
             }
         }
     }

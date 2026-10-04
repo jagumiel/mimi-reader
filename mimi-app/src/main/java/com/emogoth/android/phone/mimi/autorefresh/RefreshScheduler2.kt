@@ -53,7 +53,7 @@ class RefreshScheduler2 {
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .setInputData(inputData)
                 .addTag(REFRESH_WORKER_TAG)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, OneTimeWorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, WorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
                 .build()
     }
 
@@ -201,7 +201,7 @@ class RefreshScheduler2 {
 
 fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
     observeForever(object : Observer<T> {
-        override fun onChanged(t: T?) {
+        override fun onChanged(t: T) {
             observer.onChanged(t)
             removeObserver(this)
         }

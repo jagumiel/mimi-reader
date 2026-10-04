@@ -21,6 +21,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -34,36 +35,29 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.documentfile.provider.DocumentFile;
 
-import com.emogoth.android.phone.mimi.BuildConfig;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
 import com.emogoth.android.phone.mimi.service.DownloadService;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-;
 
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Locale;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Source;
-
 public class IOUtils {
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     private static final int EOF = -1;
@@ -429,31 +423,9 @@ public class IOUtils {
     private static final String LOG_TAG = "IOUtils";
 
     public static void safeSaveFile(final Activity activity, final DocumentFile saveDir, final File localFile, final String saveFileName, final boolean showNotification) {
-        if (saveDir != null && saveDir.canWrite()) {
-
-            Uri path;
-            try {
-                path = MimiUtil.getDocumentFileRealPath(saveDir);
-            } catch (NoSuchMethodException | NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
-                Log.e(LOG_TAG, "Error getting real path from DocumentFile", e);
-                return;
-            }
-
-            if (path == null) {
-                return;
-            }
-
-            final int fileExtBeginIndex = saveFileName.indexOf(".");
-            if (fileExtBeginIndex < 0) {
-                return;
-            }
-
-            final String fileName = saveFileName.substring(0, fileExtBeginIndex);
-            final String fileExt = saveFileName.substring(fileExtBeginIndex + 1);
-
-            DocumentFile potentialFile = DocumentFile.fromFile(new File(path.getPath() + "/" + fileName + "." + fileExt));
-
-            if (potentialFile.exists()) {
+        if (saveDir != null && saveDir.canWrite() && localFile != null && localFile.exists()) {
+            final DocumentFile potentialFile = saveDir.findFile(saveFileName);
+            if (potentialFile != null && potentialFile.exists()) {
                 final MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
                 dialogBuilder.setTitle(R.string.copy_file)
                         .setMessage(R.string.file_name_is_taken)
@@ -496,131 +468,84 @@ public class IOUtils {
 
     public static boolean saveFile(final DocumentFile dir, final File filePath, final String saveFileName, final boolean showNotification, final int action) {
         try {
-            final DocumentFile saveDir;
-            if (dir == null) {
-                saveDir = MimiUtil.getSaveDir();
-            } else {
-                saveDir = dir;
+            final DocumentFile saveDir = dir == null ? MimiUtil.getSaveDir() : dir;
+            if (saveDir == null || !saveDir.canWrite() || filePath == null || !filePath.exists()
+                    || TextUtils.isEmpty(saveFileName)) {
+                Toast.makeText(MimiApplication.getInstance().getApplicationContext(),
+                        R.string.failed_to_save_file, Toast.LENGTH_LONG).show();
+                return false;
             }
 
-            if (filePath != null) {
+            final int extensionIndex = saveFileName.lastIndexOf('.');
+            final String baseName = extensionIndex > 0
+                    ? saveFileName.substring(0, extensionIndex) : saveFileName;
+            final String fileExt = extensionIndex > 0
+                    ? saveFileName.substring(extensionIndex + 1) : "";
+            String targetName = saveFileName;
+            DocumentFile existingFile = saveDir.findFile(targetName);
 
-                final int fileExtBeginIndex = saveFileName.indexOf(".");
-                if (fileExtBeginIndex < 0) {
-                    return false;
+            if (existingFile != null && action == ACTION_CANCEL) {
+                return false;
+            }
+            if (action == ACTION_RENAME) {
+                int suffix = 1;
+                while (existingFile != null) {
+                    targetName = baseName + "(" + suffix + ")"
+                            + (TextUtils.isEmpty(fileExt) ? "" : "." + fileExt);
+                    existingFile = saveDir.findFile(targetName);
+                    suffix++;
                 }
+            } else if (existingFile != null && !existingFile.delete()) {
+                Log.e(LOG_TAG, "Could not overwrite existing document " + targetName);
+                return false;
+            }
 
-                String fileName = saveFileName.substring(0, fileExtBeginIndex);
-                final String fileExt = saveFileName.substring(fileExtBeginIndex + 1);
+            String mimeType = MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(fileExt.toLowerCase(Locale.ROOT));
+            if (TextUtils.isEmpty(mimeType)) {
+                mimeType = "application/octet-stream";
+            }
 
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExt);
+            final DocumentFile writeFile = saveDir.createFile(mimeType, targetName);
+            if (writeFile == null) {
+                Log.e(LOG_TAG, "Could not create document " + targetName);
+                return false;
+            }
 
-                Uri path;
-                try {
-                    path = MimiUtil.getDocumentFileRealPath(dir);
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    return false;
-                }
+            if (!copyFile(filePath, writeFile.getUri())) {
+                writeFile.delete();
+                return false;
+            }
 
-                if (path == null) {
-                    return false;
-                }
-
-                File fileLocation = new File(path.getPath() + "/" + fileName + "." + fileExt);
-                DocumentFile searchFile = DocumentFile.fromFile(fileLocation);
-
-                if (searchFile.exists() && action == ACTION_CANCEL) {
-                    return false;
-                }
-
-                DocumentFile writeFile = null;
-                if (action == ACTION_RENAME) {
-                    StringBuilder renamedFile = new StringBuilder(fileName);
-                    int i = 1;
-                    while (searchFile.exists()) {
-                        renamedFile = new StringBuilder(fileName).append("(").append(i).append(")");
-                        fileLocation = new File(path.getPath() + "/" + renamedFile + "." + fileExt);
-                        searchFile = DocumentFile.fromFile(fileLocation);
-                        i++;
-                    }
-
-                    fileName = renamedFile.toString();
-                }
-
-                writeFile = saveDir.createFile(mimeType, fileName);
-                if (writeFile == null) {
-                    Log.e(LOG_TAG, "Could not write file " + fileName);
-                    return false;
-                }
-
-                final Context context = MimiApplication.getInstance().getApplicationContext();
-                if (copyFile(filePath, writeFile.getUri())) {
-                    try {
-                        if (!TextUtils.isEmpty(writeFile.getName()) && !writeFile.getName().equals(fileName + "." + fileExt)) {
-                            writeFile.renameTo(fileName + "." + fileExt);
-                        }
-
-                        if (writeFile.length() > 0) {
-                            Toast.makeText(context, R.string.file_saved, Toast.LENGTH_LONG).show();
-                        } else {
-                            try {
-                                filePath.delete();
-                            } catch (Exception e) {
-                                // no op
+            final Context context = MimiApplication.getInstance().getApplicationContext();
+            Toast.makeText(context, R.string.file_saved, Toast.LENGTH_LONG).show();
+            if (showNotification) {
+                final DocumentFile savedDocument = writeFile;
+                MimiUtil.scaleBitmap(filePath)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new SingleObserver<Bitmap>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
                             }
 
-                            return false;
-                        }
+                            @Override
+                            public void onSuccess(Bitmap bitmap) {
+                                showSaveNotification(context, bitmap, savedDocument, fileExt);
+                            }
 
-                        if (showNotification) {
-                            final DocumentFile documentOfImage = writeFile;
-                            MimiUtil.scaleBitmap(filePath)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new SingleObserver<Bitmap>() {
-                                        @Override
-                                        public void onSubscribe(Disposable d) {
-
-                                        }
-
-                                        @Override
-                                        public void onSuccess(Bitmap bitmap) {
-                                            showSaveNotification(context, bitmap, documentOfImage, fileExt);
-
-                                            try {
-                                                filePath.delete();
-                                            } catch (Exception e) {
-                                                // no op
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable e) {
-                                            Log.e(LOG_TAG, "Error scaling bitmap", e);
-
-                                            try {
-                                                filePath.delete();
-                                            } catch (Exception ex) {
-                                                // no op
-                                            }
-                                        }
-                                    });
-                        }
-                        new SingleMediaScanner(context, fileLocation, (s, uri) -> { });
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "Error writing file", e);
-                        return false;
-                    }
-                }
-            } else {
-                Toast.makeText(MimiApplication.getInstance().getApplicationContext(), R.string.failed_to_save_file, Toast.LENGTH_LONG).show();
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.w(LOG_TAG, "Saved file without notification preview", e);
+                            }
+                        });
             }
+            return true;
 
         } catch (final Exception e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "Error saving document", e);
+            return false;
         }
-
-        return true;
     }
 
     private static void showSaveNotification(final Context context, final Bitmap bmp, final DocumentFile destPath, final String fileExt) {
@@ -629,44 +554,33 @@ public class IOUtils {
         }
 
         final String type;
-        if (fileExt != null && fileExt.equalsIgnoreCase(".webm")) {
+        if (Utils.isVideoExtension(fileExt)) {
             type = "video/*";
         } else {
             type = "image/*";
         }
 
-        Uri uriToImage = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            uriToImage = destPath.getUri();
-        } else {
-            try {
-                Uri realPath = MimiUtil.getDocumentFileRealPath(destPath);
-                URI fileUri = URI.create(realPath.toString());
-                uriToImage = MimiUtil.getFileProvider(new File(fileUri));
-            } catch (NoSuchMethodException | NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
-                Log.e(LOG_TAG, "Error getting real path from DocumentFile", e);
-            }
-        }
-
-        if (uriToImage == null) {
-            uriToImage = destPath.getUri();
-        }
+        final Uri uriToImage = destPath.getUri();
 
         try {
             final Intent contentIntent = new Intent();
             contentIntent.setAction(Intent.ACTION_VIEW);
             contentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             contentIntent.setDataAndType(uriToImage, type);
+            contentIntent.setClipData(ClipData.newRawUri(destPath.getName(), uriToImage));
 
-            final PendingIntent pendingContentIntent = PendingIntent.getActivity(context, 0, contentIntent, 0);
+            final PendingIntent pendingContentIntent = PendingIntent.getActivity(
+                    context, 0, contentIntent, PendingIntent.FLAG_IMMUTABLE);
 
             final Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.setDataAndType(uriToImage, type);
             shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             shareIntent.putExtra(Intent.EXTRA_STREAM, uriToImage);
+            shareIntent.setClipData(ClipData.newRawUri(destPath.getName(), uriToImage));
 
-            final PendingIntent pendingShareIntent = PendingIntent.getActivity(context, 0, shareIntent, 0);
+            final PendingIntent pendingShareIntent = PendingIntent.getActivity(
+                    context, 0, shareIntent, PendingIntent.FLAG_IMMUTABLE);
 
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -692,7 +606,9 @@ public class IOUtils {
 
             final Notification saveFileNotification = builder.build();
 
-            notificationManager.notify(NOTIFICATION_ID, saveFileNotification);
+            if (NotificationUtils.canPostNotifications(context)) {
+                notificationManager.notify(NOTIFICATION_ID, saveFileNotification);
+            }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error creating notification", e);
         }
@@ -704,31 +620,22 @@ public class IOUtils {
             return false;
         }
 
-        BufferedSink sink = null;
-        Source source = null;
-        Buffer sinkBuffer = null;
-        try {
-            sink = Okio.buffer(Okio.sink(context.getContentResolver().openOutputStream(copyTo)));
-            source = Okio.source(copyFrom);
-            sinkBuffer = sink.buffer();
-            long count = 0;
-            while (count != -1) {
-                count = source.read(sinkBuffer, 1024L);
-                sink.emit();
+        try (InputStream input = new FileInputStream(copyFrom);
+             OutputStream output = context.getContentResolver().openOutputStream(copyTo, "w")) {
+            if (output == null) {
+                Log.e(LOG_TAG, "Could not open destination document for writing");
+                return false;
             }
-        } catch (IOException | NullPointerException e) {
+
+            final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+            int count;
+            while ((count = input.read(buffer)) != EOF) {
+                output.write(buffer, 0, count);
+            }
+            output.flush();
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Error copying file", e);
             return false;
-        } finally {
-            try {
-                Log.d(LOG_TAG, "Flushing and closing after writing file");
-                source.close();
-
-                sink.flush();
-                sink.close();
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "Error finalizing file copy", e);
-            }
         }
 
         return true;

@@ -184,6 +184,14 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
         }
     }
 
+    open fun onHostPause() {
+        // Only media-backed pages need to react.
+    }
+
+    open fun onHostResume() {
+        // Only media-backed pages need to react.
+    }
+
     open fun fullScreen(enabled: Boolean = true) {
 
     }

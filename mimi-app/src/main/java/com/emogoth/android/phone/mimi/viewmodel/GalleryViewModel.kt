@@ -23,7 +23,7 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
 
         fun get(context: FragmentActivity, imageBaseUrl: String, audioLock: Boolean): GalleryViewModel {
             val factory = object : ViewModelProvider.Factory {
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return GalleryViewModel(imageBaseUrl, audioLock) as T
                 }
             }

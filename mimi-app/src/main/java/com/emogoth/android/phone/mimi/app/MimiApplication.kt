@@ -115,10 +115,10 @@ open class MimiApplication : Application(), Configuration.Provider, LifecycleObs
         }
     }
 
-    override fun getWorkManagerConfiguration() =
-            Configuration.Builder()
-                    .setMinimumLoggingLevel(Log.VERBOSE)
-                    .build()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+                .setMinimumLoggingLevel(Log.VERBOSE)
+                .build()
 
     companion object {
         private val LOG_TAG = MimiApplication::class.java.simpleName

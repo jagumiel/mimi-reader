@@ -19,6 +19,7 @@ import com.emogoth.android.phone.mimi.db.RefreshQueueTableConnection
 import com.emogoth.android.phone.mimi.db.models.QueueItem
 import com.emogoth.android.phone.mimi.util.Extras
 import com.emogoth.android.phone.mimi.util.MimiPrefs
+import com.emogoth.android.phone.mimi.util.NotificationUtils
 import com.emogoth.android.phone.mimi.util.Pages
 import io.reactivex.Flowable
 import io.reactivex.SingleObserver
@@ -49,12 +50,12 @@ object RefreshNotification {
                 context,
                 0,
                 openActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
     fun show() {
-        if (!instance.background) {
+        if (!instance.background || !NotificationUtils.canPostNotifications(instance)) {
             return
         }
 

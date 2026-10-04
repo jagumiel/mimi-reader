@@ -676,7 +676,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
     }
 
     val filterCount: Int
-        get() = if (foundPosts != null) foundPosts?.size else 0
+        get() = foundPosts?.size ?: 0
 
     override fun getFilter(): Filter {
         if (postFilter == null) {

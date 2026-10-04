@@ -16,6 +16,8 @@
 
 package com.emogoth.android.phone.mimi.prefs;
 
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.preference.ListPreference;
@@ -26,6 +28,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.db.BoardTableConnection;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.NotificationUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -34,6 +37,7 @@ import io.reactivex.schedulers.Schedulers;
 
 
 public class HistoryPrefsFragment extends PreferenceFragmentCompat {
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 2101;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -83,6 +87,13 @@ public class HistoryPrefsFragment extends PreferenceFragmentCompat {
             }
 
             notificationPref.setSummary(notificationPref.getEntries()[index]);
+
+            if (!"1".equals(o.toString())
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                    && !NotificationUtils.canPostNotifications(requireContext())) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        NOTIFICATION_PERMISSION_REQUEST);
+            }
 
             return true;
         });

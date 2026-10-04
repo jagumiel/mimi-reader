@@ -1,24 +1,20 @@
 package com.emogoth.android.phone.mimi.activity
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.contains
 import androidx.documentfile.provider.DocumentFile
 import androidx.preference.PreferenceManager
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.app.MimiApplication
+import com.emogoth.android.phone.mimi.databinding.ActivityGallery2Binding
 import com.emogoth.android.phone.mimi.fourchan.FourChanConnector
 import com.emogoth.android.phone.mimi.service.DownloadService
 import com.emogoth.android.phone.mimi.util.*
@@ -34,20 +30,21 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_gallery2.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
 class GalleryActivity2 : AppCompatActivity() {
+    private lateinit var binding: ActivityGallery2Binding
+    private val gallery_root get() = binding.galleryRoot
+    private val appBarLayout get() = binding.appBarLayout
+    private val toolbar get() = binding.toolbar
+
     companion object {
         private val LOG_TAG = GalleryActivity2::class.java.simpleName
         const val GALLERY_TYPE_GRID = 0
         const val GALLERY_TYPE_PAGER = 1
         const val GALLERY_TYPE_BOTH = 2
-
-        const val PERMISSIONS_REQUEST_EXTERNAL_STORAGE = 100
-        const val PERMISSIONS_REQUEST_CREATE_DIR = 101
 
         const val REQUEST_CODE_DIR_CHOOSER = 43
         const val REQUEST_CODE_BATCH_DOWNLOAD = 42
@@ -92,7 +89,8 @@ class GalleryActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         theme.applyStyle(MimiUtil.getFontStyle(this), true)
 
-        setContentView(R.layout.activity_gallery2)
+        binding = ActivityGallery2Binding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(toolbar)
 
         toolbar.setNavigationIcon(R.drawable.ic_nav_arrow_back)
@@ -219,6 +217,7 @@ class GalleryActivity2 : AppCompatActivity() {
         if (gp != null && gallery_root.contains(gp)) {
             gallery_root.removeView(gp)
             lifecycle.removeObserver(gp)
+            gp.release()
             galleryPager = null
         }
 
@@ -397,11 +396,7 @@ class GalleryActivity2 : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.save_menu -> {
-                if (MimiUtil.canWriteToPicturesFolder()) {
-                    saveFile(MimiUtil.getSaveDir())
-                } else {
-                    startPermissionsRequest(MimiUtil.getPicturesDirectory(), PERMISSIONS_REQUEST_CREATE_DIR)
-                }
+                saveFile(MimiUtil.getSaveDir())
             }
             R.id.save_folder_menu -> {
                 chooseSaveLocation(REQUEST_CODE_DIR_CHOOSER)
@@ -421,33 +416,12 @@ class GalleryActivity2 : AppCompatActivity() {
         return true
     }
 
-    private var saveDir: DocumentFile? = null
-
     private fun saveFile(dir: DocumentFile?) {
-        if (dir == null) {
+        if (dir == null || !dir.canWrite()) {
+            chooseSaveLocation(IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT)
             return
         }
-
-        val res = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (res != PackageManager.PERMISSION_GRANTED) {
-
-            val rationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-            // Should we show an explanation?
-            if (rationale) {
-
-                Snackbar.make(gallery_root, R.string.app_needs_your_permission_to_save, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.request) {
-                            startPermissionsRequest(dir)
-                        }
-                        .show()
-
-            } else {
-                startPermissionsRequest(dir)
-            }
-        } else {
-            saveDocumentToDisk(dir)
-        }
+        saveDocumentToDisk(dir)
     }
 
     private fun saveDocumentToDisk(dir: DocumentFile) {
@@ -490,22 +464,34 @@ class GalleryActivity2 : AppCompatActivity() {
         }
     }
 
-    private fun startPermissionsRequest(dir: DocumentFile, resultCode: Int = PERMISSIONS_REQUEST_EXTERNAL_STORAGE) {
-        saveDir = dir
-        ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                resultCode)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         val textInfo = StringBuilder()
         if (resultCode == RESULT_OK && (requestCode == REQUEST_CODE_DIR_CHOOSER || requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT || requestCode == REQUEST_CODE_BATCH_DOWNLOAD)) {
-            val uriTree = data?.data ?: Uri.EMPTY
+            val uriTree = data?.data
+            if (uriTree == null) {
+                Snackbar.make(gallery_root, R.string.error_occurred, Snackbar.LENGTH_LONG).show()
+                Log.e(LOG_TAG, "Directory picker returned no URI")
+                return
+            }
 
             textInfo.append(uriTree).append("\n")
             textInfo.append("=====================\n")
+
+            if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT
+                    || requestCode == REQUEST_CODE_BATCH_DOWNLOAD) {
+                    val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    try {
+                        contentResolver.takePersistableUriPermission(uriTree, takeFlags)
+                        if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT) {
+                            MimiUtil.setSaveDir(this, uriTree.toString())
+                        }
+                    } catch (e: SecurityException) {
+                        Log.e(LOG_TAG, "Could not persist access to selected save directory", e)
+                    }
+            }
 
             if (requestCode == REQUEST_CODE_DIR_CHOOSER || requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT) {
                 val documentFile = DocumentFile.fromTreeUri(this, uriTree)
@@ -518,10 +504,6 @@ class GalleryActivity2 : AppCompatActivity() {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(object : SingleObserver<List<GalleryItem>> {
                                     override fun onSuccess(items: List<GalleryItem>) {
-
-                                        if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT) {
-                                            MimiUtil.setSaveDir(this@GalleryActivity2, uriTree.toString())
-                                        }
 
                                         val pos = MimiUtil.findGalleryItemPositionById(viewModel.postId, items)
                                         if (pos >= 0) {
@@ -555,76 +537,8 @@ class GalleryActivity2 : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        val dir = saveDir
-        if (dir == null) {
-            Snackbar.make(gallery_root, R.string.error_occurred, Snackbar.LENGTH_LONG).show()
-            Log.e(LOG_TAG, "Received permissions request with null directory")
-            return
-        }
-
-        if (!grantResults.isNotEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            Snackbar.make(gallery_root, R.string.save_file_permission_denied, Snackbar.LENGTH_LONG).show()
-            return
-        }
-
-        when (requestCode) {
-            PERMISSIONS_REQUEST_EXTERNAL_STORAGE -> {
-                if (dir.canWrite()) {
-                    saveDocumentToDisk(dir)
-                } else {
-                    val code = if (actionMode != null) {
-                        REQUEST_CODE_BATCH_DOWNLOAD
-                    } else {
-                        REQUEST_CODE_DIR_CHOOSER
-                    }
-                    chooseSaveLocation(code)
-                }
-
-                return
-            }
-            PERMISSIONS_REQUEST_CREATE_DIR -> {
-                saveFile(MimiUtil.getSaveDir())
-            }
-        }// other 'case' lines to check for other
-        // permissions this app might request
-    }
-
     private fun chooseSaveLocation(requestCode: Int) {
-        val res = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        } else {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-
-        if (res != PackageManager.PERMISSION_GRANTED) {
-            val rationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            } else {
-                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-            // Should we show an explanation?
-            if (rationale) {
-
-                Snackbar.make(gallery_root, R.string.app_needs_your_permission_to_save, Snackbar.LENGTH_LONG).show()
-
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(
-                            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                            PERMISSIONS_REQUEST_EXTERNAL_STORAGE)
-                } else {
-                    ActivityCompat.requestPermissions(this,
-                            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                            PERMISSIONS_REQUEST_EXTERNAL_STORAGE)
-                }
-
-            }
-        } else {
-            openLocationDialog(requestCode)
-        }
+        openLocationDialog(requestCode)
     }
 
     private fun openLocationDialog(requestCode: Int) {
@@ -632,6 +546,10 @@ class GalleryActivity2 : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        if (requestCode == IOUtils.REQUEST_CODE_DIR_CHOOSER_PERSISTENT
+                || requestCode == REQUEST_CODE_BATCH_DOWNLOAD) {
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        }
         updateViewModelSaveLocation()
         startActivityForResult(intent, requestCode)
     }

@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -36,20 +35,19 @@ import androidx.core.app.NotificationCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.emogoth.android.phone.mimi.BuildConfig;
 import com.emogoth.android.phone.mimi.R;
+import com.emogoth.android.phone.mimi.activity.StartupActivity;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
 import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
-import com.emogoth.android.phone.mimi.util.SingleMediaScanner;
+import com.emogoth.android.phone.mimi.util.NotificationUtils;
 import com.emogoth.android.phone.mimi.viewmodel.ChanDataSource;
 import com.mimireader.chanlib.models.ChanPost;
 import com.mimireader.chanlib.models.ChanThread;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -63,7 +61,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
@@ -134,11 +131,8 @@ public class DownloadService extends IntentService {
     private Notification notification;
     private NotificationManager notificationManager;
 
-    private ResultReceiver receiver;
-
     private ThreadPoolExecutor executor;
     private HashMap<String, Runnable> runnableMap;
-    private SingleMediaScanner mediaScanner;
     private String downloadDir;
 
     public DownloadService() {
@@ -176,9 +170,6 @@ public class DownloadService extends IntentService {
                     downloadDir = serviceData.getString(COMMAND_SAVE);
 
                     final boolean isError = downloadFile(downloadDir, downloadFileName, fileUrl);
-                    if (!isError) {
-                        scanFile(new File(downloadDir));
-                    }
 
                     final Intent returnIntent = new Intent();
 
@@ -234,7 +225,15 @@ public class DownloadService extends IntentService {
 
                             @Override
                             public void onSuccess(@NonNull ChanThread chanThread) {
+                                final DocumentFile downloadPath = DocumentFile.fromTreeUri(
+                                        DownloadService.this, Uri.parse(downloadDir));
+                                if (downloadPath == null || !downloadPath.canWrite()) {
+                                    notificationCompleted(false);
+                                    return;
+                                }
+
                                 List<ChanPost> posts = chanThread.getPosts();
+                                boolean hadErrors = false;
                                 for (int i = 0; i < posts.size(); i++) {
                                     final ChanPost post = posts.get(i);
                                     final int idPos = MimiUtil.arrayLocation(postIds, post.getNo());
@@ -255,22 +254,7 @@ public class DownloadService extends IntentService {
                                         fileName = post.getTim() + post.getExt();
                                     }
 
-                                    DocumentFile downloadPath = DocumentFile.fromTreeUri(DownloadService.this, Uri.parse(downloadDir));
-
-                                    Uri path;
-                                    try {
-                                        path = MimiUtil.getDocumentFileRealPath(downloadPath);
-                                    } catch (NoSuchMethodException | NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
-                                        Log.e(LOG_TAG, "Error getting real path from DocumentFile", e);
-                                        return;
-                                    }
-
-                                    if (path == null) {
-                                        notificationCompleted(false);
-                                        return;
-                                    }
-
-                                    final DocumentFile downloadFile = DocumentFile.fromFile(new File(path + "/" + fileName));
+                                    final DocumentFile existingFile = downloadPath.findFile(fileName);
 
                                     final float fProgress = (float) idPos / (float) postIds.length;
                                     final int iProgress = (int) (fProgress * 100.0);
@@ -291,9 +275,10 @@ public class DownloadService extends IntentService {
                                         LocalBroadcastManager.getInstance(app.getApplicationContext()).sendBroadcast(startedIntent);
                                     }
 
-                                    if (!downloadFile.exists()) {
+                                    if (existingFile == null) {
                                         fileSize = post.getFsize();
                                         isError = downloadFile(downloadDir, fileName, url);
+                                        hadErrors = hadErrors || isError;
 
                                         if (isError) {
                                             Log.w(LOG_TAG, "Error downloading file: " + fileName + " to " + downloadDir, new Exception());
@@ -318,12 +303,13 @@ public class DownloadService extends IntentService {
 
                                 }
 
-                                notificationCompleted(true);
+                                notificationCompleted(!hadErrors);
                             }
 
                             @Override
                             public void onError(Throwable e) {
-
+                                Log.e(LOG_TAG, "Could not load thread for batch download", e);
+                                notificationCompleted(false);
                             }
                         });
                 break;
@@ -336,132 +322,112 @@ public class DownloadService extends IntentService {
     }
 
     private boolean downloadFile(String dir, String filename, String urlStr) {
-        if (TextUtils.isEmpty(filename)) {
+        if (TextUtils.isEmpty(dir) || TextUtils.isEmpty(filename) || TextUtils.isEmpty(urlStr)) {
             return true;
         }
 
         String ext = filename.substring(filename.lastIndexOf(".") + 1);
         DocumentFile documentPath = DocumentFile.fromTreeUri(this, Uri.parse(dir));
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
-        if (documentPath == null || type == null) {
+        if (documentPath == null || !documentPath.canWrite()) {
+            return true;
+        }
+        if (TextUtils.isEmpty(type)) {
+            type = "application/octet-stream";
+        }
+        if (documentPath.findFile(filename) != null) {
             return false;
         }
 
-        DocumentFile f = documentPath.createFile(type, filename);
-
-        boolean useGzip = !"pdf".equals(ext);
+        final DocumentFile targetFile = documentPath.createFile(type, filename);
+        if (targetFile == null) {
+            return true;
+        }
 
         try {
-
             OkHttpClient httpClient = HttpClientFactory.getInstance().getClient();
             Request.Builder requestBuilder = new Request.Builder();
             requestBuilder.url(urlStr)
                     .tag(urlStr)
                     .get();
 
-            if (useGzip) {
-                requestBuilder.addHeader("Accept-Encoding", "gzip");
-            }
-
             Request request = requestBuilder.build();
-            Response response = httpClient.newCall(request).execute();
+            try (Response response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    Log.e(LOG_TAG, "Http status code: " + response.code());
+                    targetFile.delete();
+                    sendDownloadError();
+                    return true;
+                }
 
-            if (response.code() != 200) {
-                //mError = true;
-                Log.e(LOG_TAG, "Http status code: " + response.code());
+                ResponseBody body = response.body();
+                if (body == null) {
+                    targetFile.delete();
+                    return true;
+                }
 
-                final Intent returnIntent = new Intent();
-                returnIntent.setAction(intentFilter);
-                returnIntent.addCategory(Intent.CATEGORY_DEFAULT);
-                returnIntent.putExtra(POSITION_KEY, position);
-                returnIntent.putExtra(ERROR_KEY, true);
-                returnIntent.putExtra(STATUS_KEY, STATUS_ERROR); // complete
-                returnIntent.putExtra(PROGRESS_KEY, 0);
-                LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(returnIntent);
+                try (OutputStream output = getContentResolver().openOutputStream(targetFile.getUri(), "w")) {
+                    if (output == null) {
+                        targetFile.delete();
+                        return true;
+                    }
 
-                return false;
-            }
+                    try (BufferedSource source = body.source();
+                         BufferedSink sink = Okio.buffer(Okio.sink(output))) {
+                    long totalBytes = 0L;
+                    long bytesRead;
+                    int previousPercent = -1;
+                    while ((bytesRead = source.read(sink.buffer(), IO_BUFFER_SIZE)) != -1) {
+                        totalBytes += bytesRead;
+                        sink.emitCompleteSegments();
 
-            ResponseBody b = null;
-            BufferedSource source = null;
-            BufferedSink sink = null;
-            Buffer sinkBuffer = null;
-            boolean sentBroadcast = false;
-
-            try {
-                b = response.body();
-                source = b.source();
-                sink = Okio.buffer(Okio.sink(getContentResolver().openOutputStream(f.getUri())));
-                sinkBuffer = sink.buffer();
-            } catch (Exception e) {
-                return false;
-            }
-
-            try {
-                long count = 0L;
-                int i = 0;
-                while (count != -1) {
-                    count = source.read(sinkBuffer, IO_BUFFER_SIZE);
-                    sink.emit();
-
-                    if (!TextUtils.isEmpty(intentFilter) && fileSize > 0) {
-                        final int percent = (int) (((float) (i * IO_BUFFER_SIZE) / (float) fileSize) * 100.0F);
-                        if (percent % 5 == 0) {
-
-                            if (!sentBroadcast) {
+                        if (!TextUtils.isEmpty(intentFilter) && fileSize > 0) {
+                            final int percent = Math.min(100,
+                                    (int) ((totalBytes * 100L) / fileSize));
+                            if (percent % 5 == 0 && percent != previousPercent) {
                                 final Intent returnIntent = new Intent();
-
                                 returnIntent.setAction(intentFilter);
                                 returnIntent.addCategory(Intent.CATEGORY_DEFAULT);
                                 returnIntent.putExtra(POSITION_KEY, position);
                                 returnIntent.putExtra(ERROR_KEY, false);
-                                returnIntent.putExtra(STATUS_KEY, STATUS_RUNNING); // complete
+                                returnIntent.putExtra(STATUS_KEY, STATUS_RUNNING);
                                 returnIntent.putExtra(PROGRESS_KEY, percent);
-                                LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(returnIntent);
+                                LocalBroadcastManager.getInstance(DownloadService.this)
+                                        .sendBroadcast(returnIntent);
+                                previousPercent = percent;
                             }
-
-                            sentBroadcast = true;
-                        } else {
-                            sentBroadcast = false;
                         }
                     }
-
-                    i++;
-                }
-            } catch (Exception e) {
-                return false;
-            } finally {
-                try {
-                    sink.flush();
-                    sink.close();
-                    source.close();
-                } catch (Exception e) {
-                    // no op
+                        sink.flush();
+                    }
                 }
             }
 
-            if (!filename.equals(f.getName())) {
-                f.renameTo(filename);
+            if (!filename.equals(targetFile.getName())) {
+                targetFile.renameTo(filename);
             }
 
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error Downloading Image: ", e);
+            targetFile.delete();
             return true;
         }
 
         return false;
     }
 
-    private void scanFile(File file) {
-        try {
-            new SingleMediaScanner(MimiApplication.getInstance().getApplicationContext(), file, (s, uri) -> {
-                if (BuildConfig.DEBUG) {
-                    Log.d(LOG_TAG, "Scanned file " + s + " at " + uri);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void sendDownloadError() {
+        if (TextUtils.isEmpty(intentFilter)) {
+            return;
         }
+        final Intent returnIntent = new Intent();
+        returnIntent.setAction(intentFilter);
+        returnIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        returnIntent.putExtra(POSITION_KEY, position);
+        returnIntent.putExtra(ERROR_KEY, true);
+        returnIntent.putExtra(STATUS_KEY, STATUS_ERROR);
+        returnIntent.putExtra(PROGRESS_KEY, 0);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(returnIntent);
     }
 
     public void createNotification() {
@@ -481,8 +447,9 @@ public class DownloadService extends IntentService {
 
         //you have to set a PendingIntent on a notification to tell the system what you want it to do when the notification is selected
         //I don't want to use this here so I'm just creating a blank one
-        final Intent notificationIntent = new Intent();
-        final PendingIntent contentIntent = PendingIntent.getActivity(app, 0, notificationIntent, 0);
+        final Intent notificationIntent = new Intent(app, StartupActivity.class);
+        final PendingIntent contentIntent = PendingIntent.getActivity(
+                app, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         notificationCompat.setContentIntent(contentIntent)
                 .setSmallIcon(icon)
@@ -505,7 +472,9 @@ public class DownloadService extends IntentService {
         notification.flags = Notification.FLAG_ONGOING_EVENT;
 
         //show the notification
-        notificationManager.notify(NOTIFICATION_ID, notification);
+        if (NotificationUtils.canPostNotifications(this)) {
+            notificationManager.notify(NOTIFICATION_ID, notification);
+        }
     }
 
     public void notificationProgressUpdate(int percentageComplete) {
@@ -519,7 +488,9 @@ public class DownloadService extends IntentService {
 
         //publish it to the status bar
         notification = notificationCompat.build();
-        notificationManager.notify(NOTIFICATION_ID, notification);
+        if (NotificationUtils.canPostNotifications(this)) {
+            notificationManager.notify(NOTIFICATION_ID, notification);
+        }
 
         Log.i(LOG_TAG, "Notification update: " + percentageComplete + "%");
     }
@@ -531,8 +502,6 @@ public class DownloadService extends IntentService {
         }
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        scanFile(new File(downloadDir));
 
         Log.i(LOG_TAG, "Notification completed");
 
@@ -547,8 +516,9 @@ public class DownloadService extends IntentService {
 
         //you have to set a PendingIntent on a notification to tell the system what you want it to do when the notification is selected
         //I don't want to use this here so I'm just creating a blank one
-        final Intent notificationIntent = new Intent();
-        final PendingIntent contentIntent = PendingIntent.getActivity(app, 0, notificationIntent, 0);
+        final Intent notificationIntent = new Intent(app, StartupActivity.class);
+        final PendingIntent contentIntent = PendingIntent.getActivity(
+                app, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         notificationCompat.setContentIntent(contentIntent)
 //                .setProgress(100, 100, false)
@@ -572,7 +542,9 @@ public class DownloadService extends IntentService {
 //        notification.flags = Notification.FLAG_ONGOING_EVENT;
 
         //show the notification
-        notificationManager.notify(NOTIFICATION_ID, notification);
+        if (NotificationUtils.canPostNotifications(this)) {
+            notificationManager.notify(NOTIFICATION_ID, notification);
+        }
 
 //        notification.flags = Notification.DEFAULT_ALL;
 //        notificationCompat.setContentText(getString(R.string.download_complete));

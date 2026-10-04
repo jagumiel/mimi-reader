@@ -182,9 +182,6 @@
     <string name="board_title">Board</string>
     <string name="board_summary">Board Preferences</string>
     <string name="debug_title">Debug</string>
-    <string name="remove_ads_title">Remove Ads</string>
-    <string name="enable_ads_title">Enable Ads</string>
-
     <string name="auto_refresh_disabled">Disabled</string>
     <string name="auto_refresh_5_seconds">5 Seconds</string>
     <string name="auto_refresh_10_seconds">10 Seconds</string>
@@ -415,8 +412,6 @@
         <item quantity="other">%d replies to you</item>
     </plurals>
 
-    <!-- Native Ads -->
-    <string name="sponsored">Sponsored</string>
     <string name="loading_captcha">Loading captcha...</string>
     <string name="copy_file">Copy File</string>
     <string name="file_name_is_taken">File name is taken</string>
@@ -437,12 +432,9 @@
     <string name="layout_browser">Browser</string>
     <string name="layout_tabbed">Tabbed</string>
     <string name="layout_sliding_panel">Sliding Panel</string>
-    <string name="ads_disabled_for">Ads Disabled For %s</string>
     <string name="video_failed_to_load">Video failed to load</string>
     <string name="video_playback_did_not_complete">Video did no complete</string>
     <string name="loading_video_please_wait">Loading video, please wait</string>
-    <string name="watch_video">Watch Video (30 mins ad free)</string>
-    <string name="buy_ad_free_version">Buy Ad Free Version</string>
     <string name="save_file_permission_denied">Permission to save file was denied</string>
     <string name="app_needs_your_permission_to_save">Save permission required</string>
     <string name="app_needs_your_permission_to_attach">The app needs your permission to attach pictures</string>
@@ -451,6 +443,7 @@
     <string name="error_loading_board">Error loading board</string>
     <string name="link">Link</string>
     <string name="image">Image</string>
+    <string name="media">Media</string>
     <string name="country">Country</string>
     <string name="youtube_link">YouTube Link</string>
     <string name="no_images_selected">No images selected</string>
@@ -483,7 +476,7 @@
     <string name="history">History</string>
     <string name="invert_sort">Invert Sort</string>
     <string name="fullscreen">Fullscreen</string>
-    <string name="auto_play_audio">Auto play webm audio</string>
+    <string name="auto_play_audio">Auto play video audio</string>
     <string name="error_copying_file">Error copying file</string>
     <string name="use_old_video_player_title">Use old video player</string>
     <string name="hide">Hide</string>
@@ -512,6 +505,12 @@
     <string name="edit_filters">Edit Filters</string>
     <string name="error_loading_boards">Error loading boards</string>
     <string name="retry">Retry</string>
+    <string name="open_externally">Open externally</string>
+    <string name="video_error_unsupported">This device cannot decode this video format.</string>
+    <string name="video_error_incomplete">The video appears to be damaged or incomplete.</string>
+    <string name="video_error_generic">The video could not be played.</string>
+    <string name="video_download_error">The video could not be downloaded.</string>
+    <string name="video_no_external_player">No compatible external video player was found.</string>
     <string name="error_while_sharing_file">Error while sharing file</string>
     <string name="error_opening_video_file">Error opening video file</string>
     <string name="find">Find</string>

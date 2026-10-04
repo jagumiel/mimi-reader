@@ -6,6 +6,7 @@ import android.content.Intent
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -20,27 +21,33 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.emogoth.android.phone.mimi.R
+import com.emogoth.android.phone.mimi.databinding.ViewGalleryPagerBinding
 import com.emogoth.android.phone.mimi.util.*
 import com.emogoth.android.phone.mimi.viewmodel.GalleryItem
 import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
 
 import com.mimireader.chanlib.models.ChanPost
 import com.mimireader.chanlib.models.ChanThread
-import kotlinx.android.synthetic.main.view_gallery_pager.view.*
 import java.io.File
 import java.util.*
 
 class GalleryPager @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), GalleryView, LifecycleObserver {
+    private lateinit var binding: ViewGalleryPagerBinding
+    private val gallery_toolbar get() = binding.galleryToolbar
+    private val file_name get() = binding.fileName
+    private val file_size get() = binding.fileSize
+    private val grid_button get() = binding.gridButton
+    private val pager get() = binding.pager
+    private val exit_fullscreen_button get() = binding.exitFullscreenButton
+
     companion object {
         val LOG_TAG: String = GalleryPager::class.java.simpleName
-        const val AD_SPACING = 9
-        const val AD_POSITION = -1
     }
 
     private var adapter: GalleryPagerAdapter? = null
-    private var player: ExoPlayer2Helper? = null
+    private var player: MediaPlayerHelper? = null
 
     private val layoutManager: RecyclerView.LayoutManager
 
@@ -77,7 +84,7 @@ class GalleryPager @JvmOverloads constructor(
     init {
         id = R.id.gallery2_pager
         Log.d(LOG_TAG, "Instance of GalleryPager created")
-        player = ExoPlayer2Helper(context)
+        player = MediaPlayerHelper(context)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         inflateView()
@@ -150,14 +157,13 @@ class GalleryPager @JvmOverloads constructor(
 
     @OnLifecycleEvent(value = Lifecycle.Event.ON_PAUSE)
     fun pause() {
+        currentHolder()?.onHostPause()
         player?.pause()
-//        release()
-//        player = null
     }
 
     @OnLifecycleEvent(value = Lifecycle.Event.ON_RESUME)
     fun resume() {
-        player?.start()
+        pager.post { currentHolder()?.onHostResume() }
     }
 
     @OnLifecycleEvent(value = Lifecycle.Event.ON_DESTROY)
@@ -169,19 +175,20 @@ class GalleryPager @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (player == null) {
-            player = ExoPlayer2Helper(context)
-        }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        release()
-        player = null
+        currentHolder()?.onHostPause()
+        player?.pause()
+    }
+
+    private fun currentHolder(): GalleryPagerItemViewHolder? {
+        return pager.findViewHolderForAdapterPosition(pagerPosition) as? GalleryPagerItemViewHolder
     }
 
     private fun inflateView() {
-        inflate(context, R.layout.view_gallery_pager, this)
+        binding = ViewGalleryPagerBinding.inflate(LayoutInflater.from(context), this, true)
     }
 
     override fun setViewModel(viewModel: GalleryViewModel) {
@@ -275,11 +282,10 @@ class GalleryPager @JvmOverloads constructor(
                         return@setOnMenuItemClickListener true
                     }
 
-                    val type: String
-                    if (shareFile.name.endsWith(".webm")) {
-                        type = "video/webm"
+                    val type = if (Utils.isVideoExtension(item.ext)) {
+                        Utils.getMimeType(item.ext)
                     } else {
-                        type = "image/*"
+                        "image/*"
                     }
 
                     shareIntent.action = Intent.ACTION_SEND
@@ -297,9 +303,9 @@ class GalleryPager @JvmOverloads constructor(
 
 }
 
-class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryViewModel, private val player: ExoPlayer2Helper?) : RecyclerView.Adapter<GalleryPagerItemViewHolder>() {
+class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryViewModel, private val player: MediaPlayerHelper?) : RecyclerView.Adapter<GalleryPagerItemViewHolder>() {
     enum class ItemType(val value: Int) {
-        UNKNOWN(0), IMAGE(1), GIF(2), WEBM(3), PDF(4);
+        UNKNOWN(0), IMAGE(1), GIF(2), VIDEO(3), PDF(4);
     }
 
     companion object {
@@ -325,7 +331,7 @@ class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryVi
         return when (viewType) {
             ItemType.IMAGE.value -> GalleryImageViewHolder(ImagePage(parent.context, viewModel))
             ItemType.GIF.value -> GalleryGifViewHolder(GifPage(parent.context, viewModel))
-            ItemType.WEBM.value -> GalleryWebmViewHolder(WebmPage(parent.context, viewModel, player))
+            ItemType.VIDEO.value -> GalleryVideoViewHolder(VideoPage(parent.context, viewModel, player))
             ItemType.PDF.value -> GalleryPdfViewHolder(PdfPage(parent.context, viewModel))
             else -> GalleryImageViewHolder(ImagePage(parent.context, viewModel))
         }
@@ -343,10 +349,11 @@ class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryVi
         if (position >= items.size) {
             Log.e("GalleryPager.Adapter", "Item position=$position, Original position=$position")
         }
-        return when (items[position].ext) {
-            ".gif" -> ItemType.GIF.value
-            ".webm" -> ItemType.WEBM.value
-            ".pdf" -> ItemType.PDF.value
+        val extension = items[position].ext.lowercase(Locale.ROOT)
+        return when {
+            Utils.isVideoExtension(extension) -> ItemType.VIDEO.value
+            extension == ".gif" -> ItemType.GIF.value
+            extension == ".pdf" -> ItemType.PDF.value
             else -> ItemType.IMAGE.value
         }
     }
@@ -363,44 +370,34 @@ class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryVi
 
 abstract class GalleryPagerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: GalleryItem) {
-        if (itemView is GalleryPage) {
-            itemView.bind(item)
-        }
+        (itemView as? GalleryPage)?.bind(item)
     }
 
     fun onSelectionChange(selected: Boolean) {
-        if (itemView is GalleryPage) {
-            itemView.onPageSelectedChange(selected)
-        }
+        (itemView as? GalleryPage)?.onPageSelectedChange(selected)
+    }
+
+    fun onHostPause() {
+        (itemView as? GalleryPage)?.onHostPause()
+    }
+
+    fun onHostResume() {
+        (itemView as? GalleryPage)?.onHostResume()
     }
 
     fun fullScreen(enabled: Boolean = true) {
-        if (itemView is GalleryPage) {
-            itemView.fullScreen(enabled)
-        }
+        (itemView as? GalleryPage)?.fullScreen(enabled)
     }
 
     val postId: Long
-        get() {
-            if (itemView is GalleryPage) {
-                return itemView.postId
-            }
-
-            return -1
-        }
+        get() = (itemView as? GalleryPage)?.postId ?: -1
 
     val localPath: File
-        get() {
-            if (itemView is GalleryPage) {
-                return itemView.localFile
-            }
-
-            return File("")
-        }
+        get() = (itemView as? GalleryPage)?.localFile ?: File("")
 }
 
 // These need to be different classes to prevent the RecyclerView from reusing the wrong viewholder
 class GalleryImageViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
-class GalleryWebmViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
+class GalleryVideoViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
 class GalleryGifViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
 class GalleryPdfViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)

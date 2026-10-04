@@ -23,7 +23,7 @@
         android:visibility="gone"
         app:srcCompat="@drawable/ic_play_circle_outline" />
 
-    <com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+    <androidx.media3.ui.AspectRatioFrameLayout
         android:id="@+id/video_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:keepScreenOn="true" />
-    </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
+    </androidx.media3.ui.AspectRatioFrameLayout>
 
     <LinearLayout
         android:id="@+id/webm_bar"

@@ -177,10 +177,6 @@
     <color name="app_background_normal_light">#273238</color>
     <color name="app_background_pressed_light">#1E2B31</color>
 
-    <!-- Native Ads -->
-    <color name="cta_background_color">#49A836</color>
-    <color name="accent_material_dark">#1976d2</color>
-
     <color name="border">#CCCCCC</color>
     <color name="border_selected">#000000</color>
     <color name="circle">#FFFFFF</color>

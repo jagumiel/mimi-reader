@@ -16,12 +16,10 @@
 
 package com.emogoth.android.phone.mimi.fragment;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,12 +42,9 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.emogoth.android.phone.mimi.R;
-import com.emogoth.android.phone.mimi.activity.GalleryActivity2;
 import com.emogoth.android.phone.mimi.activity.MimiActivity;
 import com.emogoth.android.phone.mimi.adapter.PostOptionAdapter;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
@@ -68,7 +63,6 @@ import com.emogoth.android.phone.mimi.util.ResourceUtils;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.view.IconTextView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.snackbar.Snackbar;
 ;
 import com.mimireader.chanlib.ChanConnector;
 import com.mimireader.chanlib.models.ChanBoard;
@@ -77,6 +71,10 @@ import com.mimireader.chanlib.models.ChanPost;
 import org.jsoup.Jsoup;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,10 +87,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Source;
 import retrofit2.Response;
 
 
@@ -308,24 +302,7 @@ public class PostFragment extends BottomSheetDialogFragment {
         attachedImageContainer.setVisibility(View.GONE);
 
         attachImageButton = view.findViewById(R.id.attach_image_button);
-        attachImageButton.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Snackbar.make(v, R.string.app_needs_your_permission_to_attach, Snackbar.LENGTH_LONG).show();
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            GalleryActivity2.PERMISSIONS_REQUEST_EXTERNAL_STORAGE);
-                }
-            } else {
-                pickImage();
-            }
-        });
+        attachImageButton.setOnClickListener(v -> pickImage());
 
     }
 
@@ -741,25 +718,37 @@ public class PostFragment extends BottomSheetDialogFragment {
 
     private File copyDocumentFileLocally(Uri imageUri) throws Exception {
         File localFile = null;
-        if (getActivity() != null && imageUri != null) {
-            final DocumentFile f = DocumentFile.fromSingleUri(getActivity(), imageUri);
+        final Context context = getContext();
+        if (context != null && imageUri != null) {
+            final DocumentFile f = DocumentFile.fromSingleUri(context, imageUri);
+            if (f == null) {
+                throw new IOException("Could not open selected attachment");
+            }
 
-            long count = 0;
             String fileName = f.getName();
             if (fileName == null) {
                 MimeTypeMap mtm = MimeTypeMap.getSingleton();
                 fileName = "unknown." + mtm.getExtensionFromMimeType(f.getType());
             }
-            File uploadDir = new File(getActivity().getCacheDir(), "/upload");
-            uploadDir.mkdirs();
+            fileName = new File(fileName).getName();
+            File uploadDir = new File(context.getCacheDir(), "upload");
+            if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+                throw new IOException("Could not create attachment cache directory");
+            }
 
             localFile = new File(uploadDir, fileName);
-            BufferedSink sink = Okio.buffer(Okio.sink(localFile));
-            Buffer sinkBuffer = sink.buffer();
-            Source source = Okio.source(getActivity().getContentResolver().openInputStream(f.getUri()));
-            while (count != -1) {
-                count = source.read(sinkBuffer, 1024L);
-                sink.emit();
+            try (InputStream input = context.getContentResolver().openInputStream(f.getUri());
+                 OutputStream output = new FileOutputStream(localFile, false)) {
+                if (input == null) {
+                    throw new IOException("Could not read selected attachment");
+                }
+
+                final byte[] buffer = new byte[4096];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                }
+                output.flush();
             }
 
             imagePath = localFile.getAbsolutePath();

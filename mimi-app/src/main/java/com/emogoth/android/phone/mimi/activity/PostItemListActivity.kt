@@ -14,6 +14,7 @@ import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySingleSchedulers
 import com.emogoth.android.phone.mimi.db.HistoryTableConnection
 import com.emogoth.android.phone.mimi.db.HistoryTableConnection.fetchHistory
 import com.emogoth.android.phone.mimi.db.models.History
+import com.emogoth.android.phone.mimi.databinding.ActivityPostitemListBinding
 import com.emogoth.android.phone.mimi.fragment.BoardItemListFragment
 import com.emogoth.android.phone.mimi.fragment.HistoryFragment
 import com.emogoth.android.phone.mimi.fragment.MimiFragmentBase
@@ -24,7 +25,6 @@ import com.emogoth.android.phone.mimi.util.*
 import com.mimireader.chanlib.models.ChanBoard
 import com.mimireader.chanlib.models.ChanPost
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_postitem_list.*
 import java.io.File
 import java.util.*
 
@@ -47,6 +47,11 @@ import java.util.*
  * to listen for item selections.
  */
 class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClickListener, ThumbnailClickListener, GalleryMenuItemClickListener, IToolbarContainer {
+    private lateinit var binding: ActivityPostitemListBinding
+    private val fab_add_content get() = binding.fabAddContent
+    private val mimi_toolbar get() = binding.mimiToolbar
+    private val appbar get() = binding.appbar
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -66,7 +71,8 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
     private var boardInfoSubscription: Disposable? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_postitem_list)
+        binding = ActivityPostitemListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         fragmentList = Stack()
 //        appBarLayout = findViewById(R.id.appbar)
 //        addContentFab = findViewById(R.id.fab_add_content)

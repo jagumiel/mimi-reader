@@ -1,8 +1,8 @@
 package com.emogoth.android.phone.mimi.interfaces;
 
-import com.emogoth.android.phone.mimi.util.ExoPlayer2Helper;
+import com.emogoth.android.phone.mimi.util.MediaPlayerHelper;
 
 public interface VideoHost {
-    ExoPlayer2Helper getExoPlayerHelper();
+    MediaPlayerHelper getExoPlayerHelper();
     void clearExoPlayerHelper();
 }

@@ -2,17 +2,20 @@ package com.emogoth.android.phone.mimi.view.gallery
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.emogoth.android.phone.mimi.R
+import com.emogoth.android.phone.mimi.databinding.ViewGalleryWebmBarBinding
 import com.emogoth.android.phone.mimi.util.MediaInfo
 import com.emogoth.android.phone.mimi.util.MediaUtil
 import com.emogoth.android.phone.mimi.util.MimiUtil
@@ -20,16 +23,22 @@ import com.emogoth.android.phone.mimi.util.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.view_gallery_webm_bar.view.*
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class WebmControls @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+class VideoControls @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val binding = ViewGalleryWebmBarBinding.inflate(LayoutInflater.from(context), this, true)
+    private val open_button get() = binding.openButton
+    private val mute_button get() = binding.muteButton
+    private val webm_time get() = binding.webmTime
+    private val webm_play_button get() = binding.webmPlayButton
+    private val webm_scrubber get() = binding.webmScrubber
+
     companion object {
-        val LOG_TAG = WebmControls::class.java.simpleName
+        val LOG_TAG = VideoControls::class.java.simpleName
 
         const val AUDIO_DISABLED = 0
         const val AUDIO_ENABLED = 1
@@ -117,26 +126,38 @@ class WebmControls @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var hasAudio = false
 
     init {
-        inflate(context, R.layout.view_gallery_webm_bar, this)
         initOpenButton()
     }
 
     private fun initOpenButton() {
         open_button.setOnClickListener {
-            if (videoLocation != "") {
-                val ext = videoLocation.substring(videoLocation.lastIndexOf(".") + 1)
-                val fileUri = MimiUtil.getFileProvider(File(videoLocation))
-                if (fileUri != null) {
-                    val intent = Intent(Intent.ACTION_VIEW, fileUri)
-                    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    intent.setDataAndType(fileUri, Utils.getMimeType(ext))
+            openExternally()
+        }
+    }
 
-                    if (context is Activity) {
-                        val act = context as Activity
-                        act.startActivity(intent)
-                    }
-                }
-            }
+    fun openExternally(): Boolean {
+        if (videoLocation.isBlank() || context !is Activity) {
+            return false
+        }
+
+        val file = File(videoLocation)
+        if (!file.exists()) {
+            return false
+        }
+
+        val ext = videoLocation.substringAfterLast('.', "")
+        val fileUri = MimiUtil.getFileProvider(file) ?: return false
+        val intent = Intent(Intent.ACTION_VIEW, fileUri).apply {
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            setDataAndType(fileUri, Utils.getMimeType(ext))
+        }
+
+        return try {
+            context.startActivity(intent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            Log.w(LOG_TAG, "No external player available for $videoLocation", e)
+            false
         }
     }
 

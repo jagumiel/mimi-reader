@@ -18,6 +18,7 @@ import com.emogoth.android.phone.mimi.adapter.TabPagerAdapter
 import com.emogoth.android.phone.mimi.autorefresh.RefreshScheduler2
 import com.emogoth.android.phone.mimi.db.DatabaseUtils
 import com.emogoth.android.phone.mimi.db.HistoryTableConnection
+import com.emogoth.android.phone.mimi.databinding.ActivityTabsBinding
 import com.emogoth.android.phone.mimi.fragment.MimiFragmentBase
 import com.emogoth.android.phone.mimi.fragment.PostItemsListFragment
 import com.emogoth.android.phone.mimi.interfaces.*
@@ -32,10 +33,16 @@ import com.mimireader.chanlib.models.ChanBoard
 import com.mimireader.chanlib.models.ChanPost
 import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_tabs.*
 import java.util.*
 
 class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListener, PostItemClickListener, IToolbarContainer, GalleryMenuItemClickListener, TabEventListener {
+    private lateinit var binding: ActivityTabsBinding
+    private val tab_layout get() = binding.tabLayout
+    private val tabs_pager get() = binding.tabsPager
+    private val fab_add_content get() = binding.fabAddContent
+    private val mimi_toolbar get() = binding.mimiToolbar
+    private val appbar get() = binding.appbar
+
     private var tabPagerAdapter: TabPagerAdapter? = null
     private var postListFragment: MimiFragmentBase? = null
     private var currentFragment: MimiFragmentBase? = null
@@ -50,7 +57,8 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tabs)
+        binding = ActivityTabsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val sp = PreferenceManager.getDefaultSharedPreferences(this)
         closeTabOnBack = sp.getBoolean(getString(R.string.close_tab_on_back_pref), false)
         toolbar = mimi_toolbar

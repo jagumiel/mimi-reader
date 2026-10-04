@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -51,12 +52,31 @@ public class Utils {
     }
 
     public static String getMimeType(final String extension) {
-        String ext = extension.toLowerCase();
-        if (ext.contains(".")) {
-            ext = ext.replace(".", "");
+        final String ext = normalizeExtension(extension);
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+        if (mimeType != null) {
+            return mimeType;
         }
 
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+        return isVideoExtension(ext) ? "video/*" : "application/octet-stream";
+    }
+
+    public static String normalizeExtension(final String extension) {
+        if (extension == null) {
+            return "";
+        }
+
+        String normalized = extension.trim().toLowerCase(Locale.ROOT);
+        while (normalized.startsWith(".")) {
+            normalized = normalized.substring(1);
+        }
+
+        return normalized;
+    }
+
+    public static boolean isVideoExtension(final String extension) {
+        final String normalized = normalizeExtension(extension);
+        return "webm".equals(normalized) || "mp4".equals(normalized);
     }
 
     /**
