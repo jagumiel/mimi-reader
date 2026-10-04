@@ -177,7 +177,7 @@ public final class BatchDownloadWorker extends Worker {
             final String url = MimiUtil.https() + context.getString(R.string.image_link) + path;
 
             final DownloadResult downloadResult = downloadFile(
-                    downloadPath, filename, url, completed, postIds.length);
+                    downloadPath, filename, url, post.getFsize(), completed, postIds.length);
             if (downloadResult == DownloadResult.SUCCESS) {
                 completed++;
             } else {
@@ -217,12 +217,9 @@ public final class BatchDownloadWorker extends Worker {
     private DownloadResult downloadFile(DocumentFile directory,
                                         String filename,
                                         String url,
+                                        long expectedLength,
                                         int completedFiles,
                                         int totalFiles) {
-        if (directory.findFile(filename) != null) {
-            return DownloadResult.SUCCESS;
-        }
-
         final String extension = MimeTypeMap.getFileExtensionFromUrl(filename)
                 .toLowerCase(Locale.ROOT);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
@@ -230,7 +227,26 @@ public final class BatchDownloadWorker extends Worker {
             mimeType = "application/octet-stream";
         }
 
-        final DocumentFile target = directory.createFile(mimeType, filename);
+        final DocumentFile existing = directory.findFile(filename);
+        if (existing != null) {
+            if (isCompleteFile(existing.length(), expectedLength)) {
+                return DownloadResult.SUCCESS;
+            }
+            Log.w(LOG_TAG, "Deleting incomplete existing file " + filename
+                    + "; actual=" + existing.length() + ", expected=" + expectedLength);
+            if (!existing.delete()) {
+                return DownloadResult.FAILURE;
+            }
+        }
+
+        final String temporaryFilename = temporaryFilename(filename, extension);
+        final DocumentFile staleTemporary = directory.findFile(temporaryFilename);
+        if (staleTemporary != null && !staleTemporary.delete()) {
+            Log.w(LOG_TAG, "Could not remove stale temporary file " + temporaryFilename);
+            return DownloadResult.RETRY;
+        }
+
+        final DocumentFile target = directory.createFile(mimeType, temporaryFilename);
         if (target == null) {
             return DownloadResult.FAILURE;
         }
@@ -252,6 +268,15 @@ public final class BatchDownloadWorker extends Worker {
                     return DownloadResult.RETRY;
                 }
 
+                final long responseLength = body.contentLength();
+                if (!areLengthsCompatible(expectedLength, responseLength)) {
+                    Log.w(LOG_TAG, "Unexpected content length for " + filename
+                            + "; response=" + responseLength + ", expected=" + expectedLength);
+                    target.delete();
+                    return DownloadResult.RETRY;
+                }
+
+                long bytesReadTotal = 0L;
                 try (OutputStream output = getApplicationContext().getContentResolver()
                         .openOutputStream(target.getUri(), "w")) {
                     if (output == null) {
@@ -261,28 +286,41 @@ public final class BatchDownloadWorker extends Worker {
 
                     try (BufferedSource source = body.source();
                          BufferedSink sink = Okio.buffer(Okio.sink(output))) {
-                        final long contentLength = body.contentLength();
-                        long bytesReadTotal = 0L;
                         long bytesRead;
                         while ((bytesRead = source.read(sink.buffer(), IO_BUFFER_SIZE)) != -1L) {
                             if (isStopped()) {
-                                target.delete();
-                                return DownloadResult.FAILURE;
+                                throw new IOException("Batch download was cancelled");
                             }
                             bytesReadTotal += bytesRead;
                             sink.emitCompleteSegments();
                             publishProgress(
-                                    completedFiles, totalFiles, bytesReadTotal, contentLength);
+                                    completedFiles, totalFiles, bytesReadTotal, responseLength);
                         }
                         sink.flush();
                     }
+                }
+
+                if (!isCompleteTransfer(bytesReadTotal, expectedLength, responseLength)) {
+                    Log.w(LOG_TAG, "Incomplete download for " + filename
+                            + "; received=" + bytesReadTotal + ", response=" + responseLength
+                            + ", expected=" + expectedLength);
+                    target.delete();
+                    return DownloadResult.RETRY;
                 }
             } finally {
                 currentCall = null;
             }
 
-            if (!filename.equals(target.getName())) {
-                target.renameTo(filename);
+            if (!target.renameTo(filename)) {
+                Log.e(LOG_TAG, "Could not finalize temporary file " + target.getName());
+                target.delete();
+                return DownloadResult.RETRY;
+            }
+            if (!isCompleteFile(target.length(), expectedLength)) {
+                Log.e(LOG_TAG, "Finalized file has an unexpected size " + filename
+                        + "; actual=" + target.length() + ", expected=" + expectedLength);
+                target.delete();
+                return DownloadResult.RETRY;
             }
             return DownloadResult.SUCCESS;
         } catch (IOException error) {
@@ -405,6 +443,30 @@ public final class BatchDownloadWorker extends Worker {
 
     static boolean isRetryableHttpStatus(int status) {
         return status == 408 || status == 429 || status >= 500;
+    }
+
+    static boolean isCompleteFile(long actualLength, long expectedLength) {
+        return expectedLength > 0L
+                ? actualLength == expectedLength
+                : actualLength > 0L;
+    }
+
+    static boolean areLengthsCompatible(long expectedLength, long responseLength) {
+        return expectedLength <= 0L || responseLength <= 0L || expectedLength == responseLength;
+    }
+
+    static boolean isCompleteTransfer(long transferredLength,
+                                      long expectedLength,
+                                      long responseLength) {
+        return transferredLength > 0L
+                && (expectedLength <= 0L || transferredLength == expectedLength)
+                && (responseLength <= 0L || transferredLength == responseLength);
+    }
+
+    private static String temporaryFilename(String filename, String extension) {
+        return TextUtils.isEmpty(extension)
+                ? filename + ".mimi-part"
+                : filename + ".mimi-part." + extension;
     }
 
     private enum DownloadResult {

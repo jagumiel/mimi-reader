@@ -29,7 +29,8 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Validar una descarga SAF por lotes en un dispositivo real (105 archivos, finalización correcta).
 - [ ] Validar la cancelación durante una descarga lenta y la reanudación después de matar el proceso.
   - Prueba del 4 de octubre de 2026: la cancelación detiene el trabajo y elimina el archivo en curso; WorkManager también recupera el lote después de matar el proceso.
-  - Pendiente: corregir la validación de integridad. El lote terminó en `SUCCESS`, pero 1 de 151 archivos quedó truncado porque el worker acepta como completo cualquier archivo existente y no contrasta su tamaño esperado.
+  - Corrección implementada: las descargas usan un archivo temporal, validan los tamaños esperados y recibidos, y solo adoptan el nombre definitivo cuando están completas.
+  - Pendiente: repetir la prueba real de cancelación y recuperación para cerrar esta tarea; la última ejecución terminó en `SUCCESS`, pero 1 de 151 archivos quedó truncado.
 
 ## Siguientes fases
 
