@@ -476,6 +476,24 @@ public class MimiUtil {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(context.getString(R.string.board_order_pref), order).apply();
     }
 
+    public static int getBoardFilter() {
+        final Context context = MimiApplication.getInstance().getApplicationContext();
+        try {
+            return BoardFilter.normalize(PreferenceManager.getDefaultSharedPreferences(context)
+                    .getInt(context.getString(R.string.board_filter_pref), BoardFilter.ALL));
+        } catch (final ClassCastException e) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putInt(context.getString(R.string.board_filter_pref), BoardFilter.ALL).apply();
+        }
+
+        return BoardFilter.ALL;
+    }
+
+    public static void setBoardFilter(final Context context, final int filter) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(context.getString(R.string.board_filter_pref), BoardFilter.normalize(filter)).apply();
+    }
+
     public static String https() {
         return "https://";
     }

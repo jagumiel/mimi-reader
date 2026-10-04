@@ -96,6 +96,9 @@ class BoardItemListFragment
     private var orderByLast: TextView? = null
     private var orderByPost: TextView? = null
     private var orderbyCustom: TextView? = null
+    private var filterByAll: TextView? = null
+    private var filterBySfw: TextView? = null
+    private var filterByNsfw: TextView? = null
     private var boardOrderBackground: ViewGroup? = null
     private var toolbarSpinner: Spinner? = null
     private var errorView: View? = null
@@ -105,6 +108,8 @@ class BoardItemListFragment
     private var hideListAnimation: Animation? = null
     private var hideBoardOrderBackground: Animation? = null
     private var orderByNames: Array<String> = arrayOf("")
+    private var filterNames: Array<String> = arrayOf("")
+    private var allBoards: List<ChanBoard> = emptyList()
     private var boardOrderListVisible = false
     private var editMode = false
     private var toolbar: Toolbar? = null
@@ -189,6 +194,7 @@ class BoardItemListFragment
                         boardOrderContainer?.visibility = View.GONE
                         boardsList?.isClickable = false
                         boardListAdapter?.boardClickListener = null
+                        boardListAdapter?.boards = ArrayList(allBoards)
                         mode.setTitle(R.string.manage_boards)
 
                         return act.onCreateActionMode(mode, menu)
@@ -214,6 +220,8 @@ class BoardItemListFragment
                         act.drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                         toolbar?.visibility = View.VISIBLE
                         boardListAdapter?.editMode(false)
+                        allBoards = ArrayList(boardListAdapter?.boards ?: emptyList())
+                        displayBoards()
                         boardsList?.isClickable = true
                         boardListAdapter?.boardClickListener = this@BoardItemListFragment
                         boardOrderContainer?.visibility = View.VISIBLE
@@ -221,7 +229,7 @@ class BoardItemListFragment
 
                         if (boardOrderText != null) {
                             val bo = boardOrderText as TextView
-                            bo.text = orderByNames[order]
+                            bo.text = sortSummary(order)
                         }
 
                         act.onDestroyActionMode(mode)
@@ -280,7 +288,7 @@ class BoardItemListFragment
                 .compose(applySingleSchedulers())
                 .subscribe { boards: List<ChanBoard> ->
                     if (boards.isNotEmpty()) {
-                        boardListAdapter?.boards = ArrayList(boards)
+                        updateBoardsAdapter(boards)
                         if (manageBoardsMenuItem != null) {
                             manageBoardsMenuItem?.isEnabled = true
                         }
@@ -437,7 +445,7 @@ class BoardItemListFragment
                     }
                     if (boardsList != null) {
                         boardOrderContainer?.visibility = View.VISIBLE
-                        boardListAdapter?.boards = ArrayList(chanBoards)
+                        updateBoardsAdapter(chanBoards)
                         errorSwitcher?.displayedChildId = boardsList?.id ?: 0
                     }
                 }
@@ -558,12 +566,16 @@ class BoardItemListFragment
         orderByLast = rootView.findViewById(R.id.board_order_type_last_access)
         orderByPost = rootView.findViewById(R.id.board_order_type_post_count)
         orderbyCustom = rootView.findViewById(R.id.board_order_type_custom)
+        filterByAll = rootView.findViewById(R.id.board_filter_all)
+        filterBySfw = rootView.findViewById(R.id.board_filter_sfw)
+        filterByNsfw = rootView.findViewById(R.id.board_filter_nsfw)
         val orderBackground = rootView.findViewById<ViewGroup>(R.id.board_order_background)
         if (orderBackground != null) {
             orderBackground.setOnClickListener { v: View? -> hideList(NO_ORDER_SELECTED) }
             boardOrderBackground = orderBackground
         }
         orderByNames = resources.getStringArray(R.array.orderbyName)
+        filterNames = resources.getStringArray(R.array.boardFilterName)
         val boardOrder = MimiUtil.getBoardOrder()
         showBoardOrderBackground = AlphaAnimation(0f, 1f)
         showBoardOrderBackground?.duration = 400
@@ -604,7 +616,7 @@ class BoardItemListFragment
             override fun onAnimationRepeat(animation: Animation) {}
         })
         boardOrderContainer = rootView.findViewById(R.id.board_order_container)
-        boardOrderText?.text = orderByNames[boardOrder]
+        boardOrderText?.text = sortSummary(boardOrder)
         orderByFavorites?.setOnClickListener { hideList(6) }
         orderByName?.setOnClickListener { hideList(2) }
         orderByTitle?.setOnClickListener { hideList(1) }
@@ -612,6 +624,9 @@ class BoardItemListFragment
         orderByLast?.setOnClickListener { hideList(5) }
         orderByPost?.setOnClickListener { hideList(4) }
         orderbyCustom?.setOnClickListener { hideList(7) }
+        filterByAll?.setOnClickListener { selectFilter(BoardFilter.ALL) }
+        filterBySfw?.setOnClickListener { selectFilter(BoardFilter.SFW_ONLY) }
+        filterByNsfw?.setOnClickListener { selectFilter(BoardFilter.NSFW_ONLY) }
         boardOrderContainer?.setOnClickListener {
             if (orderTypeList?.visibility == View.VISIBLE) {
                 hideList(NO_ORDER_SELECTED)
@@ -632,7 +647,7 @@ class BoardItemListFragment
         boardOrderListVisible = false
         if (index >= 0) {
             orderList(index)
-            boardOrderText?.text = orderByNames[index]
+            boardOrderText?.text = sortSummary(index)
         }
         orderTypeList?.startAnimation(hideListAnimation)
         boardOrderBackground?.startAnimation(hideBoardOrderBackground)
@@ -648,23 +663,42 @@ class BoardItemListFragment
                     .flatMap { boards: List<Board> -> Single.just<List<ChanBoard>>(convertBoardDbModelsToChanBoards(boards)) }
                     .compose(applySingleSchedulers())
                     .subscribe { orderedBoards: List<ChanBoard> ->
-                        if (orderedBoards.isNotEmpty()) {
-                            updateBoardsAdapter(orderedBoards)
-                        }
+                        updateBoardsAdapter(orderedBoards)
                     }
         }
     }
 
     private fun updateBoardsAdapter(updatedBoards: List<ChanBoard>) {
-        if (boardListAdapter != null) {
-            boardListAdapter?.boards = ArrayList(updatedBoards)
-        } else if (activity is MimiActivity) {
-            val act = activity as MimiActivity
-            boardListAdapter = BoardListAdapter(act, ArrayList(updatedBoards))
-        }
+        allBoards = ArrayList(updatedBoards)
+        displayBoards()
         if (manageBoardsMenuItem != null) {
             manageBoardsMenuItem?.isEnabled = true
         }
+    }
+
+    private fun displayBoards() {
+        val displayedBoards = if (editMode) allBoards else BoardFilter.apply(allBoards, MimiUtil.getBoardFilter())
+        if (boardListAdapter != null) {
+            boardListAdapter?.boards = ArrayList(displayedBoards)
+        } else if (activity is MimiActivity) {
+            val act = activity as MimiActivity
+            boardListAdapter = BoardListAdapter(act, ArrayList(displayedBoards))
+        }
+    }
+
+    private fun selectFilter(filter: Int) {
+        val context = activity ?: return
+        MimiUtil.setBoardFilter(context, filter)
+        displayBoards()
+        boardOrderText?.text = sortSummary(MimiUtil.getBoardOrder())
+        hideList(NO_ORDER_SELECTED)
+    }
+
+    private fun sortSummary(order: Int): String {
+        val orderName = orderByNames.getOrElse(order) { orderByNames[0] }
+        val filter = BoardFilter.normalize(MimiUtil.getBoardFilter())
+        val filterName = filterNames.getOrElse(filter) { filterNames[BoardFilter.ALL] }
+        return getString(R.string.board_sort_summary, orderName, filterName)
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

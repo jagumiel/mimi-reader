@@ -226,6 +226,11 @@
     <string name="board_order_last_access">Last Access</string>
     <string name="board_order_favorites">Favorites</string>
     <string name="board_order_custom">Custom</string>
+    <string name="board_filter_title">Filter By</string>
+    <string name="board_filter_all">All Boards</string>
+    <string name="board_filter_sfw">SFW Only</string>
+    <string name="board_filter_nsfw">NSFW Only</string>
+    <string name="board_sort_summary">%1$s · %2$s</string>
 
     <string name="error_opening_url">Could not find browser to open URL</string>
 

@@ -181,6 +181,7 @@
     <string name="theme_pref">theme_pref</string>
     <string name="theme_color_pref">theme_color_pref</string>
     <string name="board_order_pref">board_order_pref</string>
+    <string name="board_filter_pref">board_filter_pref</string>
     <string name="use_catalog_pref">use_catalog_pref</string>
     <string name="app_auto_refresh_time">app_auto_refresh_time</string>
     <string name="background_auto_refresh_time">background_auto_refresh_time</string>

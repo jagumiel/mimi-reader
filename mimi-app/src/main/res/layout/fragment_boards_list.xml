@@ -66,13 +66,18 @@
         android:orientation="vertical">
 
         <!--android:background="@color/sort_by_row_color"-->
-        <LinearLayout
+        <ScrollView
             android:id="@+id/board_order_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="320dp"
             android:layout_below="@+id/board_order_container"
-            android:orientation="vertical"
+            android:fillViewport="true"
             android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             <TextView
                 android:id="@+id/board_order_type_favorite"
@@ -80,7 +85,7 @@
                 android:layout_height="@dimen/board_order_item_height"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_favorites"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -91,7 +96,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_board_name"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -102,7 +107,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_board_title"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -113,7 +118,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_access_count"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -124,7 +129,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_post_count"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -135,7 +140,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_last_access"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
@@ -146,12 +151,58 @@
                 android:layout_height="40dp"
                 android:background="?attr/mimiPrimaryColorDark"
                 android:gravity="center_vertical"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/board_order_custom"
                 android:textColor="@color/sort_by_text_color_selector"
                 android:textSize="?attr/font_label_small" />
 
-        </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:background="?attr/mimiPrimaryColor"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/board_filter_title"
+                android:textAllCaps="true"
+                android:textColor="#FFFFFF"
+                android:textSize="?attr/font_label_xsmall"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/board_filter_all"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/board_order_item_height"
+                android:background="?attr/mimiPrimaryColorDark"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/board_filter_all"
+                android:textColor="@color/sort_by_text_color_selector"
+                android:textSize="?attr/font_label_small" />
+
+            <TextView
+                android:id="@+id/board_filter_sfw"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/board_order_item_height"
+                android:background="?attr/mimiPrimaryColorDark"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/board_filter_sfw"
+                android:textColor="@color/sort_by_text_color_selector"
+                android:textSize="?attr/font_label_small" />
+
+            <TextView
+                android:id="@+id/board_filter_nsfw"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/board_order_item_height"
+                android:background="?attr/mimiPrimaryColorDark"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/board_filter_nsfw"
+                android:textColor="@color/sort_by_text_color_selector"
+                android:textSize="?attr/font_label_small" />
+
+            </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
             android:id="@+id/board_order_container"
@@ -168,7 +219,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingLeft="8dp">
+                android:paddingStart="8dp">
 
                 <TextView
                     style="?defaultTextColor"
