@@ -57,6 +57,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 3. Navegación e interfaz moderna
 
+- [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
 - Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
 - Implementar correctamente el gesto Atrás predictivo antes de retirar la desactivación temporal.
 - Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.
