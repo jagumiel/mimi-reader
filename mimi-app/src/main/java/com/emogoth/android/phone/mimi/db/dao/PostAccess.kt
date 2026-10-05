@@ -2,6 +2,7 @@ package com.emogoth.android.phone.mimi.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.emogoth.android.phone.mimi.db.MimiDatabase
 import com.emogoth.android.phone.mimi.db.models.Post
 import io.reactivex.Flowable
@@ -25,4 +26,10 @@ abstract class PostAccess : BaseDao<Post>() {
 
     @Query("DELETE FROM ${MimiDatabase.POSTS_TABLE}")
     abstract fun clear()
+
+    @Transaction
+    open fun replaceThread(threadId: Long, posts: List<Post>): List<Long> {
+        deleteThread(threadId)
+        return insert(posts)
+    }
 }

@@ -24,9 +24,13 @@ object RefreshQueueTableConnection {
     }
 
     @JvmStatic
-    fun addItem(historyId: Int, threadSize: Int, replyCount: Int, lastRefresh: Long, queueId: Int? = null) {
-        val item = RefreshQueue(queueId, historyId, threadSize, replyCount, lastRefresh)
-        MimiDatabase.getInstance()?.refreshQueue()?.upsert(item)
+    fun addItem(historyId: Int, threadSize: Int, replyCount: Int, lastRefresh: Long, queueId: Int? = null): Single<Boolean> {
+        return DatabaseUtils.singleOnIo {
+            val refreshQueueDao = MimiDatabase.getInstance()?.refreshQueue() ?: return@singleOnIo false
+            val item = RefreshQueue(queueId, historyId, threadSize, replyCount, lastRefresh)
+            refreshQueueDao.upsert(item)
+            true
+        }
     }
 
     @JvmStatic

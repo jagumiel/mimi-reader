@@ -13,9 +13,10 @@ object ArchiveTableConnection {
 
     @JvmStatic
     fun putChanArchives(archives: List<ChanArchive>): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.archives()?.upsert(convertArchivesToDbModel(archives)) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val archiveDao = getInstance()?.archives() ?: return@singleOnIo false
+            archiveDao.upsert(convertArchivesToDbModel(archives))
+            true
         }
     }
 
@@ -38,9 +39,10 @@ object ArchiveTableConnection {
 
     @JvmStatic
     fun clear(): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.archives()?.clear() ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val archiveDao = getInstance()?.archives() ?: return@singleOnIo false
+            archiveDao.clear()
+            true
         }
     }
 }

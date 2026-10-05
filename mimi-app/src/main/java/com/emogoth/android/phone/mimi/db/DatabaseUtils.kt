@@ -9,6 +9,13 @@ import io.reactivex.schedulers.Schedulers
 
 object DatabaseUtils {
     val LOG_TAG = DatabaseUtils::class.java.simpleName
+
+    /** Defers synchronous Room work and always executes it away from the caller thread. */
+    @JvmStatic
+    fun <T> singleOnIo(operation: () -> T): Single<T> {
+        return Single.fromCallable(operation).subscribeOn(Schedulers.io())
+    }
+
     @JvmStatic
     fun <T> applySchedulers(): FlowableTransformer<T, T> {
         return FlowableTransformer { f: Flowable<T> ->

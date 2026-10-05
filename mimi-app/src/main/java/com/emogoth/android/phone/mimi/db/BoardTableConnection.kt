@@ -7,7 +7,6 @@ import com.emogoth.android.phone.mimi.db.models.Board
 import com.mimireader.chanlib.models.ChanBoard
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 import kotlin.collections.ArrayList
 
 object BoardTableConnection {
@@ -326,7 +325,7 @@ object BoardTableConnection {
                     }
                     boards
                 }
-                .doOnSuccess(saveBoards())
+                .flatMap { boards -> saveBoards(boards).map { boards } }
                 .toFlowable()
                 .flatMapIterable { board: List<ChanBoard> -> board }
                 .flatMap { s: ChanBoard -> setBoardVisibility(s, true).toFlowable() }
@@ -334,23 +333,16 @@ object BoardTableConnection {
     }
 
     @JvmStatic
-    fun saveBoards(): Consumer<List<ChanBoard>> {
-        return Consumer { saveBoards(it) }
-    }
-
-    @JvmStatic
-    fun saveBoards(chanBoards: List<ChanBoard>) {
-        Log.d(LOG_TAG, "Calling saveBoards()")
-        if (chanBoards.isEmpty()) {
-            return
-        }
-
-        try {
+    fun saveBoards(chanBoards: List<ChanBoard>): Single<Boolean> {
+        return DatabaseUtils.singleOnIo {
+            Log.d(LOG_TAG, "Calling saveBoards()")
+            if (chanBoards.isEmpty()) {
+                return@singleOnIo false
+            }
             val boards = convertChanBoardListToDbModel(chanBoards)
-
-            MimiDatabase.getInstance()?.boards()?.upsert(boards)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Error while inserting boards", e)
+            val boardDao = MimiDatabase.getInstance()?.boards() ?: return@singleOnIo false
+            boardDao.upsert(boards)
+            true
         }
     }
 

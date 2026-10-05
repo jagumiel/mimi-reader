@@ -8,7 +8,7 @@ import com.emogoth.android.phone.mimi.util.MimiPrefs
 import com.mimireader.chanlib.models.ChanThread
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.zipWith
+import io.reactivex.functions.BiFunction
 import java.util.*
 
 class ThreadViewModel(val boardName: String, val threadId: Long) : ViewModel() {
@@ -24,18 +24,21 @@ class ThreadViewModel(val boardName: String, val threadId: Long) : ViewModel() {
     var userPosts = dataSource.userPosts
 
     fun watchThread(): Flowable<ChanThread> {
-        return dataSource.watchThread(boardName, threadId)
-                .doOnNext {
-                    if (this.thread.posts.size < it.posts.size) {
-                        unread = it.posts.size - lastReadPosition
-                        this.thread.posts.clear()
-                        this.thread.posts.addAll(it.posts)
-                    }
-
-                    val history = HistoryTableConnection.fetchPost(boardName, threadId).blockingGet()
+        return Flowable.combineLatest(
+                dataSource.watchThread(boardName, threadId),
+                HistoryTableConnection.observeThread(boardName, threadId)
+                        .startWith(History()),
+                BiFunction<ChanThread, History, ChanThread> { updatedThread, history ->
                     lastReadPosition = history.lastReadPosition
                     bookmarked = history.watched
-                }
+                    if (this.thread.posts.size < updatedThread.posts.size) {
+                        this.thread.posts.clear()
+                        this.thread.posts.addAll(updatedThread.posts)
+                    }
+                    unread = (this.thread.posts.size - lastReadPosition).coerceAtLeast(0)
+
+                    updatedThread
+                })
     }
 
     fun fetchThread(force: Boolean = true): Single<ChanThread> {

@@ -22,10 +22,11 @@ object UserPostTableConnection {
 
     @JvmStatic
     fun addPost(boardName: String, threadId: Long, postId: Long): Single<Boolean> {
-        return Single.defer {
+        return DatabaseUtils.singleOnIo {
             val userPost = UserPost(null, threadId, postId, boardName, System.currentTimeMillis())
-            getInstance()?.userPosts()?.upsert(userPost) ?: Single.just(false)
-            Single.just(true)
+            val userPostDao = getInstance()?.userPosts() ?: return@singleOnIo false
+            userPostDao.upsert(userPost)
+            true
         }
     }
 
@@ -37,10 +38,10 @@ object UserPostTableConnection {
 
     @JvmStatic
     fun prune(days: Int): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.userPosts()?.prune(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days.toLong()))
-                    ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val userPostDao = getInstance()?.userPosts() ?: return@singleOnIo false
+            userPostDao.prune(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days.toLong()))
+            true
         }
     }
 

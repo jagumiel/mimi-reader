@@ -76,36 +76,53 @@ open class ChanDataSource {
     fun fetchThread(boardName: String, threadId: Long, size: Int = 0): Single<ChanThread> {
         return chanConnector.fetchThread(boardName, threadId, ChanConnector.CACHE_DEFAULT)
                 .onErrorResumeNext { throwable: Throwable -> fetchArchivesOrError(boardName, threadId, throwable).first(ErrorChanThread(ChanThread(boardName, threadId, Collections.emptyList()), throwable)) }
-                .doOnSuccess { chanThread ->
-                    if (chanThread.posts.isEmpty()) {
-                        if (chanThread is ErrorChanThread) {
-                            Log.d(TAG, "No cached posts available for /$boardName/$threadId", chanThread.error)
-                        }
-                        return@doOnSuccess
-                    }
-                    HistoryTableConnection.keepLatest(5)
-                            .flatMap {
-                                HistoryTableConnection.putHistory(boardName, threadId, chanThread.posts.get(0), chanThread.posts.size)
-                            }
-                            .subscribe({
-                                when {
-                                    chanThread is ErrorChanThread -> {
-                                        Log.d(TAG, "Error fetching thread: ${chanThread.error.localizedMessage}", chanThread.error)
-                                    }
-                                    chanThread.posts.size > size -> {
-                                        if (chanThread is ArchivedChanThread) {
-                                            Log.d(TAG, "Thread has been archived")
-                                        } else {
-                                            Log.d(TAG, "Loading active thread from 4chan")
-                                        }
-                                        Log.d(TAG, "Putting thread into the database")
-                                        PostTableConnection.putThread(chanThread)
-                                    }
-                                }
-                            }, {
-                                Log.e(TAG, "Error putting history into the database", it)
-                            })
+                .flatMap { chanThread -> cacheFetchedThread(boardName, threadId, size, chanThread) }
+    }
 
+    private fun cacheFetchedThread(
+        boardName: String,
+        threadId: Long,
+        previousSize: Int,
+        chanThread: ChanThread
+    ): Single<ChanThread> {
+        if (chanThread.posts.isEmpty()) {
+            if (chanThread is ErrorChanThread) {
+                Log.d(TAG, "No cached posts available for /$boardName/$threadId", chanThread.error)
+            }
+            return Single.just(chanThread)
+        }
+
+        return HistoryTableConnection.keepLatest(5)
+                .flatMap {
+                    HistoryTableConnection.putHistory(
+                            boardName,
+                            threadId,
+                            chanThread.posts[0],
+                            chanThread.posts.size
+                    )
+                }
+                .flatMap {
+                    when {
+                        chanThread is ErrorChanThread -> {
+                            Log.d(TAG, "Error fetching thread: ${chanThread.error.localizedMessage}", chanThread.error)
+                            Single.just(true)
+                        }
+                        chanThread.posts.size > previousSize -> {
+                            if (chanThread is ArchivedChanThread) {
+                                Log.d(TAG, "Thread has been archived")
+                            } else {
+                                Log.d(TAG, "Loading active thread from 4chan")
+                            }
+                            Log.d(TAG, "Putting thread into the database")
+                            PostTableConnection.putThread(chanThread)
+                        }
+                        else -> Single.just(true)
+                    }
+                }
+                .map { chanThread }
+                .onErrorReturn {
+                    Log.e(TAG, "Error caching /$boardName/$threadId", it)
+                    chanThread
                 }
     }
 
@@ -137,11 +154,11 @@ open class ChanDataSource {
                     .flatMap {
                         if (it is ErrorChanThread) {
                             Log.w(TAG, "Passing error through")
+                            Single.just(it as ChanThread)
                         } else {
                             ArchivedPostTableConnection.putThread(it as ArchivedChanThread)
+                                    .map { _ -> it as ChanThread }
                         }
-
-                        Single.just(it)
                     }
                     .doOnError { Single.just(ErrorChanThread(ChanThread(boardName, threadId, Collections.emptyList()), it)) }
                     .toFlowable()

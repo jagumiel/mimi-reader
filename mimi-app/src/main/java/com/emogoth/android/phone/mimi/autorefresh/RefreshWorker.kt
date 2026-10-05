@@ -38,55 +38,10 @@ class RefreshWorker(private val appContext: Context, private val workerParams: W
                     QueueItem()
                 },
                 UserPostTableConnection.fetchPosts(boardName, threadId),
-                { chanThread, queueItem, userPosts ->
-
-                    if (chanThread is ArchivedChanThread || chanThread is ErrorChanThread || (chanThread.posts.size > 0 && chanThread.posts[0].isClosed)) {
-                        Log.d(LOG_TAG, chanThread.toString())
-                        HistoryTableConnection.setHistoryRemovedStatus(queueItem.boardName, queueItem.threadId, true).subscribe()
-                    }
-
-                    if (queueItem.historyId >= 0) {
-                        val unread = queueItem.unread
-                        val oldThreadSize = queueItem.oldThreadSize
-                        val updatedThreadSize = chanThread.posts.size
-
-                        val newPostCount = updatedThreadSize - oldThreadSize
-                        val unreadCount = newPostCount + unread
-
-                        if (updatedThreadSize > oldThreadSize) {
-                            HistoryTableConnection.setThreadSize(queueItem.boardName, queueItem.threadId, updatedThreadSize)
-                                    .flatMap {
-                                        HistoryTableConnection.setUnreadCount(queueItem.boardName, queueItem.threadId, unreadCount)
-                                    }.subscribe({
-                                        if (newPostCount > queueItem.unread) {
-                                            PostTableConnection.putThread(chanThread)
-                                        }
-
-                                        val replyCount = processThread(chanThread, queueItem, userPosts)
-                                        if (LOG_DEBUG) Log.d(LOG_TAG, "Found $replyCount replies to your post")
-                                        val currentTime = System.currentTimeMillis()
-                                        try {
-                                            RefreshQueueTableConnection.addItem(queueItem.historyId, updatedThreadSize, replyCount, currentTime, queueItem.queueId)
-                                        } catch (e: Exception) {
-                                            Log.e(LOG_TAG, "Error putting refresh queue data into the queue\nhistory id = ${queueItem.historyId}, size = $updatedThreadSize, reply count = $replyCount, time = $currentTime, queue id = ${queueItem.queueId}", e)
-                                        }
-                                        RefreshNotification.show()
-
-                                        if (LOG_DEBUG) Log.d(LOG_TAG, "Showing notification for /${boardName}/${threadId} with ${updatedThreadSize - oldThreadSize} new post(s) since the last refresh")
-                                    }, {
-                                        if (LOG_DEBUG) Log.e(LOG_TAG, "Error putting refresh queue data", it)
-                                    })
-                        } else {
-                            RefreshQueueTableConnection.addItem(queueItem.historyId, queueItem.threadSize, queueItem.replyCount, System.currentTimeMillis(), queueItem.queueId)
-                            Log.d(LOG_TAG, "Not showing notification for /${boardName}/${threadId} because no new posts found (previous size=${oldThreadSize}, new size=${updatedThreadSize})")
-                        }
-                    } else {
-                        Log.e(LOG_TAG, "Refresh queue item not found for /${boardName}/${threadId}")
-                    }
-
-
-                    Pair(chanThread, queueItem)
-                })
+                Function3 { chanThread, queueItem, userPosts -> Triple(chanThread, queueItem, userPosts) })
+                .flatMap { (chanThread, queueItem, userPosts) ->
+                    persistRefresh(boardName, threadId, chanThread, queueItem, userPosts)
+                }
                 .map {
                     runNext(background)
                     Result.success()
@@ -95,6 +50,82 @@ class RefreshWorker(private val appContext: Context, private val workerParams: W
                     runNext(background)
                     Result.failure()
                 }
+    }
+
+    private fun persistRefresh(
+        boardName: String,
+        threadId: Long,
+        chanThread: ChanThread,
+        queueItem: QueueItem,
+        userPosts: List<UserPost>
+    ): Single<Boolean> {
+        val threadRemoved = chanThread is ArchivedChanThread ||
+                chanThread is ErrorChanThread ||
+                (chanThread.posts.isNotEmpty() && chanThread.posts[0].isClosed)
+        val markRemoved = if (threadRemoved) {
+            Log.d(LOG_TAG, chanThread.toString())
+            HistoryTableConnection
+                    .setHistoryRemovedStatus(queueItem.boardName, queueItem.threadId, true)
+                    .onErrorReturnItem(false)
+        } else {
+            Single.just(true)
+        }
+
+        return markRemoved.flatMap {
+            if (queueItem.historyId < 0) {
+                Log.e(LOG_TAG, "Refresh queue item not found for /$boardName/$threadId")
+                return@flatMap Single.just(false)
+            }
+
+            val oldThreadSize = queueItem.oldThreadSize
+            val updatedThreadSize = chanThread.posts.size
+            if (updatedThreadSize <= oldThreadSize) {
+                return@flatMap RefreshQueueTableConnection.addItem(
+                        queueItem.historyId,
+                        queueItem.threadSize,
+                        queueItem.replyCount,
+                        System.currentTimeMillis(),
+                        queueItem.queueId
+                ).doOnSuccess {
+                    Log.d(LOG_TAG, "Not showing notification for /$boardName/$threadId because no new posts found (previous size=$oldThreadSize, new size=$updatedThreadSize)")
+                }
+            }
+
+            val newPostCount = updatedThreadSize - oldThreadSize
+            val unreadCount = newPostCount + queueItem.unread
+            HistoryTableConnection.setThreadSize(queueItem.boardName, queueItem.threadId, updatedThreadSize)
+                    .flatMap {
+                        HistoryTableConnection.setUnreadCount(
+                                queueItem.boardName,
+                                queueItem.threadId,
+                                unreadCount
+                        )
+                    }
+                    .flatMap {
+                        if (newPostCount > queueItem.unread) {
+                            PostTableConnection.putThread(chanThread)
+                        } else {
+                            Single.just(true)
+                        }
+                    }
+                    .flatMap {
+                        val replyCount = processThread(chanThread, queueItem, userPosts)
+                        if (LOG_DEBUG) Log.d(LOG_TAG, "Found $replyCount replies to your post")
+                        RefreshQueueTableConnection.addItem(
+                                queueItem.historyId,
+                                updatedThreadSize,
+                                replyCount,
+                                System.currentTimeMillis(),
+                                queueItem.queueId
+                        )
+                    }
+                    .doOnSuccess {
+                        RefreshNotification.show()
+                        if (LOG_DEBUG) {
+                            Log.d(LOG_TAG, "Showing notification for /$boardName/$threadId with $newPostCount new post(s) since the last refresh")
+                        }
+                    }
+        }
     }
 
     private fun processThread(chanThread: ChanThread, queueItem: QueueItem, userPosts: List<UserPost>): Int {

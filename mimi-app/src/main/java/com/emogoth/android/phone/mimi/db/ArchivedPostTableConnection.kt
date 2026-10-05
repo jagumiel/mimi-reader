@@ -27,33 +27,40 @@ object ArchivedPostTableConnection {
 //                })
 //    }
 
-    fun putThread(thread: ArchivedChanThread) {
-        val posts = convertToArchivedPosts(thread)
-        Log.d("ArchivedPostsTable", "Put an archived thread into the database: saved " + posts.size + " posts")
-        getInstance()?.archivedPosts()?.insert(posts)
+    fun putThread(thread: ArchivedChanThread): Single<Boolean> {
+        return DatabaseUtils.singleOnIo {
+            val archivedPostDao = getInstance()?.archivedPosts() ?: return@singleOnIo false
+            val posts = convertToArchivedPosts(thread)
+            archivedPostDao.insert(posts)
+            Log.d("ArchivedPostsTable", "Put an archived thread into the database: saved " + posts.size + " posts")
+            true
+        }
     }
 
     @JvmStatic
     fun removeThread(boardName: String, threadId: Long): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.archivedPosts()?.removeThread(boardName, threadId) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val archivedPostDao = getInstance()?.archivedPosts() ?: return@singleOnIo false
+            archivedPostDao.removeThread(boardName, threadId)
+            true
         }
     }
 
     @JvmStatic
     fun removeThreads(threads: List<Long>): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.archivedPosts()?.removeThreads(threads) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val archivedPostDao = getInstance()?.archivedPosts() ?: return@singleOnIo false
+            archivedPostDao.removeThreads(threads)
+            true
         }
     }
 
     @JvmStatic
     fun removeAllThreads(): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.archivedPosts()?.clear() ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val archivedPostDao = getInstance()?.archivedPosts() ?: return@singleOnIo false
+            archivedPostDao.clear()
+            true
         }
     }
 

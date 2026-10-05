@@ -139,14 +139,12 @@ class RefreshScheduler2 {
                                     if (historyId == null) {
                                         Single.just(QueueItem)
                                     } else {
-                                        Single.defer {
-                                            try {
-                                                RefreshQueueTableConnection.addItem(historyId, it.threadSize, 0, it.lastAccess)
-                                            } catch (e: Exception) {
-                                                Log.e(LOG_TAG, "Error adding item to refresh queue for /$boardName/$threadId in the refresh scheduler\nhistory id = $historyId, thread size = ${it.threadSize}, last access = ${it.lastAccess}", e)
-                                            }
-                                            Single.just(0)
-                                        }
+                                        RefreshQueueTableConnection
+                                                .addItem(historyId, it.threadSize, 0, it.lastAccess)
+                                                .doOnError { error ->
+                                                    Log.e(LOG_TAG, "Error adding item to refresh queue for /$boardName/$threadId in the refresh scheduler\nhistory id = $historyId, thread size = ${it.threadSize}, last access = ${it.lastAccess}", error)
+                                                }
+                                                .onErrorReturnItem(false)
                                                 .flatMap {
                                                     RefreshQueueTableConnection.fetchItem(boardName, threadId)
                                                             .onErrorReturn { err ->

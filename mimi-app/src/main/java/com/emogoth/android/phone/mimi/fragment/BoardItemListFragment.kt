@@ -26,12 +26,12 @@ import com.emogoth.android.phone.mimi.adapter.BoardListAdapter
 import com.emogoth.android.phone.mimi.adapter.BoardListAdapter.OnBoardClickListener
 import com.emogoth.android.phone.mimi.app.MimiApplication
 import com.emogoth.android.phone.mimi.db.ArchivedPostTableConnection
+import com.emogoth.android.phone.mimi.db.BoardTableConnection
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.convertBoardDbModelsToChanBoards
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.fetchBoard
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.fetchBoards
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.incrementAccessCount
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.observeBoards
-import com.emogoth.android.phone.mimi.db.BoardTableConnection.saveBoards
 import com.emogoth.android.phone.mimi.db.BoardTableConnection.setBoardVisibility
 import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySchedulers
 import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySingleSchedulers
@@ -373,8 +373,7 @@ class BoardItemListFragment
                     if (it.isEmpty()) {
                         Log.d(LOG_TAG, "Fetching all boards for debug version")
                         connector.fetchBoards()
-                                .observeOn(Schedulers.io())
-                                .doOnSuccess(saveBoards())
+                                .flatMap { boards -> BoardTableConnection.saveBoards(boards).map { boards } }
                                 .toFlowable()
                                 .flatMapIterable { list -> list }
                                 .doOnNext { chanBoard: ChanBoard -> Log.d(LOG_TAG, "Setting visibility for " + chanBoard.title) }
@@ -420,8 +419,7 @@ class BoardItemListFragment
 
         RxUtil.safeUnsubscribe(boardFetchDisposable)
         boardFetchDisposable = connector.fetchBoards()
-                .observeOn(Schedulers.io())
-                .doOnSuccess(saveBoards())
+                .flatMap { boards -> BoardTableConnection.saveBoards(boards).map { boards } }
                 .compose(applySingleSchedulers())
                 .subscribe({
                     dismissCachedContentWarning()

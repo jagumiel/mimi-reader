@@ -27,9 +27,10 @@ object FilterTableConnection {
 
     @JvmStatic
     fun addFilter(filter: Filter): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.filters()?.upsert(filter) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val filterDao = getInstance()?.filters() ?: return@singleOnIo false
+            filterDao.upsert(filter)
+            true
         }
     }
 

@@ -20,31 +20,34 @@ object HiddenThreadTableConnection {
 
     @JvmStatic
     fun hideThread(boardName: String, threadId: Long, sticky: Boolean): Single<Boolean> {
-        return Single.defer {
+        return DatabaseUtils.singleOnIo {
             val hiddenThread = HiddenThread()
             hiddenThread.boardName = boardName
             hiddenThread.threadId = threadId
             hiddenThread.time = System.currentTimeMillis()
             hiddenThread.sticky = (if (sticky) 1 else 0)
-            getInstance()?.hiddenThreads()?.upsert(hiddenThread) ?: return@defer Single.just(false)
-            Single.just(true)
+            val hiddenThreadDao = getInstance()?.hiddenThreads() ?: return@singleOnIo false
+            hiddenThreadDao.upsert(hiddenThread)
+            true
         }
     }
 
     @JvmStatic
     fun clearAll(): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.hiddenThreads()?.clear() ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val hiddenThreadDao = getInstance()?.hiddenThreads() ?: return@singleOnIo false
+            hiddenThreadDao.clear()
+            true
         }
     }
 
     @JvmStatic
     fun prune(days: Int): Single<Boolean> {
-        return Single.defer {
+        return DatabaseUtils.singleOnIo {
             val oldestTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days.toLong())
-            getInstance()?.hiddenThreads()?.prune(oldestTime) ?: Single.just(false)
-            Single.just(true)
+            val hiddenThreadDao = getInstance()?.hiddenThreads() ?: return@singleOnIo false
+            hiddenThreadDao.prune(oldestTime)
+            true
         }
     }
 }

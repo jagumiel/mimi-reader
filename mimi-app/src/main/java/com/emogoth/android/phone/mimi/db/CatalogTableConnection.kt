@@ -27,12 +27,12 @@ object CatalogTableConnection {
 
     @JvmStatic
     fun replacePosts(catalog: ChanCatalog): Single<Boolean> {
-        return Single.defer {
+        return DatabaseUtils.singleOnIo {
             val boardName = catalog.boardName
             if (boardName.isNullOrBlank()) {
-                return@defer Single.just(false)
+                return@singleOnIo false
             }
-            val posts = catalog.posts ?: return@defer Single.just(false)
+            val posts = catalog.posts ?: return@singleOnIo false
             val catalogPosts: MutableList<CatalogPost> = ArrayList(posts.size)
             for (i in posts.indices) {
                 catalogPosts.add(CatalogPost(boardName, posts[i]))
@@ -44,23 +44,25 @@ object CatalogTableConnection {
                     success = value > 0
                 }
             }
-            Single.just(success)
+            success
         }
     }
 
     @JvmStatic
     fun removeThread(boardName: String, threadId: Long): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.catalog()?.removeThread(boardName, threadId) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val catalogDao = getInstance()?.catalog() ?: return@singleOnIo false
+            catalogDao.removeThread(boardName, threadId)
+            true
         }
     }
 
     @JvmStatic
     fun clear(boardName: String): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.catalog()?.clear(boardName) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val catalogDao = getInstance()?.catalog() ?: return@singleOnIo false
+            catalogDao.clear(boardName)
+            true
         }
     }
 }

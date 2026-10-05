@@ -39,14 +39,15 @@ object PostTableConnection {
     }
 
     @JvmStatic
-    fun putThread(thread: ChanThread): Boolean {
-        getInstance()?.posts()?.deleteThread(thread.threadId) ?: return false
-        getInstance()?.posts()?.insert(convertToPosts(thread)) ?: return false
-        return true
+    fun putThread(thread: ChanThread): Single<Boolean> {
+        return DatabaseUtils.singleOnIo {
+            val postDao = getInstance()?.posts() ?: return@singleOnIo false
+            postDao.replaceThread(thread.threadId, convertToPosts(thread)).all { it > 0 }
+        }
     }
 
-    private fun convertToPosts(thread: ChanThread?): List<Post> {
-        if (thread == null || thread.posts == null || thread.posts.size == 0) {
+    private fun convertToPosts(thread: ChanThread): List<Post> {
+        if (thread.posts.size == 0) {
             return emptyList()
         }
         val posts: MutableList<Post> = ArrayList(thread.posts.size)
@@ -58,17 +59,19 @@ object PostTableConnection {
 
     @JvmStatic
     fun removeThreads(threads: List<Long>): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.posts()?.deleteThreads(threads) ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val postDao = getInstance()?.posts() ?: return@singleOnIo false
+            postDao.deleteThreads(threads)
+            true
         }
     }
 
     @JvmStatic
     fun removeThread(thread: Long): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.posts()?.deleteThread(thread) ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val postDao = getInstance()?.posts() ?: return@singleOnIo false
+            postDao.deleteThread(thread)
+            true
         }
     }
 
@@ -89,9 +92,10 @@ object PostTableConnection {
 
     @JvmStatic
     fun removeAllThreads(): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.posts()?.clear() ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val postDao = getInstance()?.posts() ?: return@singleOnIo false
+            postDao.clear()
+            true
         }
     }
 }

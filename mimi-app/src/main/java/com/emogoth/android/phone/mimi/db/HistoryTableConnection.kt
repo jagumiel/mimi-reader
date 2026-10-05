@@ -152,9 +152,9 @@ object HistoryTableConnection {
 
     @JvmStatic
     fun putHistory(boardName: String, threadId: Long, firstPost: ChanPost, postCount: Int): Single<Boolean> {
-        return Single.defer {
+        return DatabaseUtils.singleOnIo {
             if (firstPost.no <= 0 || firstPost.no != threadId) {
-                return@defer Single.just(false)
+                return@singleOnIo false
             }
             Log.d(LOG_TAG, "putHistory: name=" + boardName + ", thread=" + firstPost.no + ", current watched=" + firstPost.isWatched)
             val history = History()
@@ -176,24 +176,26 @@ object HistoryTableConnection {
             }
             history.text = text
             history.lastAccess = System.currentTimeMillis()
-            getInstance()?.history()?.insert(history)
-            Single.just(true)
+            val historyDao = getInstance()?.history() ?: return@singleOnIo false
+            historyDao.insert(history) > 0
         }
     }
 
     @JvmStatic
     fun removeHistory(boardName: String, threadId: Long): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.history()?.removeThread(boardName, threadId)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val historyDao = getInstance()?.history() ?: return@singleOnIo false
+            historyDao.removeThread(boardName, threadId)
+            true
         }
     }
 
     @JvmStatic
     fun removeAllHistory(watched: Boolean): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.history()?.clear() ?: Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val historyDao = getInstance()?.history() ?: return@singleOnIo false
+            historyDao.clear()
+            true
         }
                 .flatMap { PostTableConnection.removeAllThreads() }
                 .flatMap { removeAllThreads() }
@@ -237,7 +239,7 @@ object HistoryTableConnection {
     fun updateHistory(history: History): Single<Boolean> {
         return if (history.threadId == 0L) {
             Single.just(false)
-        } else Single.defer { Single.just(getInstance()?.history()?.update(history) ?: 0 > 0) }
+        } else DatabaseUtils.singleOnIo { (getInstance()?.history()?.update(history) ?: 0) > 0 }
     }
 
     @JvmStatic
@@ -249,10 +251,10 @@ object HistoryTableConnection {
     @JvmStatic
     fun pruneHistory(days: Int): Single<Boolean> {
         val oldestHistoryTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days.toLong())
-        return Single.defer {
-            getInstance()?.history()?.prune(oldestHistoryTime, false)
-                    ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val historyDao = getInstance()?.history() ?: return@singleOnIo false
+            historyDao.prune(oldestHistoryTime, false)
+            true
         }
     }
 

@@ -14,9 +14,10 @@ object PostOptionTableConnection {
 
     @JvmStatic
     fun deletePostOption(id: String): Single<Boolean> {
-        return Single.defer {
-            getInstance()?.postOptions()?.remove(id) ?: return@defer Single.just(false)
-            Single.just(true)
+        return DatabaseUtils.singleOnIo {
+            val postOptionDao = getInstance()?.postOptions() ?: return@singleOnIo false
+            postOptionDao.remove(id)
+            true
         }
     }
 
