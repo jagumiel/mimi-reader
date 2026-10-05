@@ -16,10 +16,11 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 
-class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock: Boolean = false) : ViewModel() {
+class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledByDefault: Boolean = false) : ViewModel() {
     companion object {
         val TAG: String = GalleryViewModel::class.java.simpleName
         const val DOWNLOAD_DIR = "full_images"
+        private const val STATE_VIDEO_MUTED = "gallery_video_muted"
 
         fun get(context: FragmentActivity, imageBaseUrl: String, audioLock: Boolean): GalleryViewModel {
             val factory = object : ViewModelProvider.Factory {
@@ -38,6 +39,7 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
     }
 
     var boardName: String = ""
+    val audioState = GalleryAudioState(audioEnabledByDefault)
     var threadId: Long = -1
     var keepFiles = false
     var fullScreen: Boolean = false
@@ -136,6 +138,9 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
         postIds = state.getLongArray(Extras.EXTRAS_POST_LIST) ?: LongArray(0)
         position = state.getInt(Extras.EXTRAS_POSITION, -1)
         saveLocation = state.getString(Extras.EXTRAS_FILE_PATH, "")
+        if (state.containsKey(STATE_VIDEO_MUTED)) {
+            audioState.setMuted(state.getBoolean(STATE_VIDEO_MUTED))
+        }
     }
 
     // put current state into a bundle
@@ -149,6 +154,7 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
         state.putLongArray(GalleryActivity2.EXTRA_SELECTED_ITEMS, selectedItemIds)
         state.putInt(Extras.EXTRAS_POSITION, position)
         state.putString(Extras.EXTRAS_FILE_PATH, saveLocation)
+        state.putBoolean(STATE_VIDEO_MUTED, audioState.muted)
     }
 
 

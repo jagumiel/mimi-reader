@@ -167,6 +167,7 @@ class VideoControls @JvmOverloads constructor(context: Context, attrs: Attribute
         }
 
         audioLocked = lock
+        setMuted(muted, false)
 
         if (fromUser) {
             audioLockListener?.invoke(lock)
@@ -249,7 +250,7 @@ class VideoControls @JvmOverloads constructor(context: Context, attrs: Attribute
                 playListener?.invoke(paused)
             }
         } else {
-            setMuted(muted = true, fromUser = true)
+            setMuted(muted = true, fromUser = false)
             mute_button.setOnLongClickListener(null)
             mute_button.setOnClickListener(null)
 //            release()

@@ -51,11 +51,10 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
         }
 
         controlView = VideoControls(context)
-        controlView.setAudioLock(viewModel.audioLock, false)
-        controlView.audioLockListener = { locked ->
-            viewModel.audioLock = locked
-        }
+        controlView.setAudioLock(!viewModel.audioState.muted, false)
         controlView.muteListener = { muted ->
+            viewModel.audioState.setMuted(muted)
+            controlView.setAudioLock(lock = !muted, fromUser = false)
             player?.mute(muted)
         }
         controlView.playListener = { paused ->
@@ -104,15 +103,16 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
 
     override fun onPageSelectedChange(selected: Boolean) {
         super.onPageSelectedChange(selected)
-        val m = !viewModel.audioLock
-        controlView.setAudioLock(lock = viewModel.audioLock, fromUser = false)
-        controlView.setMuted(muted = m, fromUser = false)
+        val muted = viewModel.audioState.muted
+        controlView.setAudioLock(lock = !muted, fromUser = false)
+        controlView.setMuted(muted = muted, fromUser = false)
         updateVideoPlaybackState()
     }
 
     private fun updateVideoPlaybackState() {
         if (downloadComplete && pageSelected && !hostPaused) {
-            controlView.setAudioLock(viewModel.audioLock, false)
+            controlView.setAudioLock(!viewModel.audioState.muted, false)
+            controlView.setMuted(viewModel.audioState.muted, false)
 
             showVideoView()
             scaleView(videoView, downloadItem.width, downloadItem.height)
@@ -208,7 +208,7 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        controlView.setAudioLock(viewModel.audioLock, false)
+        controlView.setAudioLock(!viewModel.audioState.muted, false)
         startTimer()
     }
 
