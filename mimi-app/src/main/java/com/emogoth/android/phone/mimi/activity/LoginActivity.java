@@ -16,13 +16,10 @@ import android.widget.Toast;
 
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.fourchan.FourChanConnector;
+import com.emogoth.android.phone.mimi.fourchan.FourChanHtmlParser;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.mimireader.chanlib.ChanConnector;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
@@ -101,12 +98,10 @@ public class LoginActivity extends MimiActivity {
                                     Log.i(LOG_TAG, "response=" + response);
                                 }
 
-                                final Document doc = Jsoup.parse(response);
-                                Elements errElement = doc.getElementsByAttributeValue("class", "msg-error");
-                                Elements successElement = doc.getElementsByAttributeValue("class", "msg-success");
-                                if (!TextUtils.isEmpty(errElement.text())) {
-                                    errorMessage.setText(Html.fromHtml(errElement.html()));
-                                } else if (!TextUtils.isEmpty(successElement.text())) {
+                                final FourChanHtmlParser.LoginResult result = FourChanHtmlParser.parseLoginResponse(response);
+                                if (result.hasError()) {
+                                    errorMessage.setText(Html.fromHtml(result.getErrorHtml()));
+                                } else if (result.isSuccess()) {
                                     Toast.makeText(LoginActivity.this, R.string.auth_success, Toast.LENGTH_SHORT).show();
                                     finish();
                                 }

@@ -34,9 +34,6 @@ import com.emogoth.android.phone.mimi.span.YoutubeLinkSpan;
 import com.mimireader.chanlib.util.CommentParser;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -102,12 +99,9 @@ public final class FourChanCommentParser extends CommentParser {
     }
 
     public CharSequence parse() {
-        String rawPost = comment == null ? "" : comment.toString().replaceAll("<br>", "br2nl");
-        Document document = Jsoup.parse(rawPost);
-        document.outputSettings(new Document.OutputSettings().prettyPrint(true));
-        String postWithoutHtml = document.text().replaceAll("br2nl", "\n");
-
-        rawPost = rawPost.replaceAll("br2nl", "\n");
+        final String rawComment = comment == null ? "" : comment.toString();
+        String postWithoutHtml = FourChanHtmlParser.parseCommentText(rawComment);
+        String rawPost = FourChanHtmlParser.normalizeLineBreaks(rawComment);
         rawPost = rawPost.replaceAll("&quot;", "\"");
         rawPost = rawPost.replaceAll("&#039;", "\'");
         rawPost = rawPost.replaceAll("&amp;", "&");

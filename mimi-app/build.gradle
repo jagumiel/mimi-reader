@@ -90,6 +90,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -119,6 +120,7 @@ dependencies {
 //    implementation fileTree(dir: 'src/main/libs/', include: '*.jar')
 
     api project(':chanlib')
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs_nio:$desugar_jdk_libs_version"
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -147,7 +149,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation "org.jsoup:jsoup:$jsoup_version"
     implementation 'commons-codec:commons-codec:1.12'
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.21'

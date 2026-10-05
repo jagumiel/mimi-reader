@@ -55,6 +55,7 @@ import com.emogoth.android.phone.mimi.db.PostOptionTableConnection;
 import com.emogoth.android.phone.mimi.db.UserPostTableConnection;
 import com.emogoth.android.phone.mimi.dialog.CaptchaDialog;
 import com.emogoth.android.phone.mimi.fourchan.FourChanCommentParser;
+import com.emogoth.android.phone.mimi.fourchan.FourChanHtmlParser;
 import com.emogoth.android.phone.mimi.fourchan.FourChanConnector;
 import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
@@ -68,7 +69,6 @@ import com.mimireader.chanlib.ChanConnector;
 import com.mimireader.chanlib.models.ChanBoard;
 import com.mimireader.chanlib.models.ChanPost;
 
-import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -364,15 +364,8 @@ public class PostFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        final int i = html.indexOf("errmsg");
-        if (i > 0) {
-            final int msgStartIndex = html.indexOf(">", i) + 1;
-            final int brIndex = html.indexOf("br", i);
-            final int spanIndex = html.indexOf("</span", i);
-            final int msgEndIndex = (spanIndex < brIndex) ? spanIndex : brIndex - 1;
-
-            final String errorMsg = Jsoup.parse(html.substring(msgStartIndex, msgEndIndex)).text();
-
+        final String errorMsg = FourChanHtmlParser.parsePostError(html);
+        if (errorMsg != null) {
             Log.i(LOG_TAG, errorMsg);
 
             if (postListener != null) {
