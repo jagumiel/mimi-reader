@@ -57,6 +57,7 @@ class GalleryPager @JvmOverloads constructor(
             return pagerPosition
         }
         set(value) {
+            galleryViewModel?.prioritizeDownloads(value)
             try {
                 pager.post { pager.layoutManager?.scrollToPosition(value) }
             } catch (e: Exception) {
@@ -91,6 +92,7 @@ class GalleryPager @JvmOverloads constructor(
         pager.attachSnapHelperWithListener(PagerSnapHelper(), SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL, object : OnSnapPositionChangeListener {
             override fun onSnapPositionChange(previous: Int, current: Int) {
                 pagerPosition = current
+                galleryViewModel?.prioritizeDownloads(current)
 
                 Log.d(LOG_TAG, "Gallery Position: $current (previous=$previous)")
                 if (player?.isPlaying == true) {

@@ -69,7 +69,9 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 ### 3. Navegación e interfaz moderna
 
 - [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
-- [ ] Mantener la precarga de toda la galería, limitando las descargas simultáneas y reordenando la cola según la distancia al elemento visible: primero las imágenes y vídeos más cercanos y después los más lejanos.
+- [x] Mantener la precarga de toda la galería, limitando las descargas simultáneas y reordenando la cola según la distancia al elemento visible: primero las imágenes y vídeos más cercanos y después los más lejanos.
+  - [x] Aplicar un máximo estricto de dos descargas, también cuando las páginas visibles registran listeners.
+  - [x] Reordenar los elementos pendientes al abrir la galería y cada vez que cambia la página visible, priorizando primero el siguiente elemento en caso de empate.
 - Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
 - Implementar correctamente el gesto Atrás predictivo antes de retirar la desactivación temporal.
 - Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.

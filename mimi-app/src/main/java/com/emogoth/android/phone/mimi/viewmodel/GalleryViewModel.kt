@@ -104,7 +104,18 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
         }
 
         Log.d(TAG, "Starting gallery image download manager")
-        downloadManager = DownloadManager(HttpClientFactory.getInstance().downloadClient, downloadItems, 2, MimiApplication.instance.applicationContext)
+        val initialPosition = when {
+            position in items.indices -> position
+            else -> items.indexOfFirst { it.id == postId }.coerceAtLeast(0)
+        }
+        downloadManager = DownloadManager(
+                HttpClientFactory.getInstance().downloadClient,
+                downloadItems,
+                2,
+                MimiApplication.instance.applicationContext,
+                initialPosition
+        )
+        id = newId
         downloadManager?.start()
     }
 
@@ -113,8 +124,11 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
     }
 
     fun retryDownload(item: DownloadItem) {
-        downloadManager?.reset(item)
-        downloadManager?.start(item)
+        downloadManager?.retry(item)
+    }
+
+    fun prioritizeDownloads(position: Int) {
+        downloadManager?.prioritize(position)
     }
 
     fun removeDownloadListener(id: Long) {

@@ -1,7 +1,6 @@
 package com.emogoth.android.phone.mimi.util
 
 import android.content.Context
-import android.os.Handler
 import android.util.Log
 import com.emogoth.android.phone.mimi.BuildConfig
 import io.reactivex.BackpressureStrategy
@@ -16,11 +15,12 @@ import org.reactivestreams.Subscription
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.abs
 
 
 /**
- * A queued download manager. Once started, it downloads each file sequentially unless a listener is attached.
- * Once a listener is attached, it is given priority and a download is started regardless the number of current downloads
+ * A queued download manager that keeps a strict concurrency limit and prioritizes files near the
+ * currently visible gallery item.
  *
  *
  * @param concurrentDownloads the number of downloads to start
@@ -29,218 +29,290 @@ import java.util.concurrent.ConcurrentHashMap
  * @property app (optional) app context to determine if wifi is connected. If the context is non-null, wifi connectivity is used
  * @constructor Creates an empty group.
  */
-class DownloadManager(private val client: OkHttpClient, private val downloadItems: List<DownloadItem>, concurrentDownloads: Int, private val app: Context? = null) {
+class DownloadManager(
+    private val client: OkHttpClient,
+    private val downloadItems: List<DownloadItem>,
+    concurrentDownloads: Int,
+    private val app: Context? = null,
+    initialPosition: Int = 0
+) {
     companion object {
         val TAG = DownloadManager::class.java.simpleName
         const val BUFFER_SIZE = 1024L
     }
 
-    private val items: ArrayList<DownloadItem> = ArrayList(downloadItems)
-    private val publisherMap = ConcurrentHashMap<Long, Flowable<Int>>()
+    private val stateLock = Any()
+    private val itemById = downloadItems.associateBy { it.id }
+    private val queue = GalleryDownloadQueue(downloadItems, concurrentDownloads, initialPosition)
     private val subscriberMap = ConcurrentHashMap<Long, Subscription>()
     private val callbackMap = ConcurrentHashMap<Long, DownloadListener>()
-
-//    private val client: OkHttpClient by lazy {
-//        val cookiePersistor = SharedPrefsCookiePersistor(MimiApplication.getInstance())
-//        val jar = PersistentCookieJar(SetCookieCache(), cookiePersistor)
-//
-//        val builder = OkHttpClient.Builder()
-////                .cache(cache)
-//                .cookieJar(jar)
-//                .followRedirects(true)
-//                .followSslRedirects(true)
-//                .connectTimeout(90, TimeUnit.SECONDS)
-//                .readTimeout(90, TimeUnit.SECONDS)
-//                .writeTimeout(90, TimeUnit.SECONDS)
-//                .retryOnConnectionFailure(true)
-//
-//        builder.addNetworkInterceptor { chain: Interceptor.Chain ->
-//            val originalRequest = chain.request()
-//            val modifiedRequest = originalRequest.newBuilder()
-//                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
-//                    .build()
-//            chain.proceed(modifiedRequest)
-//        }
-//
-//        if (BuildConfig.DEBUG) {
-//            builder.addNetworkInterceptor(loggingInterceptor())
-//            builder.addNetworkInterceptor(StethoInterceptor())
-//        }
-//
-//        builder.build()
-//    }
-
-    private var maxConcurrent: Int = concurrentDownloads
-        get() {
-            if (app != null && !MimiPrefs.preloadEnabled(app)) {
-                return 0
-            }
-
-            return field
-        }
-        set(value) {
-            field = if (value > 0) {
-                value
-            } else {
-                0
-            }
-        }
-
-    init {
-
-    }
+    @Volatile
+    private var destroyed = false
 
     fun start() {
-        val size = if (maxConcurrent > downloadItems.size) {
-            downloadItems.size
-        } else {
-            maxConcurrent
-        }
+        drainQueue()
+    }
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Running start() with a size of $size")
-        }
-
-        for (i in 0 until size) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Starting download for ${downloadItems[i].url}")
-            }
-            createSubscriber(downloadItems[i])
-        }
+    fun prioritize(position: Int) {
+        queue.prioritize(position)
+        drainQueue()
     }
 
     fun cancel(id: Long) {
-        subscriberMap[id]?.cancel()
-        subscriberMap.remove(id)
-    }
-
-    private fun runNext() {
-        if (maxConcurrent == 0) {
-            return
+        val subscription = synchronized(stateLock) {
+            queue.remove(id)
+            subscriberMap.remove(id)
         }
-
-        val handler = Handler()
-        handler.postDelayed({
-            synchronized(items) {
-                if (items.size > 0) {
-                    createSubscriber(items[0])
-                }
-            }
-        }, 2000)
-
+        subscription?.cancel()
+        drainQueue()
     }
 
     fun addListener(id: Long, listener: DownloadListener): DownloadItem {
-        synchronized(callbackMap) {
-            var item: DownloadItem? = null
-            for (downloadItem in downloadItems) {
-                if (downloadItem.id == id) {
-                    item = downloadItem
-                    break
-                }
-            }
-
-            if (item == null) {
+        val item = itemById[id] ?: return DownloadItem.empty()
+        synchronized(stateLock) {
+            if (destroyed) {
                 return DownloadItem.empty()
             }
-
             callbackMap[item.id] = listener
-
-            if (publisherMap[item.id] == null) {
-                createSubscriber(item)
+            if (item.file.exists() && item.file.length() == 0L) {
+                item.file.delete()
             }
-
-            return item
+            queue.ensurePending(item)
         }
+
+        // Existing files still pass through the scheduled downloader so the completion callback
+        // cannot run before GalleryPage.bind() has stored the returned DownloadItem.
+        drainQueue()
+        return item
     }
 
     fun removeListener(id: Long) {
-        subscriberMap[id]?.cancel()
         callbackMap.remove(id)
     }
 
-    fun reset(item: DownloadItem) {
-        publisherMap.remove(item.id)
+    fun retry(item: DownloadItem) {
+        val subscription = synchronized(stateLock) {
+            if (destroyed) {
+                return
+            }
+            queue.requeue(item)
+            subscriberMap.remove(item.id)
+        }
+        subscription?.cancel()
+        drainQueue()
     }
 
-    fun start(item: DownloadItem) {
-        if (callbackMap[item.id] != null && subscriberMap[item.id] != null) {
-            subscriberMap[item.id]?.cancel()
-            subscriberMap.remove(item.id)
+    private fun preloadEnabled(): Boolean {
+        return app == null || MimiPrefs.preloadEnabled(app)
+    }
 
+    private fun drainQueue() {
+        val nextItems = synchronized(stateLock) {
+            if (destroyed) {
+                return
+            }
+            queue.takeAvailable(preloadEnabled(), callbackMap.keys)
+        }
+        for (item in nextItems) {
             createSubscriber(item)
         }
     }
 
     private fun createSubscriber(item: DownloadItem) {
-        synchronized(publisherMap) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Starting prioritized download for ${item.url}")
+        }
 
-            for (i in 0 until items.size) {
-                if (items[i].id == item.id) {
-                    items.removeAt(i)
-                    break
-                }
-            }
-
-            if (publisherMap[item.id] != null) {
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "Download already started; skipping")
-                }
-                return
-            }
-            publisherMap[item.id] = downloadToFile(client, item.url, item.file)
+        try {
+            downloadToFile(client, item.url, item.file)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : FlowableSubscriber<Int> {
+                        private var subscription: Subscription? = null
 
-            publisherMap[item.id]?.subscribe(object : FlowableSubscriber<Int> {
-                override fun onComplete() {
-                    callbackMap[item.id]?.onComplete()
+                        override fun onComplete() {
+                            finishDownload(item, subscription, null)
+                        }
 
-                    publisherMap.remove(item.id)
-                    if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "Finished download for ${item.url}")
-                    }
-                    runNext()
-                }
+                        override fun onSubscribe(s: Subscription) {
+                            subscription = s
+                            val cancel = synchronized(stateLock) {
+                                if (destroyed || !queue.isActive(item.id)) {
+                                    true
+                                } else {
+                                    subscriberMap[item.id] = s
+                                    false
+                                }
+                            }
+                            if (cancel) {
+                                s.cancel()
+                            } else {
+                                s.request(Long.MAX_VALUE)
+                            }
+                        }
 
-                override fun onSubscribe(s: Subscription) {
-                    subscriberMap[item.id] = s
-                    s.request(Long.MAX_VALUE)
-                }
+                        override fun onNext(progress: Int?) {
+                            callbackMap[item.id]?.onBytesReceived(progress ?: 0)
+                        }
 
-                override fun onNext(t: Int?) {
-                    callbackMap[item.id]?.onBytesReceived(t ?: 0)
-                }
-
-                override fun onError(t: Throwable?) {
-                    if (item.file.exists()) {
-                        item.file.delete()
-                    }
-                    publisherMap.remove(item.id)
-                    callbackMap[item.id]?.onError(t
-                            ?: Exception("Unknown (exception object is null)"))
-                }
-
-            })
+                        override fun onError(error: Throwable?) {
+                            finishDownload(
+                                    item,
+                                    subscription,
+                                    error ?: Exception("Unknown download error")
+                            )
+                        }
+                    })
+        } catch (error: Throwable) {
+            finishDownload(item, null, error)
         }
+    }
+
+    private fun finishDownload(item: DownloadItem, subscription: Subscription?, error: Throwable?) {
+        val listener = synchronized(stateLock) {
+            val currentSubscription = subscriberMap[item.id]
+            if (subscription != null && currentSubscription !== subscription) {
+                return
+            }
+            subscriberMap.remove(item.id)
+            queue.finished(item.id)
+            callbackMap[item.id]
+        }
+
+        if (error == null) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Finished download for ${item.url}")
+            }
+            listener?.onComplete()
+        } else {
+            if (item.file.exists()) {
+                item.file.delete()
+            }
+            listener?.onError(error)
+        }
+        drainQueue()
     }
 
     fun clear() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Removing listeners from subscriber map")
-        }
-        for (entry in subscriberMap) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Cancelling ${entry.key}")
+        val subscriptions = synchronized(stateLock) {
+            val current = subscriberMap.toMap()
+            subscriberMap.clear()
+            for (id in current.keys) {
+                itemById[id]?.let { queue.requeue(it) }
             }
-            entry.value.cancel()
+            current.values
         }
+        subscriptions.forEach { it.cancel() }
     }
 
     fun destroy() {
-        clear()
-        maxConcurrent = 0
-        items.clear()
+        val subscriptions = synchronized(stateLock) {
+            destroyed = true
+            queue.clear()
+            callbackMap.clear()
+            val current = subscriberMap.values.toList()
+            subscriberMap.clear()
+            current
+        }
+        subscriptions.forEach { it.cancel() }
+    }
+}
+
+internal class GalleryDownloadQueue(
+    downloadItems: List<DownloadItem>,
+    concurrentDownloads: Int,
+    initialPosition: Int = 0
+) {
+    private val maxConcurrent = concurrentDownloads.coerceAtLeast(0)
+    private val positions = downloadItems.mapIndexed { index, item -> item.id to index }.toMap()
+    private val pending = ArrayList(downloadItems.distinctBy { it.id })
+    private val active = HashSet<Long>()
+    private var focusPosition = normalizedPosition(initialPosition)
+
+    init {
+        reorderPending()
+    }
+
+    @Synchronized
+    fun prioritize(position: Int) {
+        focusPosition = normalizedPosition(position)
+        reorderPending()
+    }
+
+    @Synchronized
+    fun takeAvailable(preloadEnabled: Boolean, requestedIds: Set<Long>): List<DownloadItem> {
+        val availableSlots = (maxConcurrent - active.size).coerceAtLeast(0)
+        if (availableSlots == 0) {
+            return emptyList()
+        }
+
+        val selected = pending
+                .asSequence()
+                .filter { preloadEnabled || requestedIds.contains(it.id) }
+                .take(availableSlots)
+                .toList()
+        if (selected.isEmpty()) {
+            return emptyList()
+        }
+
+        val selectedIds = selected.mapTo(HashSet()) { it.id }
+        pending.removeAll { selectedIds.contains(it.id) }
+        active.addAll(selectedIds)
+        return selected
+    }
+
+    @Synchronized
+    fun ensurePending(item: DownloadItem) {
+        if (!active.contains(item.id) && pending.none { it.id == item.id }) {
+            pending.add(item)
+            reorderPending()
+        }
+    }
+
+    @Synchronized
+    fun requeue(item: DownloadItem) {
+        active.remove(item.id)
+        pending.removeAll { it.id == item.id }
+        pending.add(item)
+        reorderPending()
+    }
+
+    @Synchronized
+    fun finished(id: Long) {
+        active.remove(id)
+    }
+
+    @Synchronized
+    fun remove(id: Long) {
+        active.remove(id)
+        pending.removeAll { it.id == id }
+    }
+
+    @Synchronized
+    fun isActive(id: Long): Boolean = active.contains(id)
+
+    @Synchronized
+    fun clear() {
+        active.clear()
+        pending.clear()
+    }
+
+    private fun normalizedPosition(position: Int): Int {
+        if (positions.isEmpty()) {
+            return 0
+        }
+        return position.coerceIn(0, positions.size - 1)
+    }
+
+    private fun reorderPending() {
+        pending.sortWith(
+                compareBy<DownloadItem> {
+                    abs((positions[it.id] ?: Int.MAX_VALUE) - focusPosition)
+                }.thenBy {
+                    val position = positions[it.id] ?: Int.MAX_VALUE
+                    if (position >= focusPosition) 0 else 1
+                }.thenBy { positions[it.id] ?: Int.MAX_VALUE }
+        )
     }
 }
 
@@ -249,12 +321,15 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
         Log.d(DownloadManager.TAG, "Downloading file: ${file?.absolutePath}")
     }
     return Flowable.create({ emitter ->
-        if (file != null && file.exists()) {
+        if (file != null && file.exists() && file.length() > 0L) {
             if (BuildConfig.DEBUG) {
                 Log.d(DownloadManager.TAG, "File exists: ${file.absolutePath}; manually calling onComplete()")
             }
             emitter.onComplete()
             return@create
+        }
+        if (file != null && file.exists()) {
+            file.delete()
         }
 
         if (BuildConfig.DEBUG) {
@@ -262,7 +337,9 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
         }
 
         val req = Request.Builder().url(url).get().build()
-        client.newCall(req).enqueue(object : Callback {
+        val call = client.newCall(req)
+        emitter.setCancellable { call.cancel() }
+        call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 emitter.tryOnError(e)
             }
