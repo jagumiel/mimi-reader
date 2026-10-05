@@ -45,7 +45,9 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Añadir contratos de parsing HTML para comentarios, login y errores de publicación.
 - [x] Centralizar errores HTTP, límites de peticiones y tiempos de espera, respetando el máximo de una petición por segundo de la API sin limitar las descargas multimedia.
 - [x] Probar y proteger catálogo, hilo, miniaturas y multimedia ante respuestas incompletas o cambios de la API.
-- Añadir caché y estados de error recuperables para evitar pantallas vacías.
+- [x] Añadir caché y estados de error recuperables para evitar pantallas vacías.
+  - [x] Conservar catálogos separados por board y reutilizarlos cuando falle una actualización.
+  - [x] Mantener visibles boards, catálogos e hilos ya cargados, indicando que son contenido guardado y ofreciendo reintento.
 - [x] Añadir filtro persistente de boards: todas, solo SFW o solo NSFW, independiente del criterio de ordenación.
 
 ### 2. Persistencia y migraciones

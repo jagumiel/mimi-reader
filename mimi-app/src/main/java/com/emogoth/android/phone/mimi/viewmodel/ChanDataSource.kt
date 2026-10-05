@@ -3,6 +3,7 @@ package com.emogoth.android.phone.mimi.viewmodel
 import android.util.Log
 import com.emogoth.android.phone.mimi.async.ProcessThreadTask
 import com.emogoth.android.phone.mimi.db.ArchivedPostTableConnection
+import com.emogoth.android.phone.mimi.db.CatalogTableConnection
 import com.emogoth.android.phone.mimi.db.HistoryTableConnection
 import com.emogoth.android.phone.mimi.db.PostTableConnection
 import com.emogoth.android.phone.mimi.db.UserPostTableConnection
@@ -76,6 +77,12 @@ open class ChanDataSource {
         return chanConnector.fetchThread(boardName, threadId, ChanConnector.CACHE_DEFAULT)
                 .onErrorResumeNext { throwable: Throwable -> fetchArchivesOrError(boardName, threadId, throwable).first(ErrorChanThread(ChanThread(boardName, threadId, Collections.emptyList()), throwable)) }
                 .doOnSuccess { chanThread ->
+                    if (chanThread.posts.isEmpty()) {
+                        if (chanThread is ErrorChanThread) {
+                            Log.d(TAG, "No cached posts available for /$boardName/$threadId", chanThread.error)
+                        }
+                        return@doOnSuccess
+                    }
                     HistoryTableConnection.keepLatest(5)
                             .flatMap {
                                 HistoryTableConnection.putHistory(boardName, threadId, chanThread.posts.get(0), chanThread.posts.size)
@@ -152,6 +159,24 @@ open class ChanDataSource {
 
     fun fetchCatalog(boardName: String): Single<ChanCatalog> {
         return chanConnector.fetchCatalog(boardName)
+                .flatMap { catalog ->
+                    CatalogTableConnection.replacePosts(catalog)
+                            .onErrorReturn { error ->
+                                Log.e(TAG, "Could not cache catalog /$boardName/", error)
+                                false
+                            }
+                            .map { catalog }
+                }
+                .onErrorResumeNext { error: Throwable ->
+                    Log.w(TAG, "Could not refresh catalog /$boardName/; loading cached content", error)
+                    CatalogTableConnection.fetchPosts(boardName)
+                            .map(CatalogTableConnection.convertDbPostsToChanPosts())
+                            .map { posts -> CachedCatalog(boardName, posts, error) as ChanCatalog }
+                            .onErrorReturn { cacheError ->
+                                Log.e(TAG, "Could not load cached catalog /$boardName/", cacheError)
+                                CachedCatalog(boardName, emptyList(), error)
+                            }
+                }
     }
 
     fun fetchArchivedThread(boardName: String, threadId: Long, archive: Archive): Single<ArchivedChanThread> {

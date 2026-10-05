@@ -10,8 +10,8 @@ import io.reactivex.functions.Function
 object CatalogTableConnection {
     val LOG_TAG = CatalogTableConnection::class.java.simpleName
     @JvmStatic
-    fun fetchPosts(): Single<List<CatalogPost>> {
-        return getInstance()!!.catalog().getAll().firstOrError()
+    fun fetchPosts(boardName: String): Single<List<CatalogPost>> {
+        return getInstance()!!.catalog().getAll(boardName).firstOrError()
     }
 
     @JvmStatic
@@ -26,14 +26,18 @@ object CatalogTableConnection {
     }
 
     @JvmStatic
-    fun putPosts(catalog: ChanCatalog): Single<Boolean> {
+    fun replacePosts(catalog: ChanCatalog): Single<Boolean> {
         return Single.defer {
+            val boardName = catalog.boardName
+            if (boardName.isNullOrBlank()) {
+                return@defer Single.just(false)
+            }
             val posts = catalog.posts ?: return@defer Single.just(false)
             val catalogPosts: MutableList<CatalogPost> = ArrayList(posts.size)
             for (i in posts.indices) {
-                catalogPosts.add(CatalogPost(posts[i]))
+                catalogPosts.add(CatalogPost(boardName, posts[i]))
             }
-            val resultsList = getInstance()!!.catalog().insert(catalogPosts)
+            val resultsList = getInstance()!!.catalog().replace(boardName, catalogPosts)
             var success = true
             for (value in resultsList) {
                 if (success) {
@@ -45,17 +49,17 @@ object CatalogTableConnection {
     }
 
     @JvmStatic
-    fun removeThread(threadId: Long): Single<Boolean> {
+    fun removeThread(boardName: String, threadId: Long): Single<Boolean> {
         return Single.defer {
-            getInstance()?.catalog()?.removeThread(threadId) ?: return@defer Single.just(false)
+            getInstance()?.catalog()?.removeThread(boardName, threadId) ?: return@defer Single.just(false)
             Single.just(true)
         }
     }
 
     @JvmStatic
-    fun clear(): Single<Boolean> {
+    fun clear(boardName: String): Single<Boolean> {
         return Single.defer {
-            getInstance()?.catalog()?.clear() ?: return@defer Single.just(false)
+            getInstance()?.catalog()?.clear(boardName) ?: return@defer Single.just(false)
             Single.just(true)
         }
     }

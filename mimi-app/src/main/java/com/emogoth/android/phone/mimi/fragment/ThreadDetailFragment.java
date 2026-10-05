@@ -80,6 +80,7 @@ import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.GalleryScrollReceiver;
 import com.emogoth.android.phone.mimi.util.LayoutType;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.NetworkError;
 import com.emogoth.android.phone.mimi.util.NetworkErrorMessage;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.viewmodel.ThreadViewModel;
@@ -141,6 +142,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
     private int unreadCount = 0;
     private int loaderId = LOADER_ID;
     private TextView closeMessageButton;
+    private TextView retryMessageButton;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean createNewPostFragment = false;
     //    private boolean isWatched;
@@ -252,6 +254,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
         messageContainer = view.findViewById(R.id.message_container);
         messageText = view.findViewById(R.id.message);
         closeMessageButton = view.findViewById(R.id.close_message_button);
+        retryMessageButton = view.findViewById(R.id.retry_message_button);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         rememberThreadScrollPosition = MimiUtil.rememberThreadScrollPosition(getActivity());
         findViewStub = view.findViewById(R.id.find_bar_stub);
@@ -361,6 +364,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
                             onErrorResponse(new Exception(archiveMessage));
                         }
                     } else {
+                        hideErrorMessage();
                         Log.e(LOG_TAG, "Returned with " + t.getPosts().size() + " posts in thread /" + t.getBoardName() + "/" + t.getThreadId());
                     }
                 })
@@ -722,17 +726,27 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
             return;
         }
 
-        if (showLoading) {
+        if (showLoading && (currentThread == null || currentThread.getPosts().isEmpty())) {
             showLoadingLayout();
+        } else if (showLoading && swipeRefreshLayout != null) {
+            showContent();
+            swipeRefreshLayout.setRefreshing(true);
         }
 
         RxUtil.safeUnsubscribe(threadSubscription);
         threadSubscription = refreshObservable()
                 .subscribe(chanThread -> {
-                    if (chanThread.getPosts().size() > 0 && showLoading) {
-                        showContent();
-                    } else if (showLoading) {
-                        onErrorResponse(new Exception("Empty response from server"));
+                    if (chanThread instanceof ErrorChanThread) {
+                        if (showLoading) {
+                            showContent();
+                        }
+                    } else {
+                        hideErrorMessage();
+                        if (chanThread.getPosts().size() > 0 && showLoading) {
+                            showContent();
+                        } else if (showLoading) {
+                            onErrorResponse(new Exception("Empty response from server"));
+                        }
                     }
 
                     Log.d(LOG_TAG, "Refreshed thread: /" + boardName + "/" + threadId);
@@ -1061,7 +1075,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
 //            return;
         }
 
-        if (currentThread == null) {
+        if (currentThread == null || currentThread.getPosts().isEmpty()) {
             if (closeMessageButton != null) {
                 closeMessageButton.setVisibility(View.INVISIBLE);
             }
@@ -1083,6 +1097,12 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
             messageContainer.setVisibility(View.VISIBLE);
         }
 
+        if (retryMessageButton != null) {
+            final boolean retryable = NetworkError.from(error).isRetryable();
+            retryMessageButton.setVisibility(retryable ? View.VISIBLE : View.GONE);
+            retryMessageButton.setOnClickListener(retryable ? view -> refresh(false) : null);
+        }
+
         if (viewModel.bookmarked()) {
             RxUtil.safeUnsubscribe(historyRemovedSubscription);
             historyRemovedSubscription = HistoryTableConnection.setHistoryRemovedStatus(boardName, threadId, true)
@@ -1091,6 +1111,16 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
         }
 
         Log.d(LOG_TAG, "Exception while accessing network", error);
+    }
+
+    private void hideErrorMessage() {
+        if (messageContainer != null) {
+            messageContainer.setVisibility(View.GONE);
+        }
+        if (retryMessageButton != null) {
+            retryMessageButton.setVisibility(View.GONE);
+            retryMessageButton.setOnClickListener(null);
+        }
     }
 
     private ChanPost getFirstPost(final ChanThread thread) {
@@ -1205,6 +1235,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
         loadingLayout = null;
         messageContainer = null;
         closeMessageButton = null;
+        retryMessageButton = null;
         messageText = null;
         swipeRefreshLayout = null;
         bookmarkMenuItem = null;

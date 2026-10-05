@@ -45,6 +45,7 @@ import com.emogoth.android.phone.mimi.interfaces.IToolbarContainer
 import com.emogoth.android.phone.mimi.interfaces.TabInterface
 import com.emogoth.android.phone.mimi.util.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.mimireader.chanlib.ChanConnector
 import com.mimireader.chanlib.models.ChanBoard
 import io.reactivex.Single
@@ -123,6 +124,7 @@ class BoardItemListFragment
     private var boardFetchDisposable: Disposable? = null
     private var initDatabaseDisposable: Disposable? = null
     private var manageBoardsMenuItem: MenuItem? = null
+    private var cachedContentSnackbar: Snackbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = false
@@ -418,16 +420,19 @@ class BoardItemListFragment
 
         RxUtil.safeUnsubscribe(boardFetchDisposable)
         boardFetchDisposable = connector.fetchBoards()
-                .observeOn(AndroidSchedulers.mainThread())
-                .onErrorReturn { throwable: Throwable? ->
-                    Log.e(LOG_TAG, "Error while fetching list of boards from the network", throwable)
-                    showError(throwable)
-                    emptyList()
-                }
                 .observeOn(Schedulers.io())
                 .doOnSuccess(saveBoards())
                 .compose(applySingleSchedulers())
-                .subscribe()
+                .subscribe({
+                    dismissCachedContentWarning()
+                }, { throwable ->
+                    Log.e(LOG_TAG, "Error while fetching list of boards from the network", throwable)
+                    if (allBoards.isNotEmpty()) {
+                        showCachedContent(throwable)
+                    } else {
+                        showError(throwable)
+                    }
+                })
     }
 
     private fun watchDatabase() {
@@ -452,6 +457,7 @@ class BoardItemListFragment
     }
 
     private fun showError(error: Throwable? = null) {
+        dismissCachedContentWarning()
         if (manageBoardsMenuItem != null) {
             manageBoardsMenuItem?.isEnabled = false
         }
@@ -469,6 +475,22 @@ class BoardItemListFragment
             errorView = view
         }
         errorStub?.inflate()
+    }
+
+    private fun showCachedContent(error: Throwable) {
+        errorSwitcher?.displayedChildId = boardsList?.id ?: 0
+        dismissCachedContentWarning()
+        cachedContentSnackbar = rootView?.let {
+            Snackbar.make(it, R.string.cached_content_warning, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry) { loadBoards() }
+                    .also(Snackbar::show)
+        }
+        Log.w(LOG_TAG, "Showing cached boards after a recoverable refresh error", error)
+    }
+
+    private fun dismissCachedContentWarning() {
+        cachedContentSnackbar?.dismiss()
+        cachedContentSnackbar = null
     }
 
     private fun setupTouchListeners() {
@@ -712,6 +734,11 @@ class BoardItemListFragment
                 toolbarContainer?.setExpandedToolbar(true, true)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        dismissCachedContentWarning()
+        super.onDestroyView()
     }
 
     override fun onBackPressed(): Boolean {

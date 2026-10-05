@@ -7,10 +7,11 @@ import androidx.room.PrimaryKey
 import com.emogoth.android.phone.mimi.db.MimiDatabase
 import com.mimireader.chanlib.models.ChanPost
 
-@Entity(tableName = MimiDatabase.CATALOG_TABLE, indices = [Index(value = [CatalogPost.POST_ID], unique = true)])
+@Entity(tableName = MimiDatabase.CATALOG_TABLE, indices = [Index(value = [CatalogPost.BOARD_NAME, CatalogPost.POST_ID], unique = true)])
 class CatalogPost() {
 
-    constructor(other: ChanPost): this() {
+    constructor(boardName: String, other: ChanPost): this() {
+        this.boardName = boardName
         postId = other.no
         closed = if (other.isClosed) 1 else 0
         sticky = if (other.isSticky) 1 else 0
@@ -49,6 +50,7 @@ class CatalogPost() {
 
     companion object {
         const val ID = "id"
+        const val BOARD_NAME = "board_name"
         const val POST_ID = "post_id"
         const val CLOSED = "closed"
         const val STICKY = "sticky"
@@ -88,6 +90,9 @@ class CatalogPost() {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = ID)
     var id: Int? = null
+
+    @ColumnInfo(name = BOARD_NAME)
+    var boardName: String = ""
 
     @ColumnInfo(name = POST_ID)
     var postId: Long = 0

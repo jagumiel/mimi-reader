@@ -442,7 +442,7 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     return true;
                 } else if (menuItem.getItemId() == R.id.hide_thread_menu) {
                     HiddenThreadTableConnection.hideThread(boardName, threadId, sticky)
-                            .flatMap((Function<Boolean, SingleSource<Boolean>>) aBoolean -> CatalogTableConnection.removeThread(threadId))
+                            .flatMap((Function<Boolean, SingleSource<Boolean>>) aBoolean -> CatalogTableConnection.removeThread(boardName, threadId))
                             .compose(DatabaseUtils.applySingleSchedulers())
                             .subscribe(new SingleObserver<Boolean>() {
                                 @Override

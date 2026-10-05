@@ -21,7 +21,7 @@ import com.emogoth.android.phone.mimi.db.models.*
     Archive::class,
     ArchivedPost::class,
     RefreshQueue::class],
-        version = 22)
+        version = 23)
 abstract class MimiDatabase : RoomDatabase() {
     companion object {
         const val HISTORY_TABLE = "History"
@@ -49,6 +49,7 @@ abstract class MimiDatabase : RoomDatabase() {
                             .addMigrations(MIGRATION_17_18)
                             .addMigrations(MIGRATION_20_21)
                             .addMigrations(MIGRATION_21_22)
+                            .addMigrations(MIGRATION_22_23)
                             .build()
                 }
             }
@@ -335,6 +336,15 @@ abstract class MimiDatabase : RoomDatabase() {
                 database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_refresh_queue_history_id` ON `refresh_queue` (`history_id`)")
             }
 
+        }
+
+        val MIGRATION_22_23 = object : Migration(22, 23) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `catalog_posts` ADD COLUMN `board_name` TEXT NOT NULL DEFAULT ''")
+                database.execSQL("DROP INDEX IF EXISTS `index_catalog_posts_post_id`")
+                database.execSQL("DELETE FROM `catalog_posts`")
+                database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_catalog_posts_board_name_post_id` ON `catalog_posts` (`board_name`, `post_id`)")
+            }
         }
     }
 

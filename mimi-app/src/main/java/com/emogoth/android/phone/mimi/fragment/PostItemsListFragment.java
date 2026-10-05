@@ -78,6 +78,7 @@ import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.view.FilterDialog;
 import com.emogoth.android.phone.mimi.view.FilterView;
 import com.emogoth.android.phone.mimi.viewmodel.CatalogViewModel;
+import com.emogoth.android.phone.mimi.viewmodel.CachedCatalog;
 import com.google.android.material.snackbar.Snackbar;
 import com.mimireader.chanlib.models.ChanBoard;
 import com.mimireader.chanlib.models.ChanCatalog;
@@ -160,6 +161,7 @@ public class PostItemsListFragment extends MimiFragmentBase implements
     private Bundle postState;
     private boolean createNewPostFragment;
     private Disposable fetchBoardsDisposable;
+    private Snackbar cachedContentSnackbar;
 
     private CatalogViewModel viewModel;
 
@@ -261,12 +263,6 @@ public class PostItemsListFragment extends MimiFragmentBase implements
         errorRefreshButton.setOnClickListener(v -> refreshBoard(true));
 
         if (savedInstanceState == null || forceRefresh) {
-            CatalogTableConnection.clear()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe();
-
-
             fetchCatalog(true);
 
             Log.i(LOG_TAG, "Fetching catalog");
@@ -430,13 +426,11 @@ public class PostItemsListFragment extends MimiFragmentBase implements
             return;
         }
 
-        CatalogTableConnection.clear()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-
-        if (showLoading) {
+        if (showLoading && postList.isEmpty()) {
             showLoadingLayout();
+        } else if (showLoading) {
+            showContent();
+            listRefreshLayout.setRefreshing(true);
         }
 
         currentPage = 1;
@@ -505,7 +499,7 @@ public class PostItemsListFragment extends MimiFragmentBase implements
 
     private void fetchFromDb(final Parcelable listState) {
         RxUtil.safeUnsubscribe(catalogSubscription);
-        catalogSubscription = CatalogTableConnection.fetchPosts()
+        catalogSubscription = CatalogTableConnection.fetchPosts(boardName)
                 .map(CatalogTableConnection.convertDbPostsToChanPosts())
                 .flatMap((Function<List<ChanPost>, Single<ChanCatalog>>) posts -> {
                     ChanCatalog catalog = new ChanCatalog();
@@ -551,19 +545,23 @@ public class PostItemsListFragment extends MimiFragmentBase implements
                     Log.d(LOG_TAG, "No catalog to process");
                     return new ChanCatalog();
                 })
-                .map(chanCatalog -> {
-                    Log.d(LOG_TAG, "Putting catalog into database");
-                    CatalogTableConnection.putPosts(chanCatalog).subscribe();
-                    return chanCatalog;
-                })
                 .flatMap(sortPosts())
                 .compose(DatabaseUtils.applySingleSchedulers())
                 .subscribe(catalog -> {
                     Log.d(LOG_TAG, "Finished fetching catalog");
                     if (catalog.getPosts().size() > 0) {
                         catalogResponse(catalog, null, refreshing);
+                        if (catalog instanceof CachedCatalog) {
+                            showCachedContent(((CachedCatalog) catalog).getError());
+                        } else {
+                            dismissCachedContentWarning();
+                        }
                     } else {
-                        throw new Exception("Catalog response is empty");
+                        if (catalog instanceof CachedCatalog) {
+                            showError(getString(NetworkErrorMessage.resourceFor(((CachedCatalog) catalog).getError())));
+                        } else {
+                            showError(getString(R.string.generic_board_load_error));
+                        }
                     }
                 }, throwable -> {
                     showError(getString(NetworkErrorMessage.resourceFor(throwable)));
@@ -699,6 +697,8 @@ public class PostItemsListFragment extends MimiFragmentBase implements
             return;
         }
 
+        dismissCachedContentWarning();
+
         if (loadingLayout != null) {
             loadingLayout.setVisibility(View.GONE);
         }
@@ -710,6 +710,25 @@ public class PostItemsListFragment extends MimiFragmentBase implements
 
         listRefreshLayout.setRefreshing(false);
         listRefreshLayout.setVisibility(View.GONE);
+    }
+
+    private void showCachedContent(final Throwable error) {
+        if (getView() == null) {
+            return;
+        }
+
+        dismissCachedContentWarning();
+        cachedContentSnackbar = Snackbar.make(getView(), R.string.cached_content_warning, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, view -> refreshBoard(false));
+        cachedContentSnackbar.show();
+        Log.w(LOG_TAG, "Showing cached catalog after a recoverable refresh error", error);
+    }
+
+    private void dismissCachedContentWarning() {
+        if (cachedContentSnackbar != null) {
+            cachedContentSnackbar.dismiss();
+            cachedContentSnackbar = null;
+        }
     }
 
     @Override
@@ -994,6 +1013,7 @@ public class PostItemsListFragment extends MimiFragmentBase implements
 
     @Override
     public void onDestroy() {
+        dismissCachedContentWarning();
         super.onDestroy();
 
         if (postItemsAdapter != null) {
