@@ -52,10 +52,12 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 2. Persistencia y migraciones
 
-- Actualizar Room y eliminar APIs de ciclo de vida obsoletas.
-- Versionar y probar todas las migraciones de base de datos con copias reales.
-- Garantizar que historial, marcadores, filtros y preferencias sobreviven a una actualización.
-- Reducir el trabajo de base de datos en el hilo principal.
+- [ ] Actualizar Room y eliminar APIs de ciclo de vida obsoletas.
+- [ ] Versionar y probar todas las migraciones de base de datos con copias reales.
+  - [x] Añadir una prueba instrumentada de la migración `22 → 23` que valida el esquema y la conservación de historial, boards favoritas, filtros e hilos ocultos.
+  - [ ] Incorporar esquemas o copias reales anteriores a la versión 22 para cubrir las rutas de actualización antiguas.
+- [ ] Garantizar que historial, marcadores, filtros y preferencias sobreviven a una actualización.
+- [ ] Reducir el trabajo de base de datos en el hilo principal.
 
 ### 3. Navegación e interfaz moderna
 
