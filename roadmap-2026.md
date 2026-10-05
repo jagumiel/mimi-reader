@@ -44,7 +44,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Añadir pruebas HTTP simuladas para rutas, `Cache-Control`, respuestas 404/429/503 y cuerpos JSON truncados.
 - [x] Añadir contratos de parsing HTML para comentarios, login y errores de publicación.
 - [x] Centralizar errores HTTP, límites de peticiones y tiempos de espera, respetando el máximo de una petición por segundo de la API sin limitar las descargas multimedia.
-- Probar catálogo, hilo, miniaturas y multimedia ante respuestas incompletas o cambios de la API.
+- [x] Probar y proteger catálogo, hilo, miniaturas y multimedia ante respuestas incompletas o cambios de la API.
 - Añadir caché y estados de error recuperables para evitar pantallas vacías.
 - [x] Añadir filtro persistente de boards: todas, solo SFW o solo NSFW, independiente del criterio de ordenación.
 
@@ -58,6 +58,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 ### 3. Navegación e interfaz moderna
 
 - [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
+- [ ] Mantener la precarga de toda la galería, limitando las descargas simultáneas y reordenando la cola según la distancia al elemento visible: primero las imágenes y vídeos más cercanos y después los más lejanos.
 - Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
 - Implementar correctamente el gesto Atrás predictivo antes de retirar la desactivación temporal.
 - Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.

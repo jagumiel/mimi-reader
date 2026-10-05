@@ -18,6 +18,7 @@ import com.emogoth.android.phone.mimi.fourchan.FourChanEndpoints
 import com.emogoth.android.phone.mimi.model.OutsideLink
 import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.MediaContract
 import com.emogoth.android.phone.mimi.view.LongClickLinkMovementMethod
 import com.mimireader.chanlib.models.ArchivedChanPost
 import com.mimireader.chanlib.models.ChanPost
@@ -59,7 +60,7 @@ class RepliesListAdapter(val replies: List<ChanPost>, private val links: List<Ou
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE)
 
-            if (post.filename != null && "" != post.filename) {
+            if (MediaContract.hasRemoteMedia(post)) {
                 thumbUrlMap[post.no] = if (post is ArchivedChanPost)
                     post.thumbLink
                             ?: MimiUtil.https() + context.getString(R.string.thumb_link) + context.getString(R.string.thumb_path, boardName, post.tim)

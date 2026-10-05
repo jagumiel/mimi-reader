@@ -64,6 +64,7 @@ import com.emogoth.android.phone.mimi.model.HeaderFooterViewHolder;
 import com.emogoth.android.phone.mimi.util.GlideApp;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.MediaContract;
 import com.emogoth.android.phone.mimi.view.GridItemImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.mimireader.chanlib.models.ChanPost;
@@ -349,7 +350,7 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         viewHolder.threadNo.setText("" + threadId);
 
-        if (threadItem.getFilename() != null && !threadItem.getFilename().equals("")) {
+        if (MediaContract.hasRemoteMedia(threadItem)) {
             if (managerType == ManagerType.GRID || managerType == ManagerType.STAGGERED_GRID) {
                 viewHolder.thumbUrl.setAspectRatio(threadItem.getThumbnailWidth(), threadItem.getThumbnailHeight());
             } else {

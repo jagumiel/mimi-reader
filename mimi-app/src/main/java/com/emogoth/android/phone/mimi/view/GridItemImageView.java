@@ -111,7 +111,11 @@ public class GridItemImageView extends AppCompatImageView {
     }
 
     public void setAspectRatio(int width, int height) {
-        setAspectRatio((float) height / (float) width);
+        if (width <= 0 || height <= 0) {
+            setAspectRatio(DEFAULT_ASPECT_RATIO);
+        } else {
+            setAspectRatio((float) height / (float) width);
+        }
     }
 
     /**

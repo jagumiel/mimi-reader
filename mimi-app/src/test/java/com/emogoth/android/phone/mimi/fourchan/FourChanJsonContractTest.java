@@ -1,6 +1,7 @@
 package com.emogoth.android.phone.mimi.fourchan;
 
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanPost;
+import com.emogoth.android.phone.mimi.fourchan.models.FourChanBoards;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanThread;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanThreadPage;
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class FourChanJsonContractTest {
     private static final Gson GSON = new Gson();
@@ -50,6 +52,20 @@ public class FourChanJsonContractTest {
         assertEquals("Thread title", pages.get(0).getThreads().get(0).getSub());
         assertNull(pages.get(0).getThreads().get(1).getExt());
         assertNull(pages.get(0).getThreads().get(1).getTim());
+    }
+
+    @Test
+    public void normalizesExplicitlyNullCollections() {
+        final FourChanThread thread = GSON.fromJson("{\"posts\":null}", FourChanThread.class);
+        final FourChanBoards boards = GSON.fromJson("{\"boards\":null}", FourChanBoards.class);
+        final Type catalogType = new TypeToken<List<FourChanThreadPage>>() { }.getType();
+        final List<FourChanThreadPage> pages = GSON.fromJson(
+                "[{\"page\":1,\"threads\":null}]", catalogType);
+
+        assertTrue(thread.getPosts().isEmpty());
+        assertTrue(boards.getBoards().isEmpty());
+        assertTrue(boards.toBoardList().isEmpty());
+        assertTrue(pages.get(0).getThreads().isEmpty());
     }
 
     @Test(expected = JsonSyntaxException.class)

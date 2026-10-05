@@ -33,11 +33,11 @@ public class FourChanBoards {
     protected List<FourChanBoard> boards = new ArrayList<>();
 
     public List<FourChanBoard> getBoards() {
-        return boards;
+        return boards == null ? Collections.emptyList() : boards;
     }
 
     public void setBoards(List<FourChanBoard> boards) {
-        this.boards = boards;
+        this.boards = boards == null ? new ArrayList<>() : boards;
     }
 
     public FourChanBoards withBoards(List<FourChanBoard> boards) {
@@ -49,7 +49,9 @@ public class FourChanBoards {
         if (boards != null) {
             List<ChanBoard> chanBoards = new ArrayList<>();
             for (FourChanBoard board : boards) {
-                chanBoards.add(board.toBoard());
+                if (board != null && board.getName() != null && !board.getName().trim().isEmpty()) {
+                    chanBoards.add(board.toBoard());
+                }
             }
 
             return chanBoards;

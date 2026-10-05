@@ -20,6 +20,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -49,13 +50,13 @@ public class FourChanThreadPage {
      * @return The threads
      */
     public List<FourChanPost> getThreads() {
-        return threads;
+        return threads == null ? Collections.emptyList() : threads;
     }
 
     /**
      * @param threads The threads
      */
     public void setThreads(List<FourChanPost> threads) {
-        this.threads = threads;
+        this.threads = threads == null ? new ArrayList<>() : threads;
     }
 }

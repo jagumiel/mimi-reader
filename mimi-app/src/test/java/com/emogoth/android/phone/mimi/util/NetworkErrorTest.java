@@ -36,6 +36,8 @@ public class NetworkErrorTest {
         assertError(new IOException(), NetworkError.Kind.CONNECTION, 0, true);
         assertError(new SSLHandshakeException("certificate"), NetworkError.Kind.TLS, 0, false);
         assertError(new JsonSyntaxException("truncated"), NetworkError.Kind.INVALID_RESPONSE, 0, true);
+        assertError(new InvalidApiResponseException("missing posts"),
+                NetworkError.Kind.INVALID_RESPONSE, 0, true);
     }
 
     @Test

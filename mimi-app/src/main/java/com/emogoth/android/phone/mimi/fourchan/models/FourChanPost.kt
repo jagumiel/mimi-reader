@@ -3,6 +3,7 @@ package com.emogoth.android.phone.mimi.fourchan.models
 import android.content.Context
 import com.emogoth.android.phone.mimi.fourchan.FourChanCommentParser
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.MediaContract
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.mimireader.chanlib.interfaces.PostConverter
@@ -164,7 +165,7 @@ class FourChanPost : PostConverter {
         post.com = com
         post.sub = sub
         post.name = name
-        post.ext = ext
+        post.ext = MediaContract.normalizedExtension(ext).ifEmpty { null }
         post.filename = filename
         post.fsize = fileSize
         post.height = h

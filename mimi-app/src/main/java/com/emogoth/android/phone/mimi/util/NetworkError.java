@@ -53,7 +53,8 @@ public final class NetworkError {
         if (hasCause(throwable, SSLException.class)) {
             return new NetworkError(Kind.TLS, 0);
         }
-        if (hasCause(throwable, JsonParseException.class)
+        if (hasCause(throwable, InvalidApiResponseException.class)
+                || hasCause(throwable, JsonParseException.class)
                 || hasCause(throwable, EOFException.class)) {
             return new NetworkError(Kind.INVALID_RESPONSE, 0);
         }

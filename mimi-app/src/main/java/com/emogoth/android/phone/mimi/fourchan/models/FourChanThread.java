@@ -20,6 +20,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -32,13 +33,13 @@ public class FourChanThread {
      * @return The posts
      */
     public List<FourChanPost> getPosts() {
-        return posts;
+        return posts == null ? Collections.emptyList() : posts;
     }
 
     /**
      * @param posts The posts
      */
     public void setPosts(List<FourChanPost> posts) {
-        this.posts = posts;
+        this.posts = posts == null ? new ArrayList<>() : posts;
     }
 }

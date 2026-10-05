@@ -28,7 +28,6 @@ import com.emogoth.android.phone.mimi.fourchan.models.FourChanArchive;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanBoard;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanBoards;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanPost;
-import com.emogoth.android.phone.mimi.fourchan.models.FourChanThreadPage;
 import com.emogoth.android.phone.mimi.fourchan.models.archives.FoolFuukaThreadConverter;
 import com.mimireader.chanlib.ChanConnector;
 import com.mimireader.chanlib.models.ArchivedChanThread;
@@ -100,14 +99,12 @@ public class FourChanConnector extends ChanConnector {
                     Log.d(LOG_TAG, "Fetched catalog");
                     ChanCatalog cat = new ChanCatalog();
                     cat.setBoardName(boardName);
-                    for (FourChanThreadPage fourChanThreadPage : fourChanThreadPages) {
-                        List<ChanPost> posts = new ArrayList<>();
-                        for (FourChanPost fourChanPost : fourChanThreadPage.getThreads()) {
-                            fourChanPost.processComment(MimiApplication.getInstance().getApplicationContext(), boardName, 0);
-                            posts.add(fourChanPost.toPost());
-                        }
-                        cat.addPosts(posts);
+                    List<ChanPost> posts = new ArrayList<>();
+                    for (FourChanPost fourChanPost : FourChanResponseValidator.requireCatalogPosts(fourChanThreadPages)) {
+                        fourChanPost.processComment(MimiApplication.getInstance().getApplicationContext(), boardName, 0);
+                        posts.add(fourChanPost.toPost());
                     }
+                    cat.addPosts(posts);
 
                     return cat;
                 });
@@ -116,11 +113,11 @@ public class FourChanConnector extends ChanConnector {
     @NonNull
     @Override
     public Single<ChanThread> fetchThread(@NonNull final String boardName, final long threadId, final String cacheControl) {
-        final String cache = cacheControl.equals("") ? null : cacheControl;
+        final String cache = cacheControl == null || cacheControl.isEmpty() ? null : cacheControl;
         return api.fetchThread(boardName, threadId, cache)
                 .map(fourChanThread -> {
                     List<ChanPost> posts = new ArrayList<>();
-                    for (FourChanPost fourChanPost : fourChanThread.getPosts()) {
+                    for (FourChanPost fourChanPost : FourChanResponseValidator.requireThreadPosts(fourChanThread, threadId)) {
                         posts.add(fourChanPost.toPost());
                     }
 

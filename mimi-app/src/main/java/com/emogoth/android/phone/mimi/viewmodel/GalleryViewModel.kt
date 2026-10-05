@@ -178,17 +178,17 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
     }
 
     fun convertPostToGalleryItem(post: ChanPost): GalleryItem {
-        return if (post.fsize > 0 && post.tim != null && post.ext != null) {
+        return if (MediaContract.hasRemoteMedia(post)) {
             val tim: String = post.tim ?: ""
-            val ext: String = post.ext ?: ""
+            val ext = MediaContract.normalizedExtension(post.ext)
             val thumb = if (post is ArchivedChanPost) (post.thumbLink
                     ?: "$imageBaseUrl/$boardName/${tim}s.jpg") else "$imageBaseUrl/$boardName/${tim}s.jpg"
             val remoteFileName = "${tim}${ext}"
             val localFileName = "${tim}${ext}"
-            val originalFileName = "${post.filename}${ext}"
+            val originalFileName = "${MediaContract.originalFilename(post)}${ext}"
             val img = if (post is ArchivedChanPost) (post.mediaLink
                     ?: "$imageBaseUrl/$boardName/$remoteFileName") else "$imageBaseUrl/$boardName/$remoteFileName"
-            GalleryItem(post.no, thumb, img, post.fsize, post.width, post.height, boardName, ext, localFileName, originalFileName)
+            GalleryItem(post.no, thumb, img, post.fsize.coerceAtLeast(0), post.width, post.height, boardName, ext, localFileName, originalFileName)
         } else {
             GalleryItem.empty()
         }
@@ -226,7 +226,10 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
                 .flatMap {
                     val items = ArrayList<GalleryItem>(postIds.size)
                     for (chanPost in it) {
-                        items.add(convertPostToGalleryItem(chanPost))
+                        val item = convertPostToGalleryItem(chanPost)
+                        if (item != GalleryItem.empty()) {
+                            items.add(item)
+                        }
                     }
 
                     Single.just(items as List<GalleryItem>)
