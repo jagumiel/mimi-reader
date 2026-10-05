@@ -1,6 +1,7 @@
 package com.emogoth.android.phone.mimi.activity
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -10,8 +11,10 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.activity.GalleryActivity2.Companion.start
 import com.emogoth.android.phone.mimi.adapter.TabPagerAdapter
@@ -27,7 +30,7 @@ import com.emogoth.android.phone.mimi.util.Pages
 import com.emogoth.android.phone.mimi.util.RxUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
+import com.google.android.material.tabs.TabLayoutMediator
 
 import com.mimireader.chanlib.models.ChanBoard
 import com.mimireader.chanlib.models.ChanPost
@@ -44,6 +47,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     private val appbar get() = binding.appbar
 
     private var tabPagerAdapter: TabPagerAdapter? = null
+    private var tabLayoutMediator: TabLayoutMediator? = null
     private var currentFragment: MimiFragmentBase? = null
     private var closeTabOnBack = false
     override val pageName: String? = "tabs_activity"
@@ -52,6 +56,21 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
 
     companion object {
         const val LOG_TAG = "TabsActivity"
+    }
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            updateCurrentFragment(position)
+        }
+    }
+
+    private val fragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentResumed(fragmentManager: FragmentManager, fragment: Fragment) {
+            val activeFragment = tabPagerAdapter?.getActiveFragment(tabs_pager.currentItem)
+            if (fragment === activeFragment && fragment is MimiFragmentBase) {
+                activateCurrentFragment(fragment)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,22 +83,20 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         mimi_toolbar.setNavigationOnClickListener { toggleNavDrawer() }
         val tabItems: ArrayList<TabPagerAdapter.TabItem>?
         if (savedInstanceState != null && savedInstanceState.containsKey("tabItems")) {
-            tabItems = savedInstanceState.getParcelableArrayList("tabItems")
-            tabPagerAdapter = TabPagerAdapter(supportFragmentManager, tabItems)
+            tabItems = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                savedInstanceState.getParcelableArrayList("tabItems", TabPagerAdapter.TabItem::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                savedInstanceState.getParcelableArrayList("tabItems")
+            }
+            tabPagerAdapter = TabPagerAdapter(this, tabItems)
         } else {
             tabItems = null
-            tabPagerAdapter = TabPagerAdapter(supportFragmentManager)
+            tabPagerAdapter = TabPagerAdapter(this)
         }
+        supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
         tabs_pager.setAdapter(tabPagerAdapter)
-        tabs_pager.addOnPageChangeListener(TabLayoutOnPageChangeListener(tab_layout))
-        tabs_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageSelected(position: Int) {
-                updateCurrentFragment(position)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {}
-        })
+        tabs_pager.registerOnPageChangeCallback(pageChangeCallback)
         updateCurrentFragment(tabs_pager.currentItem)
 
         // Hack to stop crashing
@@ -89,33 +106,9 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
 //            uselessTab = tabLayout.newTab();
 //        }
         tab_layout.setTabMode(TabLayout.MODE_SCROLLABLE)
-        tab_layout.setupWithViewPager(tabs_pager)
-        tab_layout.setTabsFromPagerAdapter(tabPagerAdapter)
-        if (savedInstanceState != null && tabItems != null) {
-            val count = tab_layout.getTabCount()
-            for (i in 1 until count) {
-                val tab = tab_layout.getTabAt(i)
-                if (tab != null) {
-                    val item = tabItems[i]
-                    if (i == 1 && item.tabType == TabPagerAdapter.TabType.POSTS) {
-                        tab.text = getTabTitle(item.title)
-                    } else if (i == 1 && item.tabType == TabPagerAdapter.TabType.HISTORY) {
-                        tab.text = item.title.uppercase(Locale.getDefault())
-                    } else {
-                        val args = item.bundle
-                        if (args != null) {
-                            val threadId = args.getLong(Extras.EXTRAS_THREAD_ID, 0)
-                            val boardName = args.getString(Extras.EXTRAS_BOARD_NAME, "")
-                            val tabView = createTabView(threadId, boardName)
-                            tab.customView = tabView
-                            tab.select()
-                        }
-                    }
-                }
-            }
-        }
-        val boardsTab = tab_layout.getTabAt(0)
-        boardsTab?.setText(R.string.boards)
+        tabLayoutMediator = TabLayoutMediator(tab_layout, tabs_pager) { tab, position ->
+            configureTab(tab, tabPagerAdapter?.getTabItem(position))
+        }.also { it.attach() }
         fab_add_content.setOnClickListener { v: View? ->
             if (currentFragment is ContentInterface) {
                 (currentFragment as ContentInterface).addContent()
@@ -138,10 +131,11 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     override fun onDestroy() {
+        tabLayoutMediator?.detach()
+        tabLayoutMediator = null
+        tabs_pager.unregisterOnPageChangeCallback(pageChangeCallback)
+        supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks)
         super.onDestroy()
-        if (tabs_pager != null) {
-            tabs_pager.clearOnPageChangeListeners()
-        }
     }
 
     override fun onResume() {
@@ -176,6 +170,22 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         return "/" + boardName.uppercase(Locale.getDefault()) + "/"
     }
 
+    private fun configureTab(tab: TabLayout.Tab, item: TabPagerAdapter.TabItem?) {
+        when (item?.tabType) {
+            TabPagerAdapter.TabType.BOARDS -> tab.setText(R.string.boards)
+            TabPagerAdapter.TabType.POSTS -> tab.text = getTabTitle(item.title ?: "")
+            TabPagerAdapter.TabType.HISTORY -> tab.text = item.title?.uppercase(Locale.getDefault())
+            TabPagerAdapter.TabType.THREAD -> {
+                val args = item.bundle
+                val threadId = args?.getLong(Extras.EXTRAS_THREAD_ID, item.id) ?: item.id
+                val boardName = args?.getString(Extras.EXTRAS_BOARD_NAME, item.title ?: "")
+                        ?: item.title.orEmpty()
+                tab.customView = createTabView(threadId, boardName)
+            }
+            null -> tab.text = ""
+        }
+    }
+
     override fun onBoardItemClick(board: ChanBoard, saveBackStack: Boolean) {
         val arguments = Bundle()
         arguments.putString(Extras.EXTRAS_BOARD_NAME, board.name)
@@ -184,18 +194,8 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         arguments.putBoolean(Extras.EXTRAS_STICKY_AUTO_REFRESH, true)
         val tabItem = TabPagerAdapter.TabItem(TabPagerAdapter.TabType.POSTS, arguments, PostItemsListFragment.TAB_ID.toLong(), board.name, null)
         if (tabPagerAdapter?.count == 1) {
-            val postListTab = tab_layout.newTab()
-            postListTab.text = getTabTitle(board.name)
             tabPagerAdapter?.addItem(tabItem)
-            tab_layout.addTab(postListTab)
         } else {
-            val postListTab = tab_layout.getTabAt(1)
-            if (postListTab != null) {
-                val newTab = tab_layout.newTab()
-                newTab.text = getTabTitle(board.name)
-                tab_layout.removeTabAt(1)
-                tab_layout.addTab(newTab, 1)
-            }
             tabPagerAdapter?.setItemAtIndex(1, tabItem)
         }
         tabs_pager.setCurrentItem(1, true)
@@ -204,10 +204,16 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     private fun updateCurrentFragment(position: Int) {
         tabs_pager.post {
             val fragment = tabPagerAdapter?.getActiveFragment(position) as? MimiFragmentBase
-            currentFragment = fragment
-            fragment?.initMenu()
-            setFabVisibility(fragment?.showFab() ?: false)
+            if (fragment != null) {
+                activateCurrentFragment(fragment)
+            }
         }
+    }
+
+    private fun activateCurrentFragment(fragment: MimiFragmentBase) {
+        currentFragment = fragment
+        fragment.initMenu()
+        setFabVisibility(fragment.showFab())
     }
 
     private fun setFabVisibility(shouldShow: Boolean) {
@@ -245,7 +251,6 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     override fun onPostItemClick(v: View?, posts: List<ChanPost>, position: Int, boardTitle: String, boardName: String, threadId: Long) {
-        val threadTab = tab_layout.newTab()
         val threadTabItem: TabPagerAdapter.TabItem
         val args = Bundle()
         args.putLong(Extras.EXTRAS_THREAD_ID, threadId)
@@ -255,16 +260,10 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         if (posts.size > position) {
             args.putParcelable(Extras.EXTRAS_THREAD_FIRST_POST, posts[position])
         }
-        val tabView = createTabView(threadId, boardName)
-        threadTab.customView = tabView
-        threadTab.select()
         threadTabItem = TabPagerAdapter.TabItem(TabPagerAdapter.TabType.THREAD, args, threadId, boardName, threadId.toString())
-        val itemCount = tabPagerAdapter?.count ?: 0
         val pos = tabPagerAdapter?.addItem(threadTabItem) ?: 0
         if (pos < 0) {
             return
-        } else if (pos >= itemCount) {
-            tab_layout.addTab(threadTab)
         }
         tabs_pager.setCurrentItem(pos, true)
     }
@@ -292,7 +291,10 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
             true
         }
         tabView.setOnClickListener { v: View? ->
-            tabs_pager.setCurrentItem(tabPagerAdapter?.getIndex(threadId) ?: -1, false)
+            val position = tabPagerAdapter?.getIndex(threadId) ?: -1
+            if (position >= 0) {
+                tabs_pager.setCurrentItem(position, false)
+            }
         }
         title.text = getTabTitle(boardName)
         subTitle.text = threadId.toString()
@@ -359,10 +361,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
                         }, {
                             Log.e(LOG_TAG, "Caught exception", it)
                         })
-                tab_layout.removeTabAt(pos)
                 tabPagerAdapter?.removeItemAtIndex(pos)
-                tabPagerAdapter?.notifyDataSetChanged()
-                //                tabPager.setAdapter(tabPagerAdapter);
                 tabs_pager.setCurrentItem(newPos, false)
                 if (showSnackbar) {
                     Snackbar.make(tabs_pager, R.string.closing_tab, Snackbar.LENGTH_SHORT).show()
@@ -407,7 +406,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     fun updateTabHighlight(boardName: String, threadId: Long, unread: Int) {
-        if (tabPagerAdapter != null && tab_layout != null) {
+        if (tabPagerAdapter != null) {
             val tabIndex = tabPagerAdapter?.getIndex(threadId) ?: -1
             if (tabIndex >= 0) {
                 val t = tab_layout.getTabAt(tabIndex)
@@ -455,18 +454,8 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         }
         val tabItem = TabPagerAdapter.TabItem(TabPagerAdapter.TabType.HISTORY, args, PostItemsListFragment.TAB_ID.toLong(), historyFragmentName, null)
         if (tabPagerAdapter?.count == 1) {
-            val postListTab = tab_layout.newTab()
-            postListTab.text = historyFragmentName
             tabPagerAdapter?.addItem(tabItem)
-            tab_layout.addTab(postListTab)
         } else {
-            val postListTab = tab_layout.getTabAt(1)
-            if (postListTab != null) {
-                val newTab = tab_layout.newTab()
-                newTab.text = historyFragmentName
-                tab_layout.removeTabAt(1)
-                tab_layout.addTab(newTab, 1)
-            }
             tabPagerAdapter?.setItemAtIndex(1, tabItem)
         }
         tabs_pager.setCurrentItem(1, false)
@@ -488,11 +477,11 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-        tabs_pager.isEnabled = false
+        tabs_pager.isUserInputEnabled = false
         return true
     }
 
     override fun onDestroyActionMode(p0: ActionMode?) {
-        tabs_pager.isEnabled = true
+        tabs_pager.isUserInputEnabled = true
     }
 }

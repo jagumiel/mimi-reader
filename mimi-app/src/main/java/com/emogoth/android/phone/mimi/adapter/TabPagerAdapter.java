@@ -20,11 +20,11 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
@@ -33,36 +33,31 @@ import com.emogoth.android.phone.mimi.fragment.HistoryFragment;
 import com.emogoth.android.phone.mimi.fragment.PostItemsListFragment;
 import com.emogoth.android.phone.mimi.fragment.ThreadDetailFragment;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
-public class TabPagerAdapter extends FragmentStatePagerAdapter {
+public class TabPagerAdapter extends FragmentStateAdapter {
     private static final String LOG_TAG = TabPagerAdapter.class.getSimpleName();
+    private static final String ARG_TAB_STABLE_ID = "mimi_tab_stable_id";
     private final List<TabItem> tabItems = new ArrayList<>();
-    private final Map<Long, Fragment> activeFragments = new HashMap<>();
+    private final FragmentManager fragmentManager;
 
-    public TabPagerAdapter(FragmentManager fm) {
-        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-
-        setup();
+    public TabPagerAdapter(FragmentActivity activity) {
+        super(activity);
+        fragmentManager = activity.getSupportFragmentManager();
 
         final String title = MimiApplication.getInstance().getApplicationContext().getString(R.string.boards);
         tabItems.add(new TabItem(TabType.BOARDS, null, BoardItemListFragment.TAB_ID, title, null));
     }
 
-    public TabPagerAdapter(FragmentManager fm, List<TabItem> items) {
-        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+    public TabPagerAdapter(FragmentActivity activity, List<TabItem> items) {
+        super(activity);
+        fragmentManager = activity.getSupportFragmentManager();
 
         if (items != null) {
             tabItems.addAll(items);
         }
-    }
-
-    private void setup() {
-
     }
 
     public TabItem getTab(int position) {
@@ -74,26 +69,33 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
+    public Fragment createFragment(int position) {
         final TabItem item = tabItems.get(position);
+        final Fragment fragment;
         switch (item.getTabType()) {
             case BOARDS:
-                return new BoardItemListFragment();
+                fragment = new BoardItemListFragment();
+                break;
             case POSTS:
-                final PostItemsListFragment postItemsListFragment = new PostItemsListFragment();
-                postItemsListFragment.setArguments(item.getBundle());
-                return postItemsListFragment;
+                fragment = new PostItemsListFragment();
+                break;
             case THREAD:
-                final ThreadDetailFragment threadDetailFragment = new ThreadDetailFragment();
-                threadDetailFragment.setArguments(item.getBundle());
-                return threadDetailFragment;
+                fragment = new ThreadDetailFragment();
+                break;
             case HISTORY:
-                final HistoryFragment historyFragment = new HistoryFragment();
-                historyFragment.setArguments(item.getBundle());
-                return historyFragment;
+                fragment = new HistoryFragment();
+                break;
+            default:
+                fragment = new Fragment();
+                break;
         }
 
-        return new Fragment();
+        final Bundle arguments = item.getBundle() == null
+                ? new Bundle()
+                : new Bundle(item.getBundle());
+        arguments.putLong(ARG_TAB_STABLE_ID, item.getStableId());
+        fragment.setArguments(arguments);
+        return fragment;
     }
 
     private long getStableItemId(int position) {
@@ -101,73 +103,50 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        final Object item = super.instantiateItem(container, position);
-        if (item instanceof Fragment) {
-            activeFragments.put(getStableItemId(position), (Fragment) item);
+    public long getItemId(int position) {
+        return getStableItemId(position);
+    }
+
+    @Override
+    public boolean containsItem(long itemId) {
+        for (TabItem item : tabItems) {
+            if (item.getStableId() == itemId) {
+                return true;
+            }
         }
-        return item;
+        return false;
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        activeFragments.values().remove(object);
-        super.destroyItem(container, position, object);
-    }
-
-    @Override
-    public int getCount() {
+    public int getItemCount() {
         return tabItems.size();
     }
 
-    @Override
-    public int getItemPosition(Object object) {
-        Long stableId = null;
-        for (Map.Entry<Long, Fragment> entry : activeFragments.entrySet()) {
-            if (entry.getValue() == object) {
-                stableId = entry.getKey();
-                break;
-            }
-        }
-
-        if (stableId == null) {
-            return POSITION_NONE;
-        }
-
-        for (int position = 0; position < tabItems.size(); position++) {
-            if (tabItems.get(position).getStableId() == stableId) {
-                return position;
-            }
-        }
-
-        return POSITION_NONE;
+    public int getCount() {
+        return getItemCount();
     }
 
     public Fragment getActiveFragment(int position) {
         if (position < 0 || position >= tabItems.size()) {
             return null;
         }
-        return activeFragments.get(getStableItemId(position));
+        final long stableId = getStableItemId(position);
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            final Bundle arguments = fragment.getArguments();
+            if (arguments != null && arguments.getLong(ARG_TAB_STABLE_ID, Long.MIN_VALUE) == stableId) {
+                return fragment;
+            }
+        }
+        return null;
     }
 
     public int getIndex(long threadId) {
-        boolean done = false;
-        int i = 0;
-        int val = -1;
-        while (!done) {
+        for (int i = 0; i < tabItems.size(); i++) {
             if (tabItems.get(i).getId() == threadId) {
-                val = i;
-                done = true;
-            } else {
-                i++;
-            }
-
-            if (i >= tabItems.size()) {
-                done = true;
+                return i;
             }
         }
-
-        return val;
+        return -1;
     }
 
     public int addItem(TabItem item) {
@@ -178,7 +157,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
             }
 
             tabItems.add(item);
-            notifyDataSetChanged();
+            notifyItemInserted(tabItems.size() - 1);
 
             return tabItems.size() - 1;
         } catch (Exception e) {
@@ -198,13 +177,17 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setItemAtIndex(int index, TabItem item) {
-        tabItems.remove(index);
-        tabItems.add(index, item);
-        notifyDataSetChanged();
+        if (index >= 0 && index < tabItems.size()) {
+            tabItems.set(index, item);
+            notifyItemChanged(index);
+        }
     }
 
     public void removeItemAtIndex(int index) {
-        tabItems.remove(index);
+        if (index >= 0 && index < tabItems.size()) {
+            tabItems.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     public int getPositionById(long id) {
@@ -225,7 +208,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         tabItems.remove(i);
-        notifyDataSetChanged();
+        notifyItemRemoved(i);
     }
 
     public List<TabItem> getItems() {
