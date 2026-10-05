@@ -262,6 +262,13 @@
 
     <!-- Error Strings -->
     <string name="error_404">404 Not Found!</string>
+    <string name="network_error_rate_limited">Too many requests. Please wait a moment and try again.</string>
+    <string name="network_error_timeout">The request timed out. Please try again.</string>
+    <string name="network_error_connection">Could not connect. Check your internet connection and try again.</string>
+    <string name="network_error_tls">A secure connection could not be established.</string>
+    <string name="network_error_server">The server is temporarily unavailable. Please try again.</string>
+    <string name="network_error_invalid_response">The server returned an incomplete or invalid response. Please try again.</string>
+    <string name="network_error_request">The request could not be completed.</string>
     <string name="generic_board_load_error">Error loading board. Please refresh.</string>
     <string name="could_not_find_post">Error loading post. Sending error report.</string>
 

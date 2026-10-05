@@ -73,6 +73,7 @@ import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.FourChanUtil;
 import com.emogoth.android.phone.mimi.util.LayoutType;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.NetworkErrorMessage;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.view.FilterDialog;
 import com.emogoth.android.phone.mimi.view.FilterView;
@@ -565,7 +566,7 @@ public class PostItemsListFragment extends MimiFragmentBase implements
                         throw new Exception("Catalog response is empty");
                     }
                 }, throwable -> {
-                    showError(getString(R.string.error_loading_board));
+                    showError(getString(NetworkErrorMessage.resourceFor(throwable)));
                     Log.e(LOG_TAG, "Error fetching catalog", throwable);
                 });
     }

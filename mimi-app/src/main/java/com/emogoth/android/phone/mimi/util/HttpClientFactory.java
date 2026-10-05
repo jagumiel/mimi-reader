@@ -49,9 +49,17 @@ public class HttpClientFactory {
     private static final String LOG_TAG = HttpClientFactory.class.getSimpleName();
     private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
-    private static HttpClientFactory ourInstance = new HttpClientFactory();
-    private OkHttpClient client;
+    private static final int API_CONNECT_TIMEOUT_SECONDS = 20;
+    private static final int API_READ_TIMEOUT_SECONDS = 30;
+    private static final int API_CALL_TIMEOUT_SECONDS = 60;
+    private static final int DOWNLOAD_CONNECT_TIMEOUT_SECONDS = 30;
+    private static final int DOWNLOAD_IO_TIMEOUT_SECONDS = 90;
+
+    private static final HttpClientFactory ourInstance = new HttpClientFactory();
+    private OkHttpClient apiClient;
+    private OkHttpClient downloadClient;
     private SharedPrefsCookiePersistor cookiePersistor;
+    private final ApiRequestLimiter apiRequestLimiter = new ApiRequestLimiter();
 
     private String defaultUserAgent;
     private String archiveUserAgent;
@@ -81,25 +89,25 @@ public class HttpClientFactory {
 
     }
 
-    private void init(ClientType type) {
+    private void init() {
         final Cache cache = new Cache(MimiUtil.getInstance().getCacheDir(), MAX_CACHE_SIZE);
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         cookiePersistor = new SharedPrefsCookiePersistor(MimiApplication.getInstance());
         PersistentCookieJar jar = new PersistentCookieJar(new SetCookieCache(), cookiePersistor);
 
-        builder.cache(cache)
-                .cookieJar(jar)
-                .connectTimeout(90, TimeUnit.SECONDS)
-                .readTimeout(90, TimeUnit.SECONDS)
-                .writeTimeout(90, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(false)
-                .addNetworkInterceptor(headerInterceptor());
+        final OkHttpClient.Builder apiBuilder = commonBuilder(jar)
+                .cache(cache)
+                .connectTimeout(API_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(API_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .writeTimeout(API_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .callTimeout(API_CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .addNetworkInterceptor(apiRequestLimiter);
 
-        if (BuildConfig.DEBUG) {
-            builder.addNetworkInterceptor(loggingInterceptor());
-            builder.addNetworkInterceptor(new StethoInterceptor());
-        }
+        final OkHttpClient.Builder downloadBuilder = commonBuilder(jar)
+                .connectTimeout(DOWNLOAD_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(DOWNLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .writeTimeout(DOWNLOAD_IO_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .callTimeout(0, TimeUnit.SECONDS);
 
 //        try {
 //            SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -109,23 +117,45 @@ public class HttpClientFactory {
 //            Log.e(LOG_TAG, "Caught exception", e);
 //        }
 
+        final int bufferSize = configuredBufferSize();
+        if (bufferSize > 0) {
+            apiBuilder.socketFactory(bufferedSocketFactory(bufferSize));
+            downloadBuilder.socketFactory(bufferedSocketFactory(bufferSize));
+        }
+
+        apiClient = apiBuilder.build();
+        downloadClient = downloadBuilder.build();
+    }
+
+    private OkHttpClient.Builder commonBuilder(PersistentCookieJar jar) {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .cookieJar(jar)
+                .retryOnConnectionFailure(false)
+                .addNetworkInterceptor(headerInterceptor());
+
+        if (BuildConfig.DEBUG) {
+            builder.addNetworkInterceptor(loggingInterceptor());
+            builder.addNetworkInterceptor(new StethoInterceptor());
+        }
+        return builder;
+    }
+
+    private int configuredBufferSize() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MimiApplication.getInstance());
         String prefsKey = MimiApplication.getInstance().getString(R.string.http_buffer_size_pref);
         String defaultValue = MimiApplication.getInstance().getString(R.string.http_buffer_size_default);
+        return Integer.parseInt(prefs.getString(prefsKey, defaultValue));
+    }
 
-        int bufferSize = Integer.parseInt(prefs.getString(prefsKey, defaultValue));
-        if (bufferSize > 0) {
-            builder.socketFactory(new DelegatingSocketFactory(SocketFactory.getDefault()) {
-                @Override
-                protected Socket configureSocket(Socket socket) throws IOException {
-                    socket.setSendBufferSize(bufferSize);
-                    socket.setReceiveBufferSize(bufferSize);
-
-                    return socket;
-                }
-            });
-        }
-        client = builder.build();
+    private SocketFactory bufferedSocketFactory(final int bufferSize) {
+        return new DelegatingSocketFactory(SocketFactory.getDefault()) {
+            @Override
+            protected Socket configureSocket(Socket socket) throws IOException {
+                socket.setSendBufferSize(bufferSize);
+                socket.setReceiveBufferSize(bufferSize);
+                return socket;
+            }
+        };
     }
 
     private Interceptor headerInterceptor() {
@@ -160,19 +190,31 @@ public class HttpClientFactory {
         };
     }
 
-    CookiePersistor getCookieStore() {
+    synchronized CookiePersistor getCookieStore() {
+        if (cookiePersistor == null) {
+            init();
+        }
         return cookiePersistor;
     }
 
-    public OkHttpClient getClient() {
-        if (client == null) {
-            init(ClientType.API);
-        }
-
-        return client;
+    public synchronized OkHttpClient getClient() {
+        return getClient(ClientType.API);
     }
 
-    public void reset() {
-        client = null;
+    public synchronized OkHttpClient getDownloadClient() {
+        return getClient(ClientType.DOWNLOAD);
+    }
+
+    public synchronized OkHttpClient getClient(ClientType type) {
+        if (apiClient == null || downloadClient == null) {
+            init();
+        }
+        return type == ClientType.DOWNLOAD ? downloadClient : apiClient;
+    }
+
+    public synchronized void reset() {
+        apiClient = null;
+        downloadClient = null;
+        cookiePersistor = null;
     }
 }

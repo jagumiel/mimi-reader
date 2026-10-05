@@ -421,7 +421,7 @@ class BoardItemListFragment
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn { throwable: Throwable? ->
                     Log.e(LOG_TAG, "Error while fetching list of boards from the network", throwable)
-                    showError()
+                    showError(throwable)
                     emptyList()
                 }
                 .observeOn(Schedulers.io())
@@ -451,16 +451,19 @@ class BoardItemListFragment
                 }
     }
 
-    private fun showError() {
+    private fun showError(error: Throwable? = null) {
         if (manageBoardsMenuItem != null) {
             manageBoardsMenuItem?.isEnabled = false
         }
+        val messageResource = error?.let(NetworkErrorMessage::resourceFor) ?: R.string.error_loading_boards
         if (errorView != null) {
+            errorView?.findViewById<TextView>(R.id.error_message)?.setText(messageResource)
             errorSwitcher?.displayedChildId = errorView?.id ?: 0
             return
         }
         val errorStub = rootView?.findViewById<ViewStub>(R.id.error_container)
         errorStub?.setOnInflateListener { _: ViewStub?, view: View ->
+            view.findViewById<TextView>(R.id.error_message).setText(messageResource)
             view.findViewById<View>(R.id.retry_button).setOnClickListener { loadBoards() }
             errorSwitcher?.displayedChildId = view.id
             errorView = view

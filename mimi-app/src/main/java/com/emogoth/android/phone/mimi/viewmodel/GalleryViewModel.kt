@@ -102,7 +102,7 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", var audioLock
         }
 
         Log.d(TAG, "Starting gallery image download manager")
-        downloadManager = DownloadManager(HttpClientFactory.getInstance().client, downloadItems, 2, MimiApplication.instance.applicationContext)
+        downloadManager = DownloadManager(HttpClientFactory.getInstance().downloadClient, downloadItems, 2, MimiApplication.instance.applicationContext)
         downloadManager?.start()
     }
 

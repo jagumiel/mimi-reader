@@ -43,7 +43,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Añadir contratos de deserialización para catálogo, hilos, MP4, WebM, campos opcionales y JSON malformado.
 - [x] Añadir pruebas HTTP simuladas para rutas, `Cache-Control`, respuestas 404/429/503 y cuerpos JSON truncados.
 - [x] Añadir contratos de parsing HTML para comentarios, login y errores de publicación.
-- Centralizar errores HTTP, límites de peticiones y tiempos de espera.
+- [x] Centralizar errores HTTP, límites de peticiones y tiempos de espera, respetando el máximo de una petición por segundo de la API sin limitar las descargas multimedia.
 - Probar catálogo, hilo, miniaturas y multimedia ante respuestas incompletas o cambios de la API.
 - Añadir caché y estados de error recuperables para evitar pantallas vacías.
 - [x] Añadir filtro persistente de boards: todas, solo SFW o solo NSFW, independiente del criterio de ordenación.

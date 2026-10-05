@@ -75,7 +75,7 @@ public class DownloadThread extends Thread {
         long target = 0;
 
         try {
-            OkHttpClient httpClient = HttpClientFactory.getInstance().getClient();
+            OkHttpClient httpClient = HttpClientFactory.getInstance().getDownloadClient();
             Request.Builder requestBuilder = new Request.Builder();
             requestBuilder.url(url)
                     .tag(url)

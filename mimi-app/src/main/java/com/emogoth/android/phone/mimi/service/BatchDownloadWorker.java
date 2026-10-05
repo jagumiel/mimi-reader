@@ -29,6 +29,7 @@ import androidx.work.WorkerParameters;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.activity.StartupActivity;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
+import com.emogoth.android.phone.mimi.util.NetworkError;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
 import com.emogoth.android.phone.mimi.util.NotificationUtils;
@@ -253,7 +254,7 @@ public final class BatchDownloadWorker extends Worker {
 
         try {
             final Request request = new Request.Builder().url(url).get().build();
-            currentCall = HttpClientFactory.getInstance().getClient().newCall(request);
+            currentCall = HttpClientFactory.getInstance().getDownloadClient().newCall(request);
             try (Response response = currentCall.execute()) {
                 if (!response.isSuccessful()) {
                     target.delete();
@@ -442,7 +443,7 @@ public final class BatchDownloadWorker extends Worker {
     }
 
     static boolean isRetryableHttpStatus(int status) {
-        return status == 408 || status == 429 || status >= 500;
+        return NetworkError.fromHttpStatus(status).isRetryable();
     }
 
     static boolean isCompleteFile(long actualLength, long expectedLength) {

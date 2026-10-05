@@ -80,6 +80,7 @@ import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.GalleryScrollReceiver;
 import com.emogoth.android.phone.mimi.util.LayoutType;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.NetworkErrorMessage;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.viewmodel.ThreadViewModel;
 import com.emogoth.android.phone.mimi.widget.MimiRecyclerView;
@@ -104,7 +105,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
-import retrofit2.HttpException;
 
 
 public class ThreadDetailFragment extends MimiFragmentBase implements
@@ -1054,12 +1054,10 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
 
         showContent();
 
-        if (error instanceof HttpException && ((HttpException) error).code() == 404 && messageText != null) {
-            messageText.setText(R.string.error_404);
-        } else if (messageText != null) {
-            messageText.setText(error.getLocalizedMessage());
+        if (messageText != null) {
+            messageText.setText(NetworkErrorMessage.resourceFor(error));
         } else if (getActivity() != null) {
-            Toast.makeText(getActivity(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), NetworkErrorMessage.resourceFor(error), Toast.LENGTH_SHORT).show();
 //            return;
         }
 

@@ -11,6 +11,7 @@ import com.emogoth.android.phone.mimi.fourchan.FourChanConnector
 import com.emogoth.android.phone.mimi.util.ArchivesManager
 import com.emogoth.android.phone.mimi.util.HttpClientFactory
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.NetworkError
 
 import com.mimireader.chanlib.ChanConnector
 import com.mimireader.chanlib.models.*
@@ -18,7 +19,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.zipWith
-import retrofit2.HttpException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -103,7 +103,7 @@ open class ChanDataSource {
     }
 
     private fun fetchArchivesOrError(boardName: String, threadId: Long, throwable: Throwable): Flowable<ChanThread> {
-        if (throwable !is HttpException || throwable.code() != 404) {
+        if (NetworkError.from(throwable).kind != NetworkError.Kind.NOT_FOUND) {
             Log.e(TAG, "An exception occurred while trying to fetch thread [/$boardName/$threadId]")
 
             return PostTableConnection.fetchThread(threadId)
