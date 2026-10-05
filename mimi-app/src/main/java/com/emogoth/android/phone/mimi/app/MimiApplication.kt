@@ -29,13 +29,12 @@ open class MimiApplication : Application() {
         instance = this
 
         handleRxExceptions()
+        PreferenceMigration.migrate(this)
 
         MimiUtil.getInstance().init(this)
         createLifecycleListener()
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val notificationLevel = preferences.getString(getString(R.string.background_notification_pref), "0")?.toInt()
-                ?: 0
         val defaultSet = preferences.getBoolean(getString(R.string.crappy_samsung_default_set), false)
         if (!defaultSet) {
             val useCrappyVideoPlayer = MimiUtil.isCrappySamsung()
@@ -44,10 +43,6 @@ open class MimiApplication : Application() {
                     .putBoolean(getString(R.string.use_crappy_video_player), useCrappyVideoPlayer)
                     .apply()
         }
-        if (notificationLevel == 0) {
-            preferences.edit().putString(getString(R.string.background_notification_pref), "3").apply()
-        }
-
         val historyPruneDays = preferences.getString(getString(R.string.history_prune_time_pref), "0")?.toInt()
                 ?: 0
         val disposable = MimiUtil.pruneHistory(historyPruneDays)
