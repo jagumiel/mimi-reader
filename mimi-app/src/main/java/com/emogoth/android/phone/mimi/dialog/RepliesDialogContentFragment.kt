@@ -9,10 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.emogoth.android.phone.mimi.R
@@ -38,7 +34,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
-class RepliesDialogContentFragment : Fragment(), LifecycleObserver {
+class RepliesDialogContentFragment : Fragment() {
     private var listView: RecyclerView? = null
 
     private var boardName: String = ""
@@ -54,7 +50,6 @@ class RepliesDialogContentFragment : Fragment(), LifecycleObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycle.addObserver(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,7 +59,7 @@ class RepliesDialogContentFragment : Fragment(), LifecycleObserver {
         arguments?.let { extractExtras(it) }
 
         if (threadId > 0) {
-            val loadRepliesSubscription = PostTableConnection.fetchThread(threadId)
+            loadRepliesSubscription = PostTableConnection.fetchThread(threadId)
                     .map(PostTableConnection.mapDbPostsToChanThread(boardName, threadId))
                     .compose(DatabaseUtils.applySingleSchedulers())
                     .subscribe({
@@ -175,13 +170,9 @@ class RepliesDialogContentFragment : Fragment(), LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-    open fun onAny(source: LifecycleOwner?, event: Lifecycle.Event?): Unit {
-        Log.d("RepliesDialogContent", "Owner: ${source?.lifecycle.toString()}, Event: ${event}")
-
-        if (event == Lifecycle.Event.ON_DESTROY) {
-            if (loadRepliesSubscription?.isDisposed == false) loadRepliesSubscription?.dispose()
-        }
+    override fun onDestroy() {
+        RxUtil.safeUnsubscribe(loadRepliesSubscription)
+        RxUtil.safeUnsubscribe(repliesSubscription)
+        super.onDestroy()
     }
-
 }

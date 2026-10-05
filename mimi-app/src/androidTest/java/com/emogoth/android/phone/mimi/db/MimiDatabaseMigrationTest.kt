@@ -140,7 +140,7 @@ class MimiDatabaseMigrationTest {
                  spoiler, custom_spoiler)
                 VALUES (?, ?, ?, 0, 0, 640, 480, 250, 188, 1700000000, 1024, 0, 0, 0,
                         10, 1, 0, 0, 0, 0)""",
-            arrayOf(id, boardName, postId)
+            arrayOf<Any>(id, boardName, postId)
         )
     }
 

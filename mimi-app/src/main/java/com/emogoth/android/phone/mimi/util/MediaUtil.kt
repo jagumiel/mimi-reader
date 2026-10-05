@@ -16,7 +16,7 @@ class MediaUtil {
                 val mimeType = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE) ?: ""
                 metadataRetriever.release()
 
-                Single.just(MediaInfo(hasAudio.toLowerCase() == "yes", duration.toLong(), mimeType))
+                Single.just(MediaInfo(hasAudio.equals("yes", ignoreCase = true), duration.toLong(), mimeType))
             }
         }
 

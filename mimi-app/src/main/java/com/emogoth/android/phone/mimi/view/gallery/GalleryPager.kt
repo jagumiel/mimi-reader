@@ -13,9 +13,8 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +31,7 @@ import java.util.*
 
 class GalleryPager @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr), GalleryView, LifecycleObserver {
+) : FrameLayout(context, attrs, defStyleAttr), GalleryView, DefaultLifecycleObserver {
     private lateinit var binding: ViewGalleryPagerBinding
     private val gallery_toolbar get() = binding.galleryToolbar
     private val file_name get() = binding.fileName
@@ -154,18 +153,27 @@ class GalleryPager @JvmOverloads constructor(
         position = itemPosition
     }
 
-    @OnLifecycleEvent(value = Lifecycle.Event.ON_PAUSE)
+    override fun onPause(owner: LifecycleOwner) {
+        pause()
+    }
+
     fun pause() {
         currentHolder()?.onHostPause()
         player?.pause()
     }
 
-    @OnLifecycleEvent(value = Lifecycle.Event.ON_RESUME)
+    override fun onResume(owner: LifecycleOwner) {
+        resume()
+    }
+
     fun resume() {
         pager.post { currentHolder()?.onHostResume() }
     }
 
-    @OnLifecycleEvent(value = Lifecycle.Event.ON_DESTROY)
+    override fun onDestroy(owner: LifecycleOwner) {
+        release()
+    }
+
     fun release() {
         adapter?.destroy()
         player?.release()

@@ -23,6 +23,7 @@ import com.emogoth.android.phone.mimi.view.LongClickLinkMovementMethod
 import com.mimireader.chanlib.models.ArchivedChanPost
 import com.mimireader.chanlib.models.ChanPost
 import com.mimireader.chanlib.models.ChanThread
+import java.util.Locale
 
 // final List<ChanPost> replies, final List<OutsideLink> links, final ChanThread thread
 class RepliesListAdapter(val replies: List<ChanPost>, private val links: List<OutsideLink>, val thread: ChanThread) : RecyclerView.Adapter<RepliesViewHolder>() {
@@ -150,14 +151,14 @@ class ChanPostViewHolder(private val v: View,
             if (postItem.country == null) {
                 country = postItem.trollCountry
                 flagUrl = if (country != null) {
-                    FourChanEndpoints.Troll + country.toLowerCase() + ".gif"
+                    FourChanEndpoints.Troll + country.lowercase(Locale.ROOT) + ".gif"
                 } else {
                     null
                 }
             } else {
                 country = postItem.country
                 flagUrl = if (country != null) {
-                    FourChanEndpoints.Flag + country.toLowerCase() + ".gif"
+                    FourChanEndpoints.Flag + country.lowercase(Locale.ROOT) + ".gif"
                 } else {
                     null
                 }

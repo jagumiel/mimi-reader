@@ -2,9 +2,8 @@ package com.emogoth.android.phone.mimi.app
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import com.emogoth.android.phone.mimi.BuildConfig
@@ -21,7 +20,7 @@ import java.io.IOException
 import java.net.SocketException
 
 
-open class MimiApplication : Application(), LifecycleObserver {
+open class MimiApplication : Application() {
     var background = false
         private set
 
@@ -68,16 +67,14 @@ open class MimiApplication : Application(), LifecycleObserver {
     }
 
     private fun createLifecycleListener() {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_START)
-            fun foreground() {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
                 background = false
                 RefreshScheduler2.instance.foreground()
                 Log.d(LOG_TAG, "Foregrounded app")
             }
 
-            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-            fun background() {
+            override fun onStop(owner: LifecycleOwner) {
                 background = true
                 RefreshScheduler2.instance.background()
                 Log.d(LOG_TAG, "Backgrounded app")

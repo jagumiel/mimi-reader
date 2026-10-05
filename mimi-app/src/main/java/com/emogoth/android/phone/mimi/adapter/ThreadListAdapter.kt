@@ -110,7 +110,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                 colorList[i] = ChanUtil.calculateColorBase(post.id)
             }
             if (post.fsize > 0 && MediaContract.hasRemoteMedia(post)) {
-                post.humanReadableFileSize = MimiUtil.humanReadableByteCount(post.fsize.toLong(), true) + " " + MediaContract.normalizedExtension(post.ext).substring(1).toUpperCase(Locale.getDefault())
+                post.humanReadableFileSize = MimiUtil.humanReadableByteCount(post.fsize.toLong(), true) + " " + MediaContract.normalizedExtension(post.ext).substring(1).uppercase(Locale.getDefault())
             }
         }
     }
@@ -269,14 +269,14 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         if (postItem.country == null) {
             country = postItem.trollCountry
             url = if (country != null) {
-                trollUrl + country.toLowerCase(Locale.getDefault()) + ".gif"
+                trollUrl + country.lowercase(Locale.getDefault()) + ".gif"
             } else {
                 null
             }
         } else {
             country = postItem.country
             url = if (country != null) {
-                flagUrl + country.toLowerCase(Locale.getDefault()) + ".gif"
+                flagUrl + country.lowercase(Locale.getDefault()) + ".gif"
             } else {
                 null
             }
@@ -534,7 +534,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                 info = if (postItem.ext != null) {
                     (MimiUtil.humanReadableByteCount(postItem.fsize.toLong(), true)
                             + " "
-                            + postItem.ext?.toUpperCase(Locale.getDefault())?.substring(1))
+                            + postItem.ext?.uppercase(Locale.getDefault())?.substring(1))
                 } else {
                     MimiUtil.humanReadableByteCount(postItem.fsize.toLong(), true)
                 }
@@ -696,7 +696,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                 results.count = posts.size
                 results.values = LinkedHashMap<Int, TextSearchResult>()
             } else {
-                val constraint = searchStr.toString().toLowerCase(Locale.getDefault())
+                val constraint = searchStr.toString().lowercase(Locale.getDefault())
                 val resultMap = LinkedHashMap<Long, TextSearchResult>()
                 for (chanPost in items) {
                     val result = TextSearchResult()
@@ -706,8 +706,8 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                     var start = 0
                     var end = 0
                     while (start > -1) {
-                        if (chanPost.name != null && chanPost.name?.toLowerCase(Locale.getDefault())?.substring(end)?.contains(constraint) == true) {
-                            start = chanPost.name?.toLowerCase(Locale.getDefault())?.indexOf(result.searchStr, end) ?: -1
+                        if (chanPost.name != null && chanPost.name?.lowercase(Locale.getDefault())?.substring(end)?.contains(constraint) == true) {
+                            start = chanPost.name?.lowercase(Locale.getDefault())?.indexOf(result.searchStr, end) ?: -1
                             textLocation = TextLocation.LOCATION_NAME
                             end = start + constraint.length
                             var data = result.textLocation[textLocation]
@@ -723,8 +723,8 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                     start = 0
                     end = 0
                     while (start > -1) {
-                        if (chanPost.subject != null && chanPost.subject.toString().toLowerCase(Locale.getDefault()).substring(end).contains(constraint)) {
-                            start = chanPost.subject.toString().toLowerCase(Locale.getDefault()).indexOf(result.searchStr, end)
+                        if (chanPost.subject != null && chanPost.subject.toString().lowercase(Locale.getDefault()).substring(end).contains(constraint)) {
+                            start = chanPost.subject.toString().lowercase(Locale.getDefault()).indexOf(result.searchStr, end)
                             textLocation = TextLocation.LOCATION_SUBJECT
                             end = start + constraint.length
                             var data = result.textLocation[textLocation]
@@ -740,8 +740,8 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                     start = 0
                     end = 0
                     while (start > -1) {
-                        if (chanPost.comment != null && chanPost.comment.toString().toLowerCase(Locale.getDefault()).substring(end).contains(constraint)) {
-                            start = chanPost.comment.toString().toLowerCase(Locale.getDefault()).indexOf(result.searchStr, end)
+                        if (chanPost.comment != null && chanPost.comment.toString().lowercase(Locale.getDefault()).substring(end).contains(constraint)) {
+                            start = chanPost.comment.toString().lowercase(Locale.getDefault()).indexOf(result.searchStr, end)
                             textLocation = TextLocation.LOCATION_COMMENT
                             end = start + constraint.length
                             var data = result.textLocation[textLocation]

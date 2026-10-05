@@ -43,7 +43,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -213,8 +212,7 @@ public class PostItemsListFragment extends MimiFragmentBase implements
                 return (T) new CatalogViewModel();
             }
         };
-        viewModel = ViewModelProviders
-                .of(this, factory)
+        viewModel = new ViewModelProvider(this, factory)
                 .get(CatalogViewModel.class);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());

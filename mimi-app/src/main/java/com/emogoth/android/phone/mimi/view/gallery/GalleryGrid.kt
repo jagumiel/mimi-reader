@@ -200,7 +200,7 @@ class GalleryGridItemViewHolder(private val root: View, private val preloadEnabl
         this.selected = itemSelected
 
         fileSizeText.text = MimiUtil.humanReadableByteCount(item.size.toLong(), true)
-        fileExtText.text = item.ext.substring(1).toUpperCase()
+        fileExtText.text = item.ext.substring(1).uppercase(Locale.getDefault())
 
         number.text = (layoutPosition + 1).toString()
 

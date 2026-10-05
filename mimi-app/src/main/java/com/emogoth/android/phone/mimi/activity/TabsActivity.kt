@@ -100,7 +100,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
                     if (i == 1 && item.tabType == TabPagerAdapter.TabType.POSTS) {
                         tab.text = getTabTitle(item.title)
                     } else if (i == 1 && item.tabType == TabPagerAdapter.TabType.HISTORY) {
-                        tab.text = item.title.toUpperCase()
+                        tab.text = item.title.uppercase(Locale.getDefault())
                     } else {
                         val args = item.bundle
                         if (args != null) {
@@ -173,7 +173,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     protected fun getTabTitle(boardName: String): String {
-        return "/" + boardName.toUpperCase(Locale.getDefault()) + "/"
+        return "/" + boardName.uppercase(Locale.getDefault()) + "/"
     }
 
     override fun onBoardItemClick(board: ChanBoard, saveBackStack: Boolean) {
@@ -307,7 +307,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
                 val t = tabPagerAdapter?.getTab(i)
                 if (t != null) {
                     val id = Integer.valueOf(t.subtitle)
-                    closeTab(id.toLong(), t.title.toLowerCase(Locale.getDefault()).replace("/", ""), true)
+                    closeTab(id.toLong(), t.title.lowercase(Locale.getDefault()).replace("/", ""), true)
                 }
             }
         }

@@ -278,7 +278,7 @@ class BoardItemListFragment
         }
 
         RxUtil.safeUnsubscribe(boardInfoSubscription)
-        val boardName = rawBoardName.replace("/".toRegex(), "").toLowerCase().trim { it <= ' ' }
+        val boardName = rawBoardName.replace("/".toRegex(), "").lowercase(Locale.ROOT).trim { it <= ' ' }
         boardInfoSubscription = fetchBoard(boardName)
                 .flatMap { chanBoard: ChanBoard -> setBoardVisibility(chanBoard, true) }
                 .flatMap { _ ->
