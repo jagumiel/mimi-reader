@@ -55,7 +55,8 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Actualizar Room a 2.8.5, migrar a Kotlin 2.3.21 y sustituir las APIs de ciclo de vida obsoletas por los módulos y observadores actuales de Lifecycle 2.11.0.
 - [ ] Versionar y probar todas las migraciones de base de datos con copias reales.
   - [x] Añadir una prueba instrumentada de la migración `22 → 23` que valida el esquema y la conservación de historial, boards favoritas, filtros e hilos ocultos.
-  - [ ] Incorporar esquemas o copias reales anteriores a la versión 22 para cubrir las rutas de actualización antiguas.
+  - [x] Cubrir `21 → 22 → 23` con una base v21 reproducible reconstruida desde la migración, incluidos valores nulos heredados, el renombrado de filtros y la incorporación de `board_name` a los posts. El historial del repositorio comienza en v22 y no contiene una exportación original de v21.
+  - [ ] Incorporar una copia real anonimizada anterior a la versión 22 si se recupera de una instalación antigua, para contrastarla con la base reconstruida.
 - [ ] Garantizar que historial, marcadores, filtros y preferencias sobreviven a una actualización.
 - [ ] Reducir el trabajo de base de datos en el hilo principal.
 

@@ -90,6 +90,77 @@ class MimiDatabaseMigrationTest {
         database.close()
     }
 
+    @Test
+    fun migrate21To23PreservesLegacyUserDataAndNormalizesNulls() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        Version21DatabaseFixture.create(context, TEST_DATABASE)
+
+        val database = migrationHelper.runMigrationsAndValidate(
+            TEST_DATABASE,
+            23,
+            true,
+            MimiDatabase.MIGRATION_21_22,
+            MimiDatabase.MIGRATION_22_23
+        )
+
+        assertSingleTextValue(
+            database,
+            "SELECT post_text FROM History WHERE thread_id = 12345",
+            "saved thread"
+        )
+        assertSingleTextValue(
+            database,
+            "SELECT user_name FROM History WHERE thread_id = 12345",
+            "Anonymous"
+        )
+        assertSingleLongValue(
+            database,
+            "SELECT last_access FROM History WHERE thread_id = 12345",
+            0L
+        )
+        assertSingleTextValue(
+            database,
+            "SELECT comment FROM thread_posts WHERE post_id = 12346",
+            "saved reply"
+        )
+        assertSingleTextValue(
+            database,
+            "SELECT board_name FROM thread_posts WHERE post_id = 12346",
+            "Unknown"
+        )
+        assertSingleLongValue(database, "SELECT favorite FROM Boards WHERE board_path = 'g'", 1L)
+        assertSingleLongValue(database, "SELECT access_count FROM Boards WHERE board_path = 'g'", 0L)
+        assertSingleTextValue(
+            database,
+            "SELECT filter FROM post_filters WHERE name = 'hide spam'",
+            "spam"
+        )
+        assertSingleLongValue(
+            database,
+            "SELECT highlight FROM post_filters WHERE name = 'hide spam'",
+            0L
+        )
+        assertSingleLongValue(
+            database,
+            "SELECT thread_id FROM hidden_threads WHERE board_name = 'g'",
+            54321L
+        )
+        assertSingleLongValue(database, "SELECT post_time FROM posts WHERE post_id = 12346", 0L)
+        assertSingleLongValue(database, "SELECT used_count FROM post_options WHERE option = 'sage'", 0L)
+        assertSingleLongValue(database, "SELECT https FROM archives WHERE board = 'g'", 1L)
+        assertSingleLongValue(
+            database,
+            "SELECT post_id FROM archived_posts WHERE board_name = 'g'",
+            12346L
+        )
+
+        assertSingleLongValue(database, "SELECT COUNT(*) FROM catalog_posts", 0L)
+        assertSingleLongValue(database, "SELECT COUNT(*) FROM refresh_queue", 0L)
+        assertCatalogIndices(database)
+
+        database.close()
+    }
+
     private fun insertVersion22UserData(database: SupportSQLiteDatabase) {
         database.execSQL(
             """INSERT INTO History
