@@ -61,6 +61,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             updateCurrentFragment(position)
+            refreshBackNavigationState()
         }
     }
 
@@ -214,6 +215,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         currentFragment = fragment
         fragment.initMenu()
         setFabVisibility(fragment.showFab())
+        refreshBackNavigationState()
     }
 
     private fun setFabVisibility(shouldShow: Boolean) {
@@ -229,24 +231,30 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     }
 
     override fun onClick(v: View) {}
-    override fun onBackPressed() {
-        var handled = false
-        val pos = tabs_pager.currentItem
 
-        if (currentFragment != null) {
-            handled = currentFragment?.onBackPressed() ?: false
+    override fun hasCustomBackNavigation(): Boolean {
+        return super.hasCustomBackNavigation() ||
+                currentFragment?.canHandleBack() == true ||
+                (::binding.isInitialized && tabs_pager.currentItem > 0)
+    }
+
+    override fun handleCustomBackNavigation() {
+        if (isNavDrawerOpen()) {
+            super.handleCustomBackNavigation()
+            return
         }
-        if (!handled && pos > 0) {
-            handled = true
+
+        if (currentFragment?.canHandleBack() == true && currentFragment?.onBackPressed() == true) {
+            return
+        }
+
+        val pos = tabs_pager.currentItem
+        if (pos > 0) {
             if (closeTabOnBack && pos > 1) {
                 closeTab(pos, false)
             } else {
                 tabs_pager.setCurrentItem(pos - 1, true)
             }
-        }
-        if (!handled) {
-            super.onBackPressed()
-            invalidateOptionsMenu()
         }
     }
 

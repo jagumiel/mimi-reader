@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -66,6 +67,13 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
 
     private var historyObserver: Disposable? = null
 
+    private val customBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            handleCustomBackNavigation()
+            refreshBackNavigationState()
+        }
+    }
+
 //    var onBookmarkClicked: ((boardName: String, threadId: Long, boardTitle: String, orderId: Int) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +88,7 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
             setTheme(MimiUtil.getInstance().themeResourceId)
         }
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, customBackCallback)
         val extras = intent.extras
         if (extras != null) {
             if (extras.containsKey(Extras.EXTRAS_SHOW_ACTIONBAR_BADGE)) {
@@ -130,17 +139,21 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
         }
     }
 
-    override fun onBackPressed() {
-        try {
-            if (drawerLayout != null && navDrawerView != null && drawerLayout?.isDrawerOpen(navDrawerView!!) == true) {
-                toggleNavDrawer()
-            } else {
-                super.onBackPressed()
-            }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Caught exception in onBackPressed()", e)
-            Log.e(LOG_TAG, "Caught exception", e)
+    fun isNavDrawerOpen(): Boolean {
+        val drawer = navDrawerView ?: return false
+        return drawerLayout?.isDrawerOpen(drawer) == true
+    }
+
+    protected open fun hasCustomBackNavigation(): Boolean = isNavDrawerOpen()
+
+    protected open fun handleCustomBackNavigation() {
+        if (isNavDrawerOpen()) {
+            toggleNavDrawer()
         }
+    }
+
+    fun refreshBackNavigationState() {
+        customBackCallback.isEnabled = hasCustomBackNavigation()
     }
 
     override fun onDestroy() {
@@ -157,15 +170,18 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
             override fun onDrawerOpened(drawerView: View) {
                 invalidateOptionsMenu()
                 syncState()
+                refreshBackNavigationState()
             }
 
             override fun onDrawerClosed(drawerView: View) {
                 invalidateOptionsMenu()
                 syncState()
+                refreshBackNavigationState()
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 super.onDrawerSlide(drawerView, slideOffset)
+                customBackCallback.isEnabled = slideOffset > 0f || hasCustomBackNavigation()
             }
         }
 
@@ -178,6 +194,7 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
         drawerLayout?.addDrawerListener(dt)
 
         drawerToggle = dt
+        refreshBackNavigationState()
     }
 
     fun updateBadge() {

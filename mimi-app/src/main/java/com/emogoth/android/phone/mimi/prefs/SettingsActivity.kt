@@ -23,7 +23,7 @@ class SettingsActivity : MimiActivity(), PreferenceFragmentCompat.OnPreferenceSt
         toolbar.setTitle(R.string.settings)
         toolbar.logo = null
         toolbar.setNavigationIcon(R.drawable.ic_nav_arrow_back)
-        toolbar.setNavigationOnClickListener { v: View? -> finish() }
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         supportFragmentManager
                 .beginTransaction()

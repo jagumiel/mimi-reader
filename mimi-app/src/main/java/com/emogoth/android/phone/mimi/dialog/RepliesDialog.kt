@@ -1,11 +1,12 @@
 package com.emogoth.android.phone.mimi.dialog
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
+import androidx.activity.ComponentDialog
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.emogoth.android.phone.mimi.R
@@ -22,6 +23,7 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
     private var threadId: Long = 0
     private var currentPostId: Long = 0
     private var repliesSubscription: Disposable? = null
+    private lateinit var dialogBackCallback: OnBackPressedCallback
 
     var toolbar: Toolbar? = null
 
@@ -29,6 +31,9 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
         super.onCreate(savedInstanceState)
         isCancelable = true
         arguments?.let { extractExtras(it) }
+        childFragmentManager.addOnBackStackChangedListener {
+            updateBackNavigationState()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -37,25 +42,14 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        if (activity == null) {
-            return super.onCreateDialog(savedInstanceState)
-        }
-
-        return object : Dialog(activity as Context, theme) {
-            override fun onBackPressed() {
-                val fm = childFragmentManager
-                if (fm.backStackEntryCount > 1) {
-
-                    if (fm.backStackEntryCount == 2) {
-                        toolbar?.navigationIcon = null
-                    }
-
-                    fm.popBackStack()
-                } else {
-                    super.onBackPressed()
-                }
+        val componentDialog = ComponentDialog(requireContext(), theme)
+        dialogBackCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                childFragmentManager.popBackStack()
             }
         }
+        componentDialog.onBackPressedDispatcher.addCallback(this, dialogBackCallback)
+        return componentDialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +60,7 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
         toolbar?.navigationIcon = null
         toolbar?.logo = null
         toolbar?.setNavigationOnClickListener {
-            this.dialog?.onBackPressed()
+            (dialog as? ComponentDialog)?.onBackPressedDispatcher?.onBackPressed()
         }
         closeButton.setOnClickListener { v: View? ->
             dismiss()
@@ -83,6 +77,18 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
         ft.replace(R.id.replies_dialog_content, contentFragment)
         ft.addToBackStack("${boardName}_${threadId}_${currentPostId}")
         ft.commit()
+    }
+
+    private fun updateBackNavigationState() {
+        val hasNestedReply = childFragmentManager.backStackEntryCount > 1
+        if (::dialogBackCallback.isInitialized) {
+            dialogBackCallback.isEnabled = hasNestedReply
+        }
+        if (hasNestedReply) {
+            toolbar?.setNavigationIcon(R.drawable.ic_nav_arrow_back)
+        } else {
+            toolbar?.navigationIcon = null
+        }
     }
 
     fun updateReplies(post: ChanPost) {
@@ -104,7 +110,7 @@ class RepliesDialog : DialogFragment(), GoToPostListener {
         ft.addToBackStack(fragmentId)
         ft.commit()
 
-        toolbar?.setNavigationIcon(R.drawable.ic_nav_arrow_back)
+        updateBackNavigationState()
     }
 
     fun packPost(post: ChanPost): Bundle {

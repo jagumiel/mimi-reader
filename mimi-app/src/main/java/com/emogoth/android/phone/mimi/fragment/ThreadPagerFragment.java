@@ -201,6 +201,16 @@ public class ThreadPagerFragment extends MimiFragmentBase implements ContentInte
     }
 
     @Override
+    public boolean canHandleBack() {
+        if (threadPager == null || threadPagerAdapter == null) {
+            return false;
+        }
+        final MimiFragmentBase fragment = threadPagerAdapter
+                .getActiveFragment(threadPager.getCurrentItem());
+        return fragment != null && fragment.canHandleBack();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (threadPager != null) {

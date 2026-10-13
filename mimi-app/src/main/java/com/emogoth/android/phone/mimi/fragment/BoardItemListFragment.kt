@@ -661,6 +661,7 @@ class BoardItemListFragment
 
     private fun showList() {
         boardOrderListVisible = true
+        notifyBackNavigationStateChanged()
         orderTypeList?.startAnimation(revealListAnimation)
         boardOrderBackground?.startAnimation(showBoardOrderBackground)
         showContentButton?.setText(R.string.ic_content_shown)
@@ -668,6 +669,7 @@ class BoardItemListFragment
 
     private fun hideList(index: Int) {
         boardOrderListVisible = false
+        notifyBackNavigationStateChanged()
         if (index >= 0) {
             orderList(index)
             boardOrderText?.text = sortSummary(index)
@@ -746,6 +748,8 @@ class BoardItemListFragment
         }
         return super.onBackPressed()
     }
+
+    override fun canHandleBack(): Boolean = boardOrderListVisible
 
     private fun setupToolBar() {
         if (activity is MimiActivity) {

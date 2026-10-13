@@ -30,7 +30,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_title"
         android:largeHeap="true"
-        android:enableOnBackInvokedCallback="false"
+        android:enableOnBackInvokedCallback="true"
         android:testOnly="false"
         android:theme="@style/Theme.Mimi.Light.Toolbar.Default"
         tools:replace="android:theme, icon, label, allowBackup">

@@ -2,6 +2,9 @@ package com.emogoth.android.phone.mimi.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.viewpager2.widget.ViewPager2
@@ -10,6 +13,7 @@ import com.emogoth.android.phone.mimi.adapter.TabPagerAdapter
 import com.emogoth.android.phone.mimi.fragment.HistoryFragment
 import com.google.android.material.tabs.TabLayout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -17,6 +21,61 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TabsActivityNavigationTest {
+    @Test
+    fun backDispatcherClosesDrawerBeforeNavigatingTabs() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val intent = Intent(instrumentation.targetContext, TabsActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val activity = instrumentation.startActivitySync(intent) as TabsActivity
+
+        try {
+            instrumentation.waitForIdleSync()
+            val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
+            val adapter = pager.adapter as TabPagerAdapter
+            val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
+            val navDrawer = activity.findViewById<View>(R.id.nav_drawer)
+
+            instrumentation.runOnMainSync {
+                adapter.addItem(
+                        TabPagerAdapter.TabItem(
+                                TabPagerAdapter.TabType.HISTORY,
+                                Bundle(),
+                                5252L,
+                                "History",
+                                null
+                        )
+                )
+                pager.setCurrentItem(1, false)
+                drawerLayout.openDrawer(navDrawer, false)
+            }
+            instrumentation.waitForIdleSync()
+            assertTrue(drawerLayout.isDrawerOpen(navDrawer))
+
+            instrumentation.runOnMainSync { activity.onBackPressedDispatcher.onBackPressed() }
+            waitUntil { !drawerLayout.isDrawerOpen(navDrawer) }
+            instrumentation.waitForIdleSync()
+
+            assertFalse(drawerLayout.isDrawerOpen(navDrawer))
+            assertEquals(1, pager.currentItem)
+            assertFalse(activity.isFinishing)
+
+            instrumentation.runOnMainSync { activity.onBackPressedDispatcher.onBackPressed() }
+            instrumentation.waitForIdleSync()
+
+            assertEquals(0, pager.currentItem)
+            assertFalse(activity.isFinishing)
+        } finally {
+            instrumentation.runOnMainSync { activity.finishAndRemoveTask() }
+        }
+    }
+
+    private fun waitUntil(timeoutMs: Long = 2_000L, condition: () -> Boolean) {
+        val deadline = SystemClock.uptimeMillis() + timeoutMs
+        while (!condition() && SystemClock.uptimeMillis() < deadline) {
+            SystemClock.sleep(50L)
+        }
+    }
+
     @Test
     fun mainTabsUseViewPager2AndTrackDynamicItems() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()

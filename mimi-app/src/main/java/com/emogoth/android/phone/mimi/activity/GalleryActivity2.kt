@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.contains
@@ -83,6 +84,13 @@ class GalleryActivity2 : AppCompatActivity() {
     private var galleryPager: GalleryPager? = null
     private var galleryGrid: GalleryGrid? = null
 
+    private val galleryBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            val pager = galleryPager ?: return
+            showGrid(Collections.emptyList(), pager.position)
+        }
+    }
+
     private var viewModel: GalleryViewModel = GalleryViewModel.empty()
 //    private val selectedItems: ArrayList<Long> = ArrayList()
 
@@ -93,9 +101,10 @@ class GalleryActivity2 : AppCompatActivity() {
         binding = ActivityGallery2Binding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(toolbar)
+        onBackPressedDispatcher.addCallback(this, galleryBackCallback)
 
         toolbar.setNavigationIcon(R.drawable.ic_nav_arrow_back)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         val chanConnector = FourChanConnector.Builder()
                 .setCacheDirectory(MimiUtil.getInstance().cacheDir)
@@ -197,6 +206,7 @@ class GalleryActivity2 : AppCompatActivity() {
         } else {
             GALLERY_TYPE_PAGER
         }
+        refreshBackNavigationState()
     }
 
     private fun showGrid(galleryItems: List<GalleryItem>, position: Int) {
@@ -265,6 +275,11 @@ class GalleryActivity2 : AppCompatActivity() {
         }
 
         viewModel.galleryType = GALLERY_TYPE_GRID
+        refreshBackNavigationState()
+    }
+
+    private fun refreshBackNavigationState() {
+        galleryBackCallback.isEnabled = galleryGrid != null && galleryPager != null
     }
 
     private fun initActionMode(): ActionMode.Callback {
@@ -624,20 +639,4 @@ class GalleryActivity2 : AppCompatActivity() {
         galleryPager?.release()
     }
 
-    override fun onBackPressed() {
-        if (galleryGrid == null || galleryPager == null) {
-            super.onBackPressed()
-            return
-        }
-
-        val gg: GalleryGrid = galleryGrid as GalleryGrid
-        val gp: GalleryPager = galleryPager as GalleryPager
-
-        if (gg.visibility == View.VISIBLE && gp.visibility == View.VISIBLE) {
-            showGrid(Collections.emptyList(), gp.position)
-            return
-        }
-
-        super.onBackPressed()
-    }
 }

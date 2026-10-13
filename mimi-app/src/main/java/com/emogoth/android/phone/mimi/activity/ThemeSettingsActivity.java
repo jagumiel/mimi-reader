@@ -71,7 +71,7 @@ public class ThemeSettingsActivity extends MimiActivity {
             toolbar.setLogo(null);
             toolbar.setTitle(R.string.settings);
             toolbar.setNavigationIcon(R.drawable.ic_nav_arrow_back);
-            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
             setToolbar(toolbar);
         }
 

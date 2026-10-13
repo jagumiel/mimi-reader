@@ -80,7 +80,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
   - [x] Migrar las pestañas dinámicas de la pantalla principal a `ViewPager2`, conservando identidades estables, restauración de fragments y cierre individual de hilos.
   - [x] Migrar el paginador secundario de hilos y retirar los adaptadores heredados que ya no se utilicen.
-- Implementar correctamente el gesto Atrás predictivo antes de retirar la desactivación temporal.
+- [x] Migrar la navegación Atrás a `OnBackPressedDispatcher`, conservar las acciones internas de cada pantalla y habilitar el gesto Atrás predictivo.
 - Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.
 - Limitar y recuperar con claridad pestañas que no puedan restaurarse por falta de memoria.
 

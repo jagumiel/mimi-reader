@@ -139,15 +139,15 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        val handled = if (threadFragment != null) {
-            threadFragment?.onBackPressed() == true
-        } else {
-            false
-        }
-        if (!handled) {
-            super.onBackPressed()
-            invalidateOptionsMenu()
+    override fun hasCustomBackNavigation(): Boolean {
+        return super.hasCustomBackNavigation() || threadFragment?.canHandleBack() == true
+    }
+
+    override fun handleCustomBackNavigation() {
+        if (isNavDrawerOpen()) {
+            super.handleCustomBackNavigation()
+        } else if (threadFragment?.canHandleBack() == true) {
+            threadFragment?.onBackPressed()
         }
     }
 

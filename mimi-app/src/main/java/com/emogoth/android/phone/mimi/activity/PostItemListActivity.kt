@@ -63,7 +63,6 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
     private var boardTitle: String? = null
 
     //    private var addContentFab: FloatingActionButton? = null
-    private var fragmentList: Stack<MimiFragmentBase>? = null
     private var homeFragment: MimiFragmentBase? = null
     private var openPage = Pages.NONE
 
@@ -73,7 +72,18 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
         super.onCreate(savedInstanceState)
         binding = ActivityPostitemListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        fragmentList = Stack()
+        supportFragmentManager.addOnBackStackChangedListener {
+            currentFragment = supportFragmentManager.findFragmentById(R.id.postitem_list)
+                    as? MimiFragmentBase ?: homeFragment
+            currentFragment?.let {
+                setFabVisibility(it.showFab())
+                it.initMenu()
+            }
+            if (currentFragment is BoardItemListFragment) {
+                setExpandedToolbar(true, true)
+            }
+            refreshBackNavigationState()
+        }
 //        appBarLayout = findViewById(R.id.appbar)
 //        addContentFab = findViewById(R.id.fab_add_content)
         fab_add_content.setOnClickListener(View.OnClickListener { v: View ->
@@ -218,39 +228,15 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
         setFabVisibility(currentFragment?.showFab() ?: false)
     }
 
-    override fun onBackPressed() {
-        val handled: Boolean
-        //        if(isDrawerOpen(ToggleDrawerEvent.DrawerType.BOOKMARKS)) {
-//            toggleBookmarkDrawer();
-//            handled = true;
-//        } else
-        handled = if (currentFragment != null && currentFragment!!.userVisibleHint) {
-            currentFragment!!.onBackPressed()
-        } else {
-            false
-        }
-        if (!handled) {
-//            final int i = getSupportFragmentManager().getBackStackEntryCount() - 1;
-//            currentFragment = (MimiFragmentBase) getSupportFragmentManager().findFragmentById(id);
-            if (fragmentList != null && fragmentList!!.size > 0) {
-                currentFragment = fragmentList!!.pop()
-            } else {
-                currentFragment = homeFragment
-                if (currentFragment != null) {
-                    setFabVisibility(currentFragment!!.showFab())
-                }
-            }
-            if (currentFragment is BoardItemListFragment) {
-                currentFragment?.onResume()
-                currentFragment?.initMenu()
-                setExpandedToolbar(true, true)
-            }
-            super.onBackPressed()
-            supportInvalidateOptionsMenu()
+    override fun hasCustomBackNavigation(): Boolean {
+        return super.hasCustomBackNavigation() || currentFragment?.canHandleBack() == true
+    }
 
-//            if (getToolbar() != null) {
-//                getToolbar().setVisibility(View.VISIBLE);
-//            }
+    override fun handleCustomBackNavigation() {
+        if (isNavDrawerOpen()) {
+            super.handleCustomBackNavigation()
+        } else if (currentFragment?.canHandleBack() == true) {
+            currentFragment?.onBackPressed()
         }
     }
 

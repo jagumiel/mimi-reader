@@ -36,6 +36,21 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sliding_panel)
+        supportFragmentManager.addOnBackStackChangedListener {
+            val activeListFragment = supportFragmentManager
+                    .findFragmentById(R.id.postitem_list) as? MimiFragmentBase
+            if (activeListFragment != null) {
+                listFragment = activeListFragment
+                if (activeListFragment is BoardItemListFragment) {
+                    boardsFragment = activeListFragment
+                }
+                setFabVisibility(activeListFragment.showFab())
+                if (panelLayout?.isOpen == true) {
+                    activeListFragment.initMenu()
+                }
+            }
+            refreshBackNavigationState()
+        }
         var sliderFadeColor = if (MimiUtil.getInstance().theme == MimiUtil.THEME_LIGHT) {
             ResourcesCompat.getColor(resources, R.color.background_light, theme)
         } else {
@@ -52,12 +67,14 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
                 if (listFragment != null) {
                     listFragment?.initMenu()
                 }
+                refreshBackNavigationState()
             }
 
             override fun onPanelClosed(panel: View) {
                 if (detailFragment != null) {
                     detailFragment?.initMenu()
                 }
+                refreshBackNavigationState()
             }
         })
         panelLayout?.openPane()
@@ -245,17 +262,14 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
         detailFragment = threadDetailFragment
     }
 
-    override fun onBackPressed() {
-        if (panelLayout?.isOpen == true) {
-            if (listFragment is HistoryFragment) {
-                val fm = supportFragmentManager
-                val ft = fm.beginTransaction()
-                ft.remove(listFragment as HistoryFragment).commit()
-            }
-            listFragment = boardsFragment
-            super.onBackPressed()
-            listFragment?.initMenu()
-        } else {
+    override fun hasCustomBackNavigation(): Boolean {
+        return super.hasCustomBackNavigation() || panelLayout?.isOpen == false
+    }
+
+    override fun handleCustomBackNavigation() {
+        if (isNavDrawerOpen()) {
+            super.handleCustomBackNavigation()
+        } else if (panelLayout?.isOpen == false) {
             panelLayout?.openPane()
         }
     }

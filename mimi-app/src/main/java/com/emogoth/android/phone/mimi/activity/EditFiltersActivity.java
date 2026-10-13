@@ -182,7 +182,7 @@ public class EditFiltersActivity extends MimiActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            finish();
+            getOnBackPressedDispatcher().onBackPressed();
         }
 
         return true;

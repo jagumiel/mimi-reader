@@ -952,6 +952,23 @@ public class PostItemsListFragment extends MimiFragmentBase implements
     }
 
     private void setupSearchMenu(MenuItem searchItem) {
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                if (toolbar != null) {
+                    toolbar.post(PostItemsListFragment.this::notifyBackNavigationStateChanged);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (toolbar != null) {
+                    toolbar.post(PostItemsListFragment.this::notifyBackNavigationStateChanged);
+                }
+                return true;
+            }
+        });
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         if (searchView != null) {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -1153,6 +1170,11 @@ public class PostItemsListFragment extends MimiFragmentBase implements
         }
 
         return false;
+    }
+
+    @Override
+    public boolean canHandleBack() {
+        return toolbar != null && toolbar.hasExpandedActionView();
     }
 
     @Override

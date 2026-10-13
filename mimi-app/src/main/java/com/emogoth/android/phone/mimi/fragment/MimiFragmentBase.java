@@ -20,7 +20,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import com.emogoth.android.phone.mimi.app.MimiApplication;
+import com.emogoth.android.phone.mimi.activity.MimiActivity;
 import com.emogoth.android.phone.mimi.util.Extras;
 
 public abstract class MimiFragmentBase extends Fragment {
@@ -44,6 +44,16 @@ public abstract class MimiFragmentBase extends Fragment {
 
     public boolean onBackPressed() {
         return false;
+    }
+
+    public boolean canHandleBack() {
+        return false;
+    }
+
+    protected void notifyBackNavigationStateChanged() {
+        if (getActivity() instanceof MimiActivity) {
+            ((MimiActivity) getActivity()).refreshBackNavigationState();
+        }
     }
 
     public abstract String getTitle();
