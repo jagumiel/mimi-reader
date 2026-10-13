@@ -94,6 +94,7 @@
         android:id="@+id/nav_drawer"
         android:layout_width="300dp"
         android:layout_height="match_parent"
+        android:background="@color/sidebar_background"
         android:layout_gravity="start" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -88,6 +88,7 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
             setTheme(MimiUtil.getInstance().themeResourceId)
         }
         super.onCreate(savedInstanceState)
+        SystemBarInsets.enable(this, MimiUtil.getInstance().theme == MimiUtil.THEME_LIGHT)
         onBackPressedDispatcher.addCallback(this, customBackCallback)
         val extras = intent.extras
         if (extras != null) {
@@ -98,6 +99,11 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
                 bookmarksOrHistory = extras.getInt(Extras.EXTRAS_VIEWING_HISTORY)
             }
         }
+    }
+
+    override fun onContentChanged() {
+        super.onContentChanged()
+        SystemBarInsets.apply(this, MimiUtil.getInstance().theme == MimiUtil.THEME_LIGHT)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

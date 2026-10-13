@@ -82,7 +82,6 @@
         </activity>
         <activity
             android:name=".activity.TabsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:label="@string/app_title"
             android:launchMode="singleTask" />

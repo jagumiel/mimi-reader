@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.viewpager2.widget.ViewPager2
@@ -21,6 +24,72 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TabsActivityNavigationTest {
+    @Test
+    fun tabsAndSystemBarInsetsSurviveActivityRecreation() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val intent = Intent(instrumentation.targetContext, TabsActivity::class.java)
+        val scenario = ActivityScenario.launch<TabsActivity>(intent)
+        var appBarTopPadding = -1
+        var contentBottomPadding = -1
+        var drawerTopPadding = -1
+
+        try {
+            scenario.onActivity { activity ->
+                val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
+                val adapter = pager.adapter as TabPagerAdapter
+                adapter.addItem(
+                        TabPagerAdapter.TabItem(
+                                TabPagerAdapter.TabType.HISTORY,
+                                Bundle(),
+                                6262L,
+                                "History",
+                                null
+                        )
+                )
+                pager.setCurrentItem(1, false)
+            }
+            instrumentation.waitForIdleSync()
+
+            scenario.onActivity { activity ->
+                val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
+                val appBar = activity.findViewById<View>(R.id.appbar)
+                val navDrawer = activity.findViewById<View>(R.id.nav_drawer)
+                val mainContent = drawerLayout.getChildAt(0)
+                val bars = ViewCompat.getRootWindowInsets(drawerLayout)?.getInsets(
+                        WindowInsetsCompat.Type.systemBars() or
+                                WindowInsetsCompat.Type.displayCutout()
+                )
+
+                assertTrue((bars?.top ?: 0) > 0)
+                assertTrue(appBar.paddingTop >= (bars?.top ?: 0))
+                assertTrue(mainContent.paddingBottom >= (bars?.bottom ?: 0))
+                assertTrue(navDrawer.paddingTop >= (bars?.top ?: 0))
+                appBarTopPadding = appBar.paddingTop
+                contentBottomPadding = mainContent.paddingBottom
+                drawerTopPadding = navDrawer.paddingTop
+            }
+
+            scenario.recreate()
+            instrumentation.waitForIdleSync()
+
+            scenario.onActivity { activity ->
+                val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
+                val adapter = pager.adapter as TabPagerAdapter
+                val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
+                val appBar = activity.findViewById<View>(R.id.appbar)
+                val navDrawer = activity.findViewById<View>(R.id.nav_drawer)
+
+                assertEquals(2, adapter.itemCount)
+                assertEquals(1, pager.currentItem)
+                assertEquals(appBarTopPadding, appBar.paddingTop)
+                assertEquals(contentBottomPadding, drawerLayout.getChildAt(0).paddingBottom)
+                assertEquals(drawerTopPadding, navDrawer.paddingTop)
+            }
+        } finally {
+            scenario.close()
+        }
+    }
+
     @Test
     fun backDispatcherClosesDrawerBeforeNavigatingTabs() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()

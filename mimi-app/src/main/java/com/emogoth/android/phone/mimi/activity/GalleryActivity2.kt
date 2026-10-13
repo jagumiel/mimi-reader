@@ -96,10 +96,12 @@ class GalleryActivity2 : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SystemBarInsets.enable(this, false)
         theme.applyStyle(MimiUtil.getFontStyle(this), true)
 
         binding = ActivityGallery2Binding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBarInsets.apply(this, false)
         setSupportActionBar(toolbar)
         onBackPressedDispatcher.addCallback(this, galleryBackCallback)
 
