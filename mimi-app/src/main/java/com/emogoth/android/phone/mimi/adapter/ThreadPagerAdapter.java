@@ -17,10 +17,11 @@
 package com.emogoth.android.phone.mimi.adapter;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import android.util.Log;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.emogoth.android.phone.mimi.fragment.MimiFragmentBase;
 import com.emogoth.android.phone.mimi.fragment.ThreadDetailFragment;
@@ -31,56 +32,66 @@ import com.mimireader.chanlib.models.ChanPost;
 import java.util.List;
 
 
-public class ThreadPagerAdapter extends FragmentStatePagerAdapter {
-    private static final String LOG_TAG = ThreadPagerAdapter.class.getSimpleName();
+public class ThreadPagerAdapter extends FragmentStateAdapter {
+    private static final String ARG_PAGER_POSITION = "mimi_thread_pager_position";
 
     private final List<ThreadInfo> threadList;
     private final int[] unreadCountList;
     private final int postPosition;
-    private int sizeWithAds;
+    private final ChanPost initialPost;
+    private final FragmentManager fragmentManager;
 
-    private ChanPost initialPost;
-
-    public ThreadPagerAdapter(final FragmentManager fm, final List<ThreadInfo> threadList, final int[] unreadCountList, final ChanPost initialPost, final int postPosition) {
-        super(fm);
+    public ThreadPagerAdapter(final Fragment owner, final List<ThreadInfo> threadList,
+                              final int[] unreadCountList, final ChanPost initialPost,
+                              final int postPosition) {
+        super(owner);
+        fragmentManager = owner.getChildFragmentManager();
         this.threadList = threadList;
         this.unreadCountList = unreadCountList;
         this.initialPost = initialPost;
         this.postPosition = postPosition;
-
-        this.sizeWithAds = threadList.size();
     }
 
+    @NonNull
     @Override
-    public Fragment getItem(final int position) {
+    public Fragment createFragment(final int position) {
         final MimiFragmentBase fragment = new ThreadDetailFragment();
         final Bundle args = new Bundle();
-        if (position < threadList.size()) {
+        final ThreadInfo thread = threadList.get(position);
 
-                args.putString(Extras.EXTRAS_BOARD_NAME, threadList.get(position).getBoardName());
-                args.putString(Extras.EXTRAS_BOARD_TITLE, threadList.get(position).getBoardTitle());
-                args.putLong(Extras.EXTRAS_THREAD_ID, threadList.get(position).getThreadId());
-                args.putInt(Extras.LOADER_ID, position % 3);
+        args.putString(Extras.EXTRAS_BOARD_NAME, thread.getBoardName());
+        args.putString(Extras.EXTRAS_BOARD_TITLE, thread.getBoardTitle());
+        args.putLong(Extras.EXTRAS_THREAD_ID, thread.getThreadId());
+        args.putInt(Extras.LOADER_ID, position % 3);
+        args.putInt(ARG_PAGER_POSITION, position);
 
-                if (unreadCountList != null) {
-                    args.putInt(Extras.EXTRAS_UNREAD_COUNT, unreadCountList[position]);
-                }
-
-                if (position == postPosition && initialPost != null) {
-                    args.putParcelable(Extras.EXTRAS_THREAD_FIRST_POST, initialPost);
-                    initialPost = null;
-                }
-
+        if (unreadCountList != null && position < unreadCountList.length) {
+            args.putInt(Extras.EXTRAS_UNREAD_COUNT, unreadCountList[position]);
         }
 
+        if (position == postPosition && initialPost != null) {
+            args.putParcelable(Extras.EXTRAS_THREAD_FIRST_POST, initialPost);
+        }
         fragment.setArguments(args);
-
         return fragment;
     }
 
     @Override
-    public int getCount() {
-        return sizeWithAds;
+    public int getItemCount() {
+        return threadList.size();
     }
 
+    public MimiFragmentBase getActiveFragment(final int position) {
+        if (position < 0 || position >= threadList.size()) {
+            return null;
+        }
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            final Bundle arguments = fragment.getArguments();
+            if (fragment instanceof MimiFragmentBase && arguments != null
+                    && arguments.getInt(ARG_PAGER_POSITION, -1) == position) {
+                return (MimiFragmentBase) fragment;
+            }
+        }
+        return null;
+    }
 }

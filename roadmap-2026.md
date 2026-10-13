@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 5 de octubre de 2026.
+Última revisión: 13 de octubre de 2026.
 
 ## Objetivo
 
@@ -69,12 +69,17 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 ### 3. Navegación e interfaz moderna
 
 - [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
+- [ ] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales. Debe solicitar confirmación y conservar las descargas del usuario, la base de datos y las preferencias.
+- [ ] Añadir reproducción automática opcional en la galería multimedia.
+  - [ ] Avanzar las imágenes tras 3 segundos de visualización.
+  - [ ] Avanzar al finalizar la reproducción de cada vídeo.
+  - [ ] Avanzar al completar un ciclo de cada GIF animado.
 - [x] Mantener la precarga de toda la galería, limitando las descargas simultáneas y reordenando la cola según la distancia al elemento visible: primero las imágenes y vídeos más cercanos y después los más lejanos.
   - [x] Aplicar un máximo estricto de dos descargas, también cuando las páginas visibles registran listeners.
   - [x] Reordenar los elementos pendientes al abrir la galería y cada vez que cambia la página visible, priorizando primero el siguiente elemento en caso de empate.
-- [ ] Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
+- [x] Migrar gradualmente de `ViewPager` a `ViewPager2` o a una navegación equivalente.
   - [x] Migrar las pestañas dinámicas de la pantalla principal a `ViewPager2`, conservando identidades estables, restauración de fragments y cierre individual de hilos.
-  - [ ] Migrar el paginador secundario de hilos y retirar los adaptadores heredados que ya no se utilicen.
+  - [x] Migrar el paginador secundario de hilos y retirar los adaptadores heredados que ya no se utilicen.
 - Implementar correctamente el gesto Atrás predictivo antes de retirar la desactivación temporal.
 - Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.
 - Limitar y recuperar con claridad pestañas que no puedan restaurarse por falta de memoria.
