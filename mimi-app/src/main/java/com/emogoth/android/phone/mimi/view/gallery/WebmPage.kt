@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.net.toUri
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.databinding.ViewGalleryVideoErrorBinding
 import com.emogoth.android.phone.mimi.db.DatabaseUtils
@@ -99,6 +100,7 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
         hidePlaybackError()
         updateVideoPlaybackState()
         loaded = true
+        notifyContentReady()
     }
 
     override fun onPageSelectedChange(selected: Boolean) {
@@ -249,6 +251,9 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
     override fun onStateChanged(playWhenReady: Boolean, playbackState: Int) {
         Log.d(LOG_TAG, "State changed (playWhenReady: $playWhenReady, state: $playbackState)")
         videoView.keepScreenOn = pageSelected && playWhenReady
+        if (pageSelected && playbackState == Player.STATE_ENDED) {
+            notifyPlaybackCompleted()
+        }
     }
 
     override fun onHostPause() {

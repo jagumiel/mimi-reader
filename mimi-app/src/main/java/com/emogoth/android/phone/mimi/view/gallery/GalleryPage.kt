@@ -30,6 +30,11 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
     protected var pageSelected = false
     protected var loaded = false
 
+    private var eventListener: ((GalleryPageEvent) -> Unit)? = null
+
+    val contentReady: Boolean
+        get() = loaded
+
     private var childView: View? = null
     private var progressView: ProgressBar? = null
 
@@ -88,7 +93,9 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
             return downloadItem.file
         }
 
-    fun bind(item: GalleryItem) {
+    fun bind(item: GalleryItem, listener: (GalleryPageEvent) -> Unit) {
+        eventListener = listener
+        loaded = false
         onViewBind()
         if (item != GalleryItem.empty()) {
             postId = item.id
@@ -102,6 +109,14 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
             progressView?.visibility = View.GONE
             childView?.visibility = View.VISIBLE
         }
+    }
+
+    protected fun notifyContentReady() {
+        eventListener?.invoke(GalleryPageEvent.CONTENT_READY)
+    }
+
+    protected fun notifyPlaybackCompleted() {
+        eventListener?.invoke(GalleryPageEvent.PLAYBACK_COMPLETED)
     }
 
     protected fun addMainChildView(child: View) {
@@ -195,4 +210,9 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
     open fun fullScreen(enabled: Boolean = true) {
 
     }
+}
+
+enum class GalleryPageEvent {
+    CONTENT_READY,
+    PLAYBACK_COMPLETED
 }

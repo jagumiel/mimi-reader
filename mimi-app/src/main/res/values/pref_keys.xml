@@ -229,6 +229,7 @@
 
     <string name="scroll_thread_with_gallery_pref">scroll_thread_with_gallery_pref</string>
     <string name="close_gallery_on_click_pref">close_gallery_on_click_pref</string>
+    <string name="gallery_autoplay_pref">gallery_autoplay_pref</string>
 
     <string name="quote_color_pref">quote_color_pref</string>
     <string name="reply_color_pref">reply_color_pref</string>

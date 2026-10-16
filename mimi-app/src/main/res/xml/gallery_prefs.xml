@@ -26,6 +26,13 @@
             app:title="@string/auto_play_audio" />
 
         <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="@string/gallery_autoplay_pref"
+            app:summary="@string/gallery_autoplay_summary"
+            app:title="@string/gallery_autoplay_title" />
+
+        <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             app:key="@string/use_original_filename_pref"
             app:summary="@string/use_original_filename_summary"

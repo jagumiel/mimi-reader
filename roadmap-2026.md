@@ -72,10 +72,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales.
   - [x] Solicitar confirmación, ejecutar la limpieza fuera del hilo principal e informar del espacio liberado.
   - [x] Vaciar Glide, HTTP y los temporales internos/externos sin tocar descargas del usuario, base de datos, historial, marcadores ni preferencias.
-- [ ] Añadir reproducción automática opcional en la galería multimedia.
-  - [ ] Avanzar las imágenes tras 3 segundos de visualización.
-  - [ ] Avanzar al finalizar la reproducción de cada vídeo.
-  - [ ] Avanzar al completar un ciclo de cada GIF animado.
+- [x] Añadir reproducción automática opcional en la galería multimedia.
+  - [x] Avanzar las imágenes tras 3 segundos de visualización.
+  - [x] Avanzar al finalizar la reproducción de cada vídeo.
+  - [x] Avanzar al completar un ciclo de cada GIF animado.
 - [x] Mantener la precarga de toda la galería, limitando las descargas simultáneas y reordenando la cola según la distancia al elemento visible: primero las imágenes y vídeos más cercanos y después los más lejanos.
   - [x] Aplicar un máximo estricto de dos descargas, también cuando las páginas visibles registran listeners.
   - [x] Reordenar los elementos pendientes al abrir la galería y cada vez que cambia la página visible, priorizando primero el siguiente elemento en caso de empate.

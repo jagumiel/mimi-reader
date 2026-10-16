@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -42,10 +43,18 @@ class GalleryPager @JvmOverloads constructor(
 
     companion object {
         val LOG_TAG: String = GalleryPager::class.java.simpleName
+        private const val IMAGE_AUTOPLAY_DELAY_MS = 3_000L
     }
 
     private var adapter: GalleryPagerAdapter? = null
     private var player: MediaPlayerHelper? = null
+    private val autoplayController = GalleryAutoplayController(MimiPrefs.galleryAutoplayEnabled(context))
+    private var scheduledAutoplayPosition = RecyclerView.NO_POSITION
+    private val imageAutoplayRunnable = Runnable {
+        val position = scheduledAutoplayPosition
+        scheduledAutoplayPosition = RecyclerView.NO_POSITION
+        advanceFrom(position)
+    }
 
     private val layoutManager: RecyclerView.LayoutManager
 
@@ -84,6 +93,7 @@ class GalleryPager @JvmOverloads constructor(
         id = R.id.gallery2_pager
         Log.d(LOG_TAG, "Instance of GalleryPager created")
         player = MediaPlayerHelper(context)
+        player?.setRepeatEnabled(!autoplayController.enabled)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         inflateView()
@@ -91,7 +101,9 @@ class GalleryPager @JvmOverloads constructor(
         pager.layoutManager = layoutManager
         pager.attachSnapHelperWithListener(PagerSnapHelper(), SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL, object : OnSnapPositionChangeListener {
             override fun onSnapPositionChange(previous: Int, current: Int) {
+                cancelImageAutoplay()
                 pagerPosition = current
+                autoplayController.onPageSelected(current, getItems().size)
                 galleryViewModel?.prioritizeDownloads(current)
 
                 Log.d(LOG_TAG, "Gallery Position: $current (previous=$previous)")
@@ -138,6 +150,8 @@ class GalleryPager @JvmOverloads constructor(
 
                     actionBar?.subtitle = subtitle
                 }
+
+                scheduleImageAutoplay(current)
             }
         })
 
@@ -160,6 +174,8 @@ class GalleryPager @JvmOverloads constructor(
     }
 
     fun pause() {
+        autoplayController.onHostPause()
+        cancelImageAutoplay()
         currentHolder()?.onHostPause()
         player?.pause()
     }
@@ -169,7 +185,11 @@ class GalleryPager @JvmOverloads constructor(
     }
 
     fun resume() {
-        pager.post { currentHolder()?.onHostResume() }
+        autoplayController.onHostResume()
+        pager.post {
+            currentHolder()?.onHostResume()
+            scheduleImageAutoplay(pagerPosition)
+        }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
@@ -177,6 +197,8 @@ class GalleryPager @JvmOverloads constructor(
     }
 
     fun release() {
+        autoplayController.onHostPause()
+        cancelImageAutoplay()
         adapter?.destroy()
         player?.release()
         player = null
@@ -184,16 +206,61 @@ class GalleryPager @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        val owner = context as? LifecycleOwner
+        if (owner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.RESUMED) == true) {
+            resume()
+        }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        autoplayController.onHostPause()
+        cancelImageAutoplay()
         currentHolder()?.onHostPause()
         player?.pause()
     }
 
     private fun currentHolder(): GalleryPagerItemViewHolder? {
         return pager.findViewHolderForAdapterPosition(pagerPosition) as? GalleryPagerItemViewHolder
+    }
+
+    private fun onPageEvent(position: Int, event: GalleryPageEvent) {
+        when (event) {
+            GalleryPageEvent.CONTENT_READY -> scheduleImageAutoplay(position)
+            GalleryPageEvent.PLAYBACK_COMPLETED -> advanceFrom(position)
+        }
+    }
+
+    private fun scheduleImageAutoplay(position: Int) {
+        val currentAdapter = adapter ?: return
+        if (position != pagerPosition || position !in 0 until currentAdapter.itemCount) {
+            return
+        }
+
+        cancelImageAutoplay()
+        if (currentAdapter.getItemViewType(position) != GalleryPagerAdapter.ItemType.IMAGE.value) {
+            return
+        }
+
+        val holder = pager.findViewHolderForAdapterPosition(position) as? GalleryPagerItemViewHolder
+        if (!autoplayController.shouldScheduleImage(position, holder?.contentReady == true)) {
+            return
+        }
+
+        scheduledAutoplayPosition = position
+        pager.postDelayed(imageAutoplayRunnable, IMAGE_AUTOPLAY_DELAY_MS)
+    }
+
+    private fun cancelImageAutoplay() {
+        pager.removeCallbacks(imageAutoplayRunnable)
+        scheduledAutoplayPosition = RecyclerView.NO_POSITION
+    }
+
+    private fun advanceFrom(position: Int) {
+        val nextPosition = autoplayController.requestAdvance(position) ?: return
+        cancelImageAutoplay()
+        player?.pause()
+        pager.smoothScrollToPosition(nextPosition)
     }
 
     private fun inflateView() {
@@ -211,7 +278,11 @@ class GalleryPager @JvmOverloads constructor(
 
         val viewModel: GalleryViewModel = galleryViewModel as GalleryViewModel
         if (adapter == null) {
-            adapter = GalleryPagerAdapter(items, viewModel, player)
+            adapter = GalleryPagerAdapter(items, viewModel, player) { position, event ->
+                if (autoplayController.enabled) {
+                    pager.post { onPageEvent(position, event) }
+                }
+            }
             pager.adapter = adapter
 
             actionBar = if (this.context is AppCompatActivity) {
@@ -312,7 +383,12 @@ class GalleryPager @JvmOverloads constructor(
 
 }
 
-class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryViewModel, private val player: MediaPlayerHelper?) : RecyclerView.Adapter<GalleryPagerItemViewHolder>() {
+class GalleryPagerAdapter(
+        val items: List<GalleryItem>,
+        val viewModel: GalleryViewModel,
+        private val player: MediaPlayerHelper?,
+        private val pageEventListener: (Int, GalleryPageEvent) -> Unit
+) : RecyclerView.Adapter<GalleryPagerItemViewHolder>() {
     enum class ItemType(val value: Int) {
         UNKNOWN(0), IMAGE(1), GIF(2), VIDEO(3), PDF(4);
     }
@@ -368,7 +444,12 @@ class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryVi
     }
 
     override fun onBindViewHolder(holder: GalleryPagerItemViewHolder, position: Int) {
-        holder.bind(if (position >= 0) items[position] else GalleryItem.empty())
+        holder.bind(if (position >= 0) items[position] else GalleryItem.empty()) { event ->
+            val currentPosition = holder.bindingAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                pageEventListener(currentPosition, event)
+            }
+        }
     }
 
     fun destroy() {
@@ -378,8 +459,8 @@ class GalleryPagerAdapter(val items: List<GalleryItem>, val viewModel: GalleryVi
 }
 
 abstract class GalleryPagerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(item: GalleryItem) {
-        (itemView as? GalleryPage)?.bind(item)
+    fun bind(item: GalleryItem, listener: (GalleryPageEvent) -> Unit) {
+        (itemView as? GalleryPage)?.bind(item, listener)
     }
 
     fun onSelectionChange(selected: Boolean) {
@@ -403,6 +484,9 @@ abstract class GalleryPagerItemViewHolder(itemView: View) : RecyclerView.ViewHol
 
     val localPath: File
         get() = (itemView as? GalleryPage)?.localFile ?: File("")
+
+    val contentReady: Boolean
+        get() = (itemView as? GalleryPage)?.contentReady == true
 }
 
 // These need to be different classes to prevent the RecyclerView from reusing the wrong viewholder

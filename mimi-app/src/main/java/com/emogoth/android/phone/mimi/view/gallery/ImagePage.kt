@@ -31,12 +31,12 @@ class ImagePage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
 
         try {
             view.setImage(ImageSource.uri(downloadItem.file.toUri()))
+            loaded = true
+            notifyContentReady()
         } catch (e: Exception) {
             if (!retryDownload()) {
                 Log.w("ImagePage", "Ran out of retries; download failed for ${downloadItem.file.absolutePath}", e)
             }
-        } finally {
-            loaded = true
         }
     }
 

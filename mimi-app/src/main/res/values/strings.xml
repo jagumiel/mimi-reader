@@ -167,6 +167,8 @@
     <string name="scroll_thread_with_gallery_title">Scroll thread with gallery</string>
     <string name="scroll_thread_with_gallery_summary">Swiping in the gallery scrolls the thread</string>
     <string name="close_gallery_on_click_title">Tap image to close gallery</string>
+    <string name="gallery_autoplay_title">Autoplay gallery</string>
+    <string name="gallery_autoplay_summary">Advance images after 3 seconds and continue when videos or GIFs finish</string>
 
     <string name="disabled">Disabled</string>
 

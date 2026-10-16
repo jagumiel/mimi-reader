@@ -106,6 +106,12 @@ public class MediaPlayerHelper implements Player.Listener {
         }
     }
 
+    public void setRepeatEnabled(boolean enabled) {
+        if (!released) {
+            player.setRepeatMode(enabled ? Player.REPEAT_MODE_ONE : Player.REPEAT_MODE_OFF);
+        }
+    }
+
     public boolean isPlaying() {
         return player.isPlaying();
     }

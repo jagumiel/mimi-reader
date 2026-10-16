@@ -12,7 +12,8 @@ import pl.droidsonroids.gif.GifImageView
 @SuppressLint("ViewConstructor")
 class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(context, viewModel) {
     override fun onViewBind() {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        (view.drawable as? GifDrawable)?.recycle()
+        view.setImageDrawable(null)
     }
 
     val view = GifImageView(context)
@@ -29,14 +30,20 @@ class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(conte
         }
 
         try {
+            (view.drawable as? GifDrawable)?.recycle()
             val drawable = GifDrawable(downloadItem.file)
+            drawable.addAnimationListener {
+                if (pageSelected) {
+                    notifyPlaybackCompleted()
+                }
+            }
             view.setImageDrawable(drawable)
 
             if (pageSelected) drawable.start() else drawable.stop()
+            loaded = true
+            notifyContentReady()
         } catch (e: Exception) {
             Snackbar.make(this, R.string.could_not_load_gif, Snackbar.LENGTH_SHORT).setAction(R.string.retry) { onComplete() }.show()
-        } finally {
-            loaded = true
         }
     }
 
@@ -46,6 +53,16 @@ class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(conte
         val drawable = view.drawable
         if (drawable != null && drawable is GifDrawable) {
             if (selected) drawable.start() else drawable.stop()
+        }
+    }
+
+    override fun onHostPause() {
+        (view.drawable as? GifDrawable)?.stop()
+    }
+
+    override fun onHostResume() {
+        if (pageSelected) {
+            (view.drawable as? GifDrawable)?.start()
         }
     }
 }
