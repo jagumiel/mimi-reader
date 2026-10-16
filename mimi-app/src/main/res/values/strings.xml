@@ -439,6 +439,11 @@
     <string name="font_size">Font Size</string>
     <string name="you_have_unread_posts_exclamation">You have unread posts!</string>
     <string name="closing_tab">CLOSING TAB</string>
+    <string name="tab_limit_reached">Tab limit reached. The oldest inactive tab was closed to keep the app responsive.</string>
+    <plurals name="tabs_not_restored">
+        <item quantity="one">%d tab could not be restored and was closed.</item>
+        <item quantity="other">%d tabs could not be restored and were closed.</item>
+    </plurals>
 
     <!-- Layout Types -->
     <string name="layout_browser">Browser</string>

@@ -50,12 +50,15 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     private var tabLayoutMediator: TabLayoutMediator? = null
     private var currentFragment: MimiFragmentBase? = null
     private var closeTabOnBack = false
+    private var failedTabStateRestore = false
     override val pageName: String? = "tabs_activity"
 
     private var historyObserver: Disposable? = null
 
     companion object {
         const val LOG_TAG = "TabsActivity"
+        private const val STATE_TAB_ITEMS = "tabItems"
+        private const val STATE_SELECTED_TAB_ID = "selectedTabId"
     }
 
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -83,14 +86,26 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         toolbar = mimi_toolbar
         mimi_toolbar.setNavigationOnClickListener { toggleNavDrawer() }
         val tabItems: ArrayList<TabPagerAdapter.TabItem>?
-        if (savedInstanceState != null && savedInstanceState.containsKey("tabItems")) {
-            tabItems = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                savedInstanceState.getParcelableArrayList("tabItems", TabPagerAdapter.TabItem::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                savedInstanceState.getParcelableArrayList("tabItems")
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_TAB_ITEMS)) {
+            tabItems = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    savedInstanceState.getParcelableArrayList(STATE_TAB_ITEMS, TabPagerAdapter.TabItem::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    savedInstanceState.getParcelableArrayList(STATE_TAB_ITEMS)
+                }
+            } catch (exception: RuntimeException) {
+                failedTabStateRestore = true
+                Log.e(LOG_TAG, "Could not read the saved tab state", exception)
+                null
             }
-            tabPagerAdapter = TabPagerAdapter(this, tabItems)
+            val selectedTabId = savedInstanceState.getLong(STATE_SELECTED_TAB_ID, Long.MIN_VALUE)
+            tabPagerAdapter = if (tabItems == null) {
+                failedTabStateRestore = true
+                TabPagerAdapter(this)
+            } else {
+                TabPagerAdapter(this, tabItems, selectedTabId)
+            }
         } else {
             tabItems = null
             tabPagerAdapter = TabPagerAdapter(this)
@@ -110,6 +125,7 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
         tabLayoutMediator = TabLayoutMediator(tab_layout, tabs_pager) { tab, position ->
             configureTab(tab, tabPagerAdapter?.getTabItem(position))
         }.also { it.attach() }
+        restoreSelectedTabAndReportDiscarded(savedInstanceState)
         fab_add_content.setOnClickListener { v: View? ->
             if (currentFragment is ContentInterface) {
                 (currentFragment as ContentInterface).addContent()
@@ -163,8 +179,36 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val tabItems = ArrayList(tabPagerAdapter?.items ?: emptyList())
-        outState.putParcelableArrayList("tabItems", tabItems)
+        val adapter = tabPagerAdapter
+        val tabItems = ArrayList(adapter?.items ?: emptyList())
+        outState.putParcelableArrayList(STATE_TAB_ITEMS, tabItems)
+        adapter?.getTabItem(tabs_pager.currentItem)?.let {
+            outState.putLong(STATE_SELECTED_TAB_ID, it.stableId)
+        }
+    }
+
+    private fun restoreSelectedTabAndReportDiscarded(savedInstanceState: Bundle?) {
+        val adapter = tabPagerAdapter ?: return
+        val selectedTabId = savedInstanceState?.getLong(STATE_SELECTED_TAB_ID, Long.MIN_VALUE)
+                ?: Long.MIN_VALUE
+        val selectedPosition = adapter.getPositionByStableId(selectedTabId)
+        val discardedCount = adapter.discardedTabCount + if (failedTabStateRestore) 1 else 0
+        tabs_pager.post {
+            if (selectedPosition >= 0) {
+                tabs_pager.setCurrentItem(selectedPosition, false)
+            }
+            if (discardedCount > 0 && !isFinishing && !isDestroyed) {
+                Snackbar.make(
+                        tabs_pager,
+                        resources.getQuantityString(
+                                R.plurals.tabs_not_restored,
+                                discardedCount,
+                                discardedCount
+                        ),
+                        Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     protected fun getTabTitle(boardName: String): String {
@@ -269,11 +313,15 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
             args.putParcelable(Extras.EXTRAS_THREAD_FIRST_POST, posts[position])
         }
         threadTabItem = TabPagerAdapter.TabItem(TabPagerAdapter.TabType.THREAD, args, threadId, boardName, threadId.toString())
-        val pos = tabPagerAdapter?.addItem(threadTabItem) ?: 0
+        val adapter = tabPagerAdapter ?: return
+        val pos = adapter.addItem(threadTabItem, tabs_pager.currentItem)
         if (pos < 0) {
             return
         }
         tabs_pager.setCurrentItem(pos, true)
+        if (adapter.consumeLastEvictedTab() != null) {
+            Snackbar.make(tabs_pager, R.string.tab_limit_reached, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun createTabView(threadId: Long, boardName: String): View {

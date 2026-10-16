@@ -32,31 +32,112 @@ import com.emogoth.android.phone.mimi.fragment.BoardItemListFragment;
 import com.emogoth.android.phone.mimi.fragment.HistoryFragment;
 import com.emogoth.android.phone.mimi.fragment.PostItemsListFragment;
 import com.emogoth.android.phone.mimi.fragment.ThreadDetailFragment;
+import com.emogoth.android.phone.mimi.util.Extras;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
 public class TabPagerAdapter extends FragmentStateAdapter {
+    public static final int MAX_TAB_COUNT = 12;
     private static final String LOG_TAG = TabPagerAdapter.class.getSimpleName();
     private static final String ARG_TAB_STABLE_ID = "mimi_tab_stable_id";
     private final List<TabItem> tabItems = new ArrayList<>();
     private final FragmentManager fragmentManager;
+    private int discardedTabCount;
+    private TabItem lastEvictedTab;
 
     public TabPagerAdapter(FragmentActivity activity) {
         super(activity);
         fragmentManager = activity.getSupportFragmentManager();
-
-        final String title = MimiApplication.getInstance().getApplicationContext().getString(R.string.boards);
-        tabItems.add(new TabItem(TabType.BOARDS, null, BoardItemListFragment.TAB_ID, title, null));
+        tabItems.add(createBoardsTab());
     }
 
     public TabPagerAdapter(FragmentActivity activity, List<TabItem> items) {
+        this(activity, items, Long.MIN_VALUE);
+    }
+
+    public TabPagerAdapter(FragmentActivity activity, List<TabItem> items, long preferredItemId) {
         super(activity);
         fragmentManager = activity.getSupportFragmentManager();
+        restoreItems(items, preferredItemId);
+    }
 
-        if (items != null) {
-            tabItems.addAll(items);
+    private TabItem createBoardsTab() {
+        final String title = MimiApplication.getInstance().getApplicationContext().getString(R.string.boards);
+        return new TabItem(TabType.BOARDS, null, BoardItemListFragment.TAB_ID, title, null);
+    }
+
+    private void restoreItems(List<TabItem> items, long preferredItemId) {
+        tabItems.add(createBoardsTab());
+        if (items == null) {
+            return;
+        }
+
+        final List<TabItem> candidates = new ArrayList<>();
+        final Set<Long> stableIds = new HashSet<>();
+        stableIds.add(tabItems.get(0).getStableId());
+        for (TabItem item : items) {
+            if (item != null && item.getTabType() == TabType.BOARDS) {
+                continue;
+            }
+            if (!isRestorable(item) || !stableIds.add(item.getStableId())) {
+                discardedTabCount++;
+                continue;
+            }
+            candidates.add(item);
+        }
+
+        final int availableSlots = MAX_TAB_COUNT - 1;
+        if (candidates.size() <= availableSlots) {
+            tabItems.addAll(candidates);
+            return;
+        }
+
+        final Set<TabItem> retained = new HashSet<>();
+        retained.add(candidates.get(0));
+        for (TabItem item : candidates) {
+            if (item.getStableId() == preferredItemId) {
+                retained.add(item);
+                break;
+            }
+        }
+        for (int i = candidates.size() - 1; i >= 0 && retained.size() < availableSlots; i--) {
+            retained.add(candidates.get(i));
+        }
+        for (TabItem item : candidates) {
+            if (retained.contains(item)) {
+                tabItems.add(item);
+            } else {
+                discardedTabCount++;
+            }
+        }
+    }
+
+    private boolean isRestorable(TabItem item) {
+        if (item == null || item.getTabType() == null) {
+            return false;
+        }
+        try {
+            switch (item.getTabType()) {
+                case BOARDS:
+                    return true;
+                case POSTS:
+                    return item.getBundle() != null
+                            && item.getBundle().getString(Extras.EXTRAS_BOARD_NAME) != null;
+                case THREAD:
+                    return item.getId() > 0
+                            && item.getBundle() != null
+                            && item.getBundle().getString(Extras.EXTRAS_BOARD_NAME) != null;
+                case HISTORY:
+                    return item.getBundle() != null && item.getTitle() != null;
+                default:
+                    return false;
+            }
+        } catch (RuntimeException exception) {
+            Log.w(LOG_TAG, "Discarding an invalid saved tab", exception);
+            return false;
         }
     }
 
@@ -150,10 +231,36 @@ public class TabPagerAdapter extends FragmentStateAdapter {
     }
 
     public int addItem(TabItem item) {
+        return addItem(item, -1);
+    }
+
+    public int addItem(TabItem item, int protectedPosition) {
         try {
+            lastEvictedTab = null;
+            if (!isRestorable(item) || item.getTabType() == TabType.BOARDS) {
+                Log.w(LOG_TAG, "Ignoring an invalid tab");
+                return -1;
+            }
             final int index = tabItems.indexOf(item);
             if (index >= 0 && tabItems.get(index).getBundle() != null) {
                 return index;
+            }
+
+            if (tabItems.size() >= MAX_TAB_COUNT) {
+                int removalPosition = -1;
+                // Position 0 is the boards screen and position 1 is the board/history anchor.
+                // Keep both so closing an old thread never strands the user inside thread tabs.
+                for (int i = 2; i < tabItems.size(); i++) {
+                    if (i != protectedPosition) {
+                        removalPosition = i;
+                        break;
+                    }
+                }
+                if (removalPosition < 0) {
+                    return -1;
+                }
+                lastEvictedTab = tabItems.remove(removalPosition);
+                notifyItemRemoved(removalPosition);
             }
 
             tabItems.add(item);
@@ -165,6 +272,16 @@ public class TabPagerAdapter extends FragmentStateAdapter {
         }
 
         return -1;
+    }
+
+    public TabItem consumeLastEvictedTab() {
+        final TabItem evictedTab = lastEvictedTab;
+        lastEvictedTab = null;
+        return evictedTab;
+    }
+
+    public int getDiscardedTabCount() {
+        return discardedTabCount;
     }
 
     public TabItem getTabItem(int pos) {
@@ -199,6 +316,15 @@ public class TabPagerAdapter extends FragmentStateAdapter {
         }
 
         return index;
+    }
+
+    public int getPositionByStableId(long stableId) {
+        for (int i = 0; i < tabItems.size(); i++) {
+            if (tabItems.get(i).getStableId() == stableId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void removeItemById(long id) {
@@ -336,7 +462,10 @@ public class TabPagerAdapter extends FragmentStateAdapter {
 
         protected TabItem(Parcel in) {
             int tmpTabType = in.readInt();
-            this.tabType = tmpTabType == -1 ? null : TabType.values()[tmpTabType];
+            final TabType[] values = TabType.values();
+            this.tabType = tmpTabType < 0 || tmpTabType >= values.length
+                    ? null
+                    : values[tmpTabType];
             this.id = in.readLong();
             this.bundle = in.readBundle(getClass().getClassLoader());
             this.title = in.readString();

@@ -1,6 +1,7 @@
 package com.emogoth.android.phone.mimi.activity
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
@@ -47,7 +48,7 @@ class TabsActivityNavigationTest {
                 pager.setCurrentItem(1, false)
             }
             instrumentation.waitForIdleSync()
-            waitForSystemBarInsets(scenario)
+            waitForSystemBarProtection(scenario)
 
             scenario.onActivity { activity ->
                 val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
@@ -60,14 +61,12 @@ class TabsActivityNavigationTest {
                 )
 
                 assertTrue((bars?.top ?: 0) > 0)
-                assertTrue(appBar.paddingTop >= (bars?.top ?: 0))
-                assertTrue(mainContent.paddingBottom >= (bars?.bottom ?: 0))
-                assertTrue(navDrawer.paddingTop >= (bars?.top ?: 0))
+                assertSystemBarsProtected(activity, appBar, mainContent, navDrawer, bars)
             }
 
             scenario.recreate()
             instrumentation.waitForIdleSync()
-            waitForSystemBarInsets(scenario)
+            waitForSystemBarProtection(scenario)
 
             scenario.onActivity { activity ->
                 val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
@@ -82,9 +81,13 @@ class TabsActivityNavigationTest {
 
                 assertEquals(2, adapter.itemCount)
                 assertEquals(1, pager.currentItem)
-                assertEquals(bars?.top ?: 0, appBar.paddingTop)
-                assertEquals(bars?.bottom ?: 0, drawerLayout.getChildAt(0).paddingBottom)
-                assertEquals(bars?.top ?: 0, navDrawer.paddingTop)
+                assertSystemBarsProtected(
+                        activity,
+                        appBar,
+                        drawerLayout.getChildAt(0),
+                        navDrawer,
+                        bars
+                )
                 assertEquals(
                         1,
                         activity.supportFragmentManager.fragments
@@ -151,22 +154,57 @@ class TabsActivityNavigationTest {
         }
     }
 
-    private fun waitForSystemBarInsets(scenario: ActivityScenario<TabsActivity>) {
+    private fun waitForSystemBarProtection(scenario: ActivityScenario<TabsActivity>) {
         waitUntil {
-            var applied = false
+            var protected = false
             scenario.onActivity { activity ->
                 val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
                 val bars = ViewCompat.getRootWindowInsets(drawerLayout)?.getInsets(
                         WindowInsetsCompat.Type.systemBars() or
                                 WindowInsetsCompat.Type.displayCutout()
                 )
-                applied = bars != null &&
-                        activity.findViewById<View>(R.id.appbar).paddingTop >= bars.top &&
-                        drawerLayout.getChildAt(0).paddingBottom >= bars.bottom &&
-                        activity.findViewById<View>(R.id.nav_drawer).paddingTop >= bars.top
+                protected = bars != null && bars.top > 0 &&
+                        protectedTop(activity.findViewById(R.id.appbar)) >= bars.top &&
+                        protectedTop(activity.findViewById(R.id.nav_drawer)) >= bars.top &&
+                        protectedBottom(drawerLayout.getChildAt(0)) <=
+                        activity.window.decorView.height - bars.bottom
             }
-            applied
+            protected
         }
+    }
+
+    private fun assertSystemBarsProtected(
+            activity: TabsActivity,
+            appBar: View,
+            mainContent: View,
+            navDrawer: View,
+            bars: androidx.core.graphics.Insets?
+    ) {
+        val insets = checkNotNull(bars)
+        assertTrue(protectedTop(appBar) >= insets.top)
+        assertTrue(protectedTop(navDrawer) >= insets.top)
+        assertTrue(protectedBottom(mainContent) <= activity.window.decorView.height - insets.bottom)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            assertEquals(insets.top, appBar.paddingTop)
+            assertEquals(insets.bottom, mainContent.paddingBottom)
+            assertEquals(insets.top, navDrawer.paddingTop)
+        } else {
+            assertEquals(0, appBar.paddingTop)
+            assertEquals(0, mainContent.paddingBottom)
+            assertEquals(0, navDrawer.paddingTop)
+        }
+    }
+
+    private fun protectedTop(view: View): Int {
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+        return location[1] + view.paddingTop
+    }
+
+    private fun protectedBottom(view: View): Int {
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+        return location[1] + view.height - view.paddingBottom
     }
 
     @Test
@@ -237,4 +275,79 @@ class TabsActivityNavigationTest {
             instrumentation.runOnMainSync { activity.finishAndRemoveTask() }
         }
     }
+
+    @Test
+    fun tabLimitEvictsOldestInactiveTabAndRestoresSelection() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val intent = Intent(instrumentation.targetContext, TabsActivity::class.java)
+        val scenario = ActivityScenario.launch<TabsActivity>(intent)
+        var selectedStableId = Long.MIN_VALUE
+
+        try {
+            scenario.onActivity { activity ->
+                val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
+                val adapter = pager.adapter as TabPagerAdapter
+                repeat(TabPagerAdapter.MAX_TAB_COUNT - 1) { index ->
+                    adapter.addItem(historyTab(10_000L + index), pager.currentItem)
+                }
+                assertEquals(TabPagerAdapter.MAX_TAB_COUNT, adapter.itemCount)
+
+                pager.setCurrentItem(1, false)
+                val protectedId = adapter.getItemId(1)
+                val evictedId = adapter.getItemId(2)
+                val newPosition = adapter.addItem(historyTab(20_000L), pager.currentItem)
+
+                assertEquals(TabPagerAdapter.MAX_TAB_COUNT, adapter.itemCount)
+                assertEquals(protectedId, adapter.getItemId(1))
+                assertEquals(evictedId, checkNotNull(adapter.consumeLastEvictedTab()).stableId)
+                pager.setCurrentItem(newPosition, false)
+                selectedStableId = adapter.getItemId(newPosition)
+            }
+            instrumentation.waitForIdleSync()
+
+            scenario.recreate()
+            instrumentation.waitForIdleSync()
+
+            scenario.onActivity { activity ->
+                val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
+                val adapter = pager.adapter as TabPagerAdapter
+                assertEquals(TabPagerAdapter.MAX_TAB_COUNT, adapter.itemCount)
+                assertEquals(selectedStableId, adapter.getItemId(pager.currentItem))
+            }
+        } finally {
+            scenario.close()
+        }
+    }
+
+    @Test
+    fun oversizedSavedTabListKeepsAnchorSelectedAndNewestTabs() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val intent = Intent(instrumentation.targetContext, TabsActivity::class.java)
+        val scenario = ActivityScenario.launch<TabsActivity>(intent)
+
+        try {
+            scenario.onActivity { activity ->
+                val savedTabs = (0 until 15).map { historyTab(30_000L + it) }
+                val selectedTab = savedTabs[5]
+                val adapter = TabPagerAdapter(activity, savedTabs, selectedTab.stableId)
+
+                assertEquals(TabPagerAdapter.MAX_TAB_COUNT, adapter.itemCount)
+                assertEquals(4, adapter.discardedTabCount)
+                assertTrue(adapter.getPositionByStableId(savedTabs.first().stableId) > 0)
+                assertTrue(adapter.getPositionByStableId(selectedTab.stableId) > 0)
+                assertTrue(adapter.getPositionByStableId(savedTabs.last().stableId) > 0)
+                assertEquals(-1, adapter.getPositionByStableId(savedTabs[1].stableId))
+            }
+        } finally {
+            scenario.close()
+        }
+    }
+
+    private fun historyTab(id: Long) = TabPagerAdapter.TabItem(
+            TabPagerAdapter.TabType.HISTORY,
+            Bundle(),
+            id,
+            "History $id",
+            null
+    )
 }

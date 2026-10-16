@@ -1,6 +1,7 @@
 package com.emogoth.android.phone.mimi.util
 
 import android.app.Activity
+import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.emogoth.android.phone.mimi.R
 import java.util.WeakHashMap
 
-/** Applies edge-to-edge insets without duplicating padding after recreation. */
+/** Keeps content clear of system bars across legacy and enforced edge-to-edge Android versions. */
 object SystemBarInsets {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
@@ -19,7 +20,13 @@ object SystemBarInsets {
 
     @JvmStatic
     fun enable(activity: Activity, lightTheme: Boolean) {
-        WindowCompat.enableEdgeToEdge(activity.window)
+        if (usesEnforcedEdgeToEdge()) {
+            WindowCompat.enableEdgeToEdge(activity.window)
+        } else {
+            // Android 10-14 can reserve the system-bar area itself. Keeping decor fitting enabled
+            // avoids a transient toolbar/status-bar overlap while insets are being dispatched.
+            WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+        }
         updateIconAppearance(activity, lightTheme, hasTopBar = false)
     }
 
@@ -35,6 +42,9 @@ object SystemBarInsets {
         val topInsetTarget = primaryAppBar ?: galleryAppBar ?: topBar
 
         updateIconAppearance(activity, lightTheme, topBar != null)
+        if (!usesEnforcedEdgeToEdge()) {
+            return
+        }
 
         if (root is DrawerLayout) {
             val mainContent = root.children().firstOrNull { child ->
@@ -67,6 +77,9 @@ object SystemBarInsets {
             isAppearanceLightNavigationBars = lightTheme
         }
     }
+
+    private fun usesEnforcedEdgeToEdge(): Boolean =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
 
     private fun applyPadding(
             view: View,
