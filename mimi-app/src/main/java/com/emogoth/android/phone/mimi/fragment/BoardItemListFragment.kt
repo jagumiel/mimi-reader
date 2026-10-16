@@ -774,8 +774,12 @@ class BoardItemListFragment
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.manage_boards_menu && activity != null) {
-            activity?.startActionMode(actionMode)
+        when (item.itemId) {
+            R.id.refresh_menu -> loadBoards()
+            R.id.manage_boards_menu -> if (activity != null) {
+                activity?.startActionMode(actionMode)
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
         return true
     }

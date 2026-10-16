@@ -521,6 +521,7 @@
     <string name="failed_to_save_filter">Failed to save filter</string>
     <string name="edit_filters">Edit Filters</string>
     <string name="error_loading_boards">Error loading boards</string>
+    <string name="error_loading_tab">This tab could not be updated.</string>
     <string name="retry">Retry</string>
     <string name="cached_content_warning">Could not refresh. Showing saved content.</string>
     <string name="open_externally">Open externally</string>

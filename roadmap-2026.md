@@ -88,6 +88,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Limitar y recuperar con claridad pestañas que no puedan restaurarse por falta de memoria.
   - [x] Limitar la pantalla principal a 12 pestañas, cerrando la pestaña inactiva más antigua con un aviso antes de que una sesión excesiva agote la memoria.
   - [x] Validar el estado guardado, descartar pestañas dañadas o duplicadas y conservar siempre la pestaña seleccionada al restaurar una sesión recortada.
+- [x] Permitir actualizar desde el menú todas las pestañas principales y ofrecer una acción directa de reintento cuando una pestaña muestre un error.
 
 ### 4. Calidad y publicación
 

@@ -80,7 +80,6 @@ import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.GalleryScrollReceiver;
 import com.emogoth.android.phone.mimi.util.LayoutType;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
-import com.emogoth.android.phone.mimi.util.NetworkError;
 import com.emogoth.android.phone.mimi.util.NetworkErrorMessage;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.viewmodel.ThreadViewModel;
@@ -1098,9 +1097,10 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
         }
 
         if (retryMessageButton != null) {
-            final boolean retryable = NetworkError.from(error).isRetryable();
-            retryMessageButton.setVisibility(retryable ? View.VISIBLE : View.GONE);
-            retryMessageButton.setOnClickListener(retryable ? view -> refresh(false) : null);
+            // Even errors normally considered permanent can be caused by stale intermediary
+            // state. Keep a manual refresh available so a failed tab never becomes a dead end.
+            retryMessageButton.setVisibility(View.VISIBLE);
+            retryMessageButton.setOnClickListener(view -> refresh(true));
         }
 
         if (viewModel.bookmarked()) {

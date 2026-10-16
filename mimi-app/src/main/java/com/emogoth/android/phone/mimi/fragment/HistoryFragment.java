@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -51,6 +52,7 @@ import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.widget.MimiRecyclerView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +69,7 @@ public class HistoryFragment extends MimiFragmentBase {
     private HistoryAdapter historyAdapter;
     private ViewGroup emptyListMessageContainer;
     private TextView emptyListMessage;
+    private TextView historyRetryButton;
     private ListView historylist;
     private TextView closeButton;
     private TextView clearAllButton;
@@ -84,6 +87,7 @@ public class HistoryFragment extends MimiFragmentBase {
     private ItemTouchHelper recyclerViewTouchHelper;
     private ItemTouchHelper.Callback touchHelperCallback;
     private RecyclerView.LayoutManager layoutManager;
+    private Snackbar loadErrorSnackbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -187,6 +191,8 @@ public class HistoryFragment extends MimiFragmentBase {
 
         emptyListMessageContainer = view.findViewById(R.id.empty_list);
         emptyListMessage = view.findViewById(R.id.empty_list_text);
+        historyRetryButton = view.findViewById(R.id.history_retry_button);
+        historyRetryButton.setOnClickListener(v -> loadHistory(isBookmarks));
 
         clearAllButton = view.findViewById(R.id.clear_all_button);
         clearAllButton.setOnClickListener(v -> {
@@ -262,6 +268,15 @@ public class HistoryFragment extends MimiFragmentBase {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh_menu) {
+            loadHistory(isBookmarks);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void initMenu() {
         super.initMenu();
 
@@ -327,6 +342,7 @@ public class HistoryFragment extends MimiFragmentBase {
                 })
                 .compose(DatabaseUtils.applySchedulers())
                 .subscribe(historyList -> {
+                    dismissLoadError();
                     if (historyList != null && getActivity() != null) {
                         postList = historyList;
                         if (historyList.size() > 0) {
@@ -343,7 +359,54 @@ public class HistoryFragment extends MimiFragmentBase {
                     } else {
                         Log.i(LOG_TAG, "Cursor is null!");
                     }
-                });
+                }, this::showLoadError);
+    }
+
+    void showLoadError(Throwable error) {
+        Log.e(LOG_TAG, "Error loading history tab", error);
+        if (getView() == null) {
+            return;
+        }
+
+        if (historyAdapter != null && historyAdapter.getItemCount() > 0) {
+            loadErrorSnackbar = Snackbar.make(
+                    getView(),
+                    R.string.error_loading_tab,
+                    Snackbar.LENGTH_INDEFINITE
+            ).setAction(R.string.refresh, view -> loadHistory(isBookmarks));
+            loadErrorSnackbar.show();
+            return;
+        }
+
+        historyRecyclerView.setVisibility(View.GONE);
+        emptyListMessage.setText(R.string.error_loading_tab);
+        historyRetryButton.setVisibility(View.VISIBLE);
+        emptyListMessageContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void dismissLoadError() {
+        if (loadErrorSnackbar != null) {
+            loadErrorSnackbar.dismiss();
+            loadErrorSnackbar = null;
+        }
+        if (historyRetryButton != null) {
+            historyRetryButton.setVisibility(View.GONE);
+        }
+        if (emptyListMessage != null) {
+            emptyListMessage.setText(
+                    historyQuery == HistoryTableConnection.BOOKMARKS
+                            ? R.string.no_bookmarks_message
+                            : R.string.no_history_message
+            );
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        RxUtil.safeUnsubscribe(fetchHistorySubscription);
+        dismissLoadError();
+        historyRetryButton = null;
+        super.onDestroyView();
     }
 
     private void openThreadInActivity(final int position) {

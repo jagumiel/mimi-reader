@@ -19,6 +19,12 @@
     xmlns:mimi="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/refresh_menu"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/refresh"
+        mimi:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/manage_boards_menu"
         android:title="@string/manage_boards"
         mimi:showAsAction="never" />

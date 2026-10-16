@@ -70,20 +70,32 @@
         </LinearLayout>
     </LinearLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/empty_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone">
 
         <TextView
             android:id="@+id/empty_list_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:textColor="@color/text_color_dark"
             tools:text="NO HISTORY" />
-    </FrameLayout>
+
+        <TextView
+            android:id="@+id/history_retry_button"
+            style="?basicButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:text="@string/refresh"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
 
 
 </FrameLayout>
