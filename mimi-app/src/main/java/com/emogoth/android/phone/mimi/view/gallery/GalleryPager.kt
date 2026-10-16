@@ -89,6 +89,9 @@ class GalleryPager @JvmOverloads constructor(
     var pageChangeCallback: ((Int) -> (Unit))? = null
     var pageClickCallback: ((View) -> (Unit))? = null
 
+    val autoplayEnabled: Boolean
+        get() = autoplayController.enabled
+
     init {
         id = R.id.gallery2_pager
         Log.d(LOG_TAG, "Instance of GalleryPager created")
@@ -167,6 +170,20 @@ class GalleryPager @JvmOverloads constructor(
 
     fun setInitialPosition(itemPosition: Int) {
         position = itemPosition
+    }
+
+    fun setAutoplayEnabled(enabled: Boolean) {
+        if (autoplayController.enabled == enabled) {
+            return
+        }
+
+        autoplayController.setEnabled(enabled)
+        player?.setRepeatEnabled(!enabled)
+        cancelImageAutoplay()
+        if (enabled) {
+            autoplayController.onPageSelected(pagerPosition, getItems().size)
+            scheduleImageAutoplay(pagerPosition)
+        }
     }
 
     override fun onPause(owner: LifecycleOwner) {

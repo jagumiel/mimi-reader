@@ -406,9 +406,26 @@ class GalleryActivity2 : AppCompatActivity() {
         menu?.clear()
         try {
             menuInflater.inflate(menuRes, menu)
+            if (type == GALLERY_TYPE_PAGER) {
+                updateAutoplayMenuItem(menu)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error! ${e.localizedMessage}", e)
         }
+    }
+
+    private fun updateAutoplayMenuItem(menu: Menu? = this.menu) {
+        val item = menu?.findItem(R.id.autoplay_menu) ?: return
+        val enabled = galleryPager?.autoplayEnabled ?: MimiPrefs.galleryAutoplayEnabled(this)
+        item.setIcon(if (enabled) R.drawable.ic_autoplay_stop else R.drawable.ic_autoplay_start)
+        item.setTitle(if (enabled) R.string.gallery_autoplay_stop else R.string.gallery_autoplay_start)
+    }
+
+    private fun toggleGalleryAutoplay() {
+        val enabled = !(galleryPager?.autoplayEnabled ?: MimiPrefs.galleryAutoplayEnabled(this))
+        MimiPrefs.setGalleryAutoplayEnabled(this, enabled)
+        galleryPager?.setAutoplayEnabled(enabled)
+        updateAutoplayMenuItem()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -425,6 +442,9 @@ class GalleryActivity2 : AppCompatActivity() {
             R.id.fullscreen_menu -> {
                 toolbar.visibility = View.GONE
                 galleryPager?.fullScreen(enabled = true)
+            }
+            R.id.autoplay_menu -> {
+                toggleGalleryAutoplay()
             }
             R.id.download_images -> {
                 toolbar.visibility = View.VISIBLE

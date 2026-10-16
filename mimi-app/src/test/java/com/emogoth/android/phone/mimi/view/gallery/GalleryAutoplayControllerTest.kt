@@ -52,4 +52,18 @@ class GalleryAutoplayControllerTest {
         assertFalse(disabled.shouldScheduleImage(position = 0, contentReady = true))
         assertNull(disabled.requestAdvance(position = 0))
     }
+
+    @Test
+    fun autoplayCanBeToggledWhileTheGalleryIsOpen() {
+        val controller = GalleryAutoplayController(enabled = false)
+        controller.onHostResume()
+        controller.onPageSelected(position = 0, count = 2)
+
+        controller.setEnabled(true)
+        assertTrue(controller.shouldScheduleImage(position = 0, contentReady = true))
+        assertEquals(1, controller.requestAdvance(position = 0))
+
+        controller.setEnabled(false)
+        assertNull(controller.requestAdvance(position = 0))
+    }
 }

@@ -1,6 +1,9 @@
 package com.emogoth.android.phone.mimi.view.gallery
 
-internal class GalleryAutoplayController(val enabled: Boolean) {
+internal class GalleryAutoplayController(enabled: Boolean) {
+    var enabled = enabled
+        private set
+
     private var currentPosition = -1
     private var itemCount = 0
     private var hostResumed = false
@@ -18,6 +21,11 @@ internal class GalleryAutoplayController(val enabled: Boolean) {
 
     fun onHostPause() {
         hostResumed = false
+        advancePending = false
+    }
+
+    fun setEnabled(enabled: Boolean) {
+        this.enabled = enabled
         advancePending = false
     }
 

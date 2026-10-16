@@ -73,6 +73,12 @@ class MimiPrefs {
         }
 
         @JvmStatic
+        fun setGalleryAutoplayEnabled(context: Context, enabled: Boolean) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            prefs.edit().putBoolean(context.getString(R.string.gallery_autoplay_pref), enabled).apply()
+        }
+
+        @JvmStatic
         fun refreshInterval(): Int {
             val context = MimiApplication.instance.applicationContext
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)

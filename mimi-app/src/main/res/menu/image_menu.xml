@@ -37,6 +37,12 @@
         mimi:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/autoplay_menu"
+        android:icon="@drawable/ic_autoplay_start"
+        android:title="@string/gallery_autoplay_start"
+        mimi:showAsAction="always" />
+
+    <item
         android:id="@+id/fullscreen_menu"
         android:title="@string/fullscreen"
         android:icon="@drawable/ic_fullscreen"

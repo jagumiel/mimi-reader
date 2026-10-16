@@ -169,6 +169,8 @@
     <string name="close_gallery_on_click_title">Tap image to close gallery</string>
     <string name="gallery_autoplay_title">Autoplay gallery</string>
     <string name="gallery_autoplay_summary">Advance images after 3 seconds and continue when videos or GIFs finish</string>
+    <string name="gallery_autoplay_start">Start autoplay</string>
+    <string name="gallery_autoplay_stop">Stop autoplay</string>
 
     <string name="disabled">Disabled</string>
 

@@ -73,6 +73,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Solicitar confirmación, ejecutar la limpieza fuera del hilo principal e informar del espacio liberado.
   - [x] Vaciar Glide, HTTP y los temporales internos/externos sin tocar descargas del usuario, base de datos, historial, marcadores ni preferencias.
 - [x] Añadir reproducción automática opcional en la galería multimedia.
+  - [x] Permitir activarla y pausarla desde un botón visible en la barra de la galería, conservando el estado elegido.
   - [x] Avanzar las imágenes tras 3 segundos de visualización.
   - [x] Avanzar al finalizar la reproducción de cada vídeo.
   - [x] Avanzar al completar un ciclo de cada GIF animado.
