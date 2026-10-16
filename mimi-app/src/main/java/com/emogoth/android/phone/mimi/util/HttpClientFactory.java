@@ -32,6 +32,7 @@ import com.franmontiel.persistentcookiejar.persistence.CookiePersistor;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import okhttp3.Request;
 public class HttpClientFactory {
     private static final String LOG_TAG = HttpClientFactory.class.getSimpleName();
     private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024;
+    static final String HTTP_CACHE_DIRECTORY = "http_cache";
 
     private static final int API_CONNECT_TIMEOUT_SECONDS = 20;
     private static final int API_READ_TIMEOUT_SECONDS = 30;
@@ -90,7 +92,11 @@ public class HttpClientFactory {
     }
 
     private void init() {
-        final Cache cache = new Cache(MimiUtil.getInstance().getCacheDir(), MAX_CACHE_SIZE);
+        final File cacheDirectory = new File(
+                MimiUtil.getInstance().getCacheDir(),
+                HTTP_CACHE_DIRECTORY
+        );
+        final Cache cache = new Cache(cacheDirectory, MAX_CACHE_SIZE);
 
         cookiePersistor = new SharedPrefsCookiePersistor(MimiApplication.getInstance());
         PersistentCookieJar jar = new PersistentCookieJar(new SetCookieCache(), cookiePersistor);
@@ -216,5 +222,12 @@ public class HttpClientFactory {
         apiClient = null;
         downloadClient = null;
         cookiePersistor = null;
+    }
+
+    public synchronized void clearCache() throws IOException {
+        final Cache cache = getClient().cache();
+        if (cache != null) {
+            cache.evictAll();
+        }
     }
 }

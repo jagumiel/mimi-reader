@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -36,7 +37,10 @@ import com.emogoth.android.phone.mimi.app.MimiApplication;
 import com.emogoth.android.phone.mimi.db.DatabaseUtils;
 import com.emogoth.android.phone.mimi.db.HiddenThreadTableConnection;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
+import com.emogoth.android.phone.mimi.util.AppCacheCleaner;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.RxUtil;
+import com.bumptech.glide.Glide;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -52,6 +56,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class AdvancedPrefsFragment extends PreferenceFragmentCompat {
     public static final String LOG_TAG = AdvancedPrefsFragment.class.getSimpleName();
+    private Disposable clearCacheDisposable;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -93,6 +98,14 @@ public class AdvancedPrefsFragment extends PreferenceFragmentCompat {
             return true;
         });
 
+        final Preference clearCachePref = findPreference(getString(R.string.clear_cache_pref));
+        if (clearCachePref != null) {
+            clearCachePref.setOnPreferenceClickListener(preference -> {
+                showClearCacheConfirmation(clearCachePref);
+                return true;
+            });
+        }
+
         final Preference chanpassLogin = findPreference(getString(R.string.chanpass_login_pref));
         if (MimiUtil.getInstance().isLoggedIn()) {
             chanpassLogin.setTitle(R.string.chanpass_logout);
@@ -119,5 +132,60 @@ public class AdvancedPrefsFragment extends PreferenceFragmentCompat {
                 return true;
             });
         }
+    }
+
+    private void showClearCacheConfirmation(Preference preference) {
+        if (getContext() == null) {
+            return;
+        }
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle(R.string.clear_cache_title)
+                .setMessage(R.string.clear_cache_confirmation)
+                .setPositiveButton(R.string.clear_info, (dialog, which) -> clearCache(preference))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void clearCache(Preference preference) {
+        if (getContext() == null || clearCacheDisposable != null && !clearCacheDisposable.isDisposed()) {
+            return;
+        }
+
+        final android.content.Context appContext = getContext().getApplicationContext();
+        preference.setEnabled(false);
+        preference.setSummary(R.string.clearing_cache);
+        clearCacheDisposable = Single.fromCallable(() -> AppCacheCleaner.clear(appContext))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bytesFreed -> {
+                    Glide.get(appContext).clearMemory();
+                    preference.setEnabled(true);
+                    preference.setSummary(R.string.clear_cache_summary);
+                    final String freed = Formatter.formatShortFileSize(appContext, bytesFreed);
+                    if (getView() != null) {
+                        Snackbar.make(
+                                getView(),
+                                getString(R.string.cache_cleared, freed),
+                                Snackbar.LENGTH_LONG
+                        ).show();
+                    }
+                }, throwable -> {
+                    Log.e(LOG_TAG, "Could not clear app cache", throwable);
+                    preference.setEnabled(true);
+                    preference.setSummary(R.string.clear_cache_summary);
+                    if (getView() != null) {
+                        Snackbar.make(
+                                getView(),
+                                R.string.error_while_clearing_cache,
+                                Snackbar.LENGTH_LONG
+                        ).show();
+                    }
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        RxUtil.safeUnsubscribe(clearCacheDisposable);
+        super.onDestroy();
     }
 }

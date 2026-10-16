@@ -140,6 +140,8 @@
     <string name="prevent_screen_from_rotating_summary_off">Screen rotation unlocked</string>
     <string name="clear_cache_title">Clear Cache</string>
     <string name="clear_cache_summary">Clear the app cache</string>
+    <string name="clear_cache_confirmation">Clear cached images, videos, network responses, and temporary files? Downloads, history, bookmarks, and settings will be kept.</string>
+    <string name="cache_cleared">Cache cleared. %1$s freed.</string>
     <string name="save_history_title">Save History</string>
     <string name="save_history_summary_off">History is not saved</string>
     <string name="save_history_summary_on">History is saved</string>

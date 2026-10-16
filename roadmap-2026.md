@@ -69,7 +69,9 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 ### 3. Navegación e interfaz moderna
 
 - [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
-- [ ] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales. Debe solicitar confirmación y conservar las descargas del usuario, la base de datos y las preferencias.
+- [x] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales.
+  - [x] Solicitar confirmación, ejecutar la limpieza fuera del hilo principal e informar del espacio liberado.
+  - [x] Vaciar Glide, HTTP y los temporales internos/externos sin tocar descargas del usuario, base de datos, historial, marcadores ni preferencias.
 - [ ] Añadir reproducción automática opcional en la galería multimedia.
   - [ ] Avanzar las imágenes tras 3 segundos de visualización.
   - [ ] Avanzar al finalizar la reproducción de cada vídeo.

@@ -314,12 +314,13 @@ class BoardItemListFragment
         val lastVersion = preferences.getInt(getString(R.string.last_version_code_pref), 0)
         if (BuildConfig.VERSION_CODE > lastVersion) {
             showChangeLog()
+            val appContext = requireContext().applicationContext
 
             // TODO: Remove the removeAllThreads() calls
             Single.defer {
                 val timer = System.currentTimeMillis()
                 Log.d(LOG_TAG, "Starting clearing cache...")
-                MimiUtil.deleteRecursive(activity?.cacheDir, true)
+                AppCacheCleaner.clear(appContext)
                 Log.d(LOG_TAG, "Cache cleared in " + (System.currentTimeMillis() - timer) + " ms")
                 Single.just(true)
             }
