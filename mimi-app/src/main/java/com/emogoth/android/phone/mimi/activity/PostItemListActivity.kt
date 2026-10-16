@@ -130,8 +130,8 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
 //                    .setActivateOnItemClick(true);
         }
         initDrawers(R.id.nav_drawer, R.id.nav_drawer_container, listType == BOARD_LIST_ID)
+        createDrawers(R.id.nav_drawer)
         if (savedInstanceState == null) {
-            createDrawers(R.id.nav_drawer)
             initFragments()
             if (boardName != null) {
                 RxUtil.safeUnsubscribe(boardInfoSubscription)
@@ -143,8 +143,10 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
                             }
                         }
             }
+        } else {
+            restoreFragments()
         }
-        if (openPage != Pages.NONE) {
+        if (savedInstanceState == null && openPage != Pages.NONE) {
             val intent = Intent(this, PostItemListActivity::class.java)
             val args = Bundle()
             if (openPage == Pages.BOOKMARKS) {
@@ -153,6 +155,18 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
             }
             startActivity(intent)
         }
+    }
+
+    private fun restoreFragments() {
+        homeFragment = supportFragmentManager.findFragmentByTag(TAG_BOARD_LIST)
+                as? MimiFragmentBase
+        currentFragment = supportFragmentManager.fragments
+                .asReversed()
+                .filterIsInstance<MimiFragmentBase>()
+                .firstOrNull { it.id == R.id.postitem_list && !it.isHidden }
+                ?: homeFragment
+        (homeFragment as? BoardItemListFragment)?.setActivateOnItemClick(true)
+        currentFragment?.let { setFabVisibility(it.showFab()) }
     }
 
     private fun initFragments() {
@@ -195,11 +209,6 @@ class PostItemListActivity : MimiActivity(), BoardItemClickListener, View.OnClic
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("rotated", true)
-        super.onSaveInstanceState(outState)
     }
 
     override fun onBoardItemClick(board: ChanBoard, saveBackStack: Boolean) {

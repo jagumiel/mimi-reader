@@ -81,10 +81,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Migrar las pestañas dinámicas de la pantalla principal a `ViewPager2`, conservando identidades estables, restauración de fragments y cierre individual de hilos.
   - [x] Migrar el paginador secundario de hilos y retirar los adaptadores heredados que ya no se utilicen.
 - [x] Migrar la navegación Atrás a `OnBackPressedDispatcher`, conservar las acciones internas de cada pantalla y habilitar el gesto Atrás predictivo.
-- [ ] Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.
+- [x] Revisar edge-to-edge, barras del sistema, rotación y restauración del estado.
   - [x] Activar edge-to-edge de forma retrocompatible, aplicar insets seguros a toolbars, contenido y cajones, y mantener iconos legibles con los temas claro, oscuro y negro.
   - [x] Dejar que Android recree la pantalla principal al rotar y comprobar que las pestañas y su selección se restauran sin duplicar los insets.
-  - [ ] Extender la restauración gestionada por Android a las pantallas heredadas de lista, detalle y panel doble.
+  - [x] Extender la restauración gestionada por Android a las pantallas heredadas de lista, detalle y panel doble, evitando fragments duplicados y conservando el lado visible del panel.
 - Limitar y recuperar con claridad pestañas que no puedan restaurarse por falta de memoria.
 
 ### 4. Calidad y publicación

@@ -77,7 +77,9 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
                 refreshBackNavigationState()
             }
         })
-        panelLayout?.openPane()
+        if (savedInstanceState == null) {
+            panelLayout?.openPane()
+        }
         addContentFab = findViewById<View>(R.id.fab_add_content) as FloatingActionButton
         addContentFab?.setOnClickListener {
             val fragment = if (panelLayout?.isOpen == true) {
@@ -98,10 +100,28 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
         extractExtras(intent.extras)
         initDrawers(R.id.nav_drawer, R.id.nav_drawer_container, true)
         createDrawers(R.id.nav_drawer)
-        initFragments()
-        if (openPage == Pages.BOOKMARKS) {
-            openHistoryPage(true)
+        if (savedInstanceState == null) {
+            initFragments()
+            if (openPage == Pages.BOOKMARKS) {
+                openHistoryPage(true)
+            }
+        } else {
+            restoreFragments()
         }
+    }
+
+    private fun restoreFragments() {
+        boardsFragment = supportFragmentManager.findFragmentByTag(TAG_BOARD_LIST)
+                as? MimiFragmentBase
+        listFragment = supportFragmentManager.fragments
+                .asReversed()
+                .filterIsInstance<MimiFragmentBase>()
+                .firstOrNull { it.id == R.id.postitem_list && !it.isHidden }
+                ?: boardsFragment
+        detailFragment = supportFragmentManager.findFragmentById(R.id.postitem_detail)
+                as? MimiFragmentBase ?: listFragment
+        (boardsFragment as? BoardItemListFragment)?.setActivateOnItemClick(true)
+        listFragment?.let { setFabVisibility(it.showFab()) }
     }
 
     private fun initFragments() {

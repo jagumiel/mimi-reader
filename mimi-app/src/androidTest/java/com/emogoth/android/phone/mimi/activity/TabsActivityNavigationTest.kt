@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.adapter.TabPagerAdapter
 import com.emogoth.android.phone.mimi.fragment.HistoryFragment
+import com.emogoth.android.phone.mimi.fragment.NavDrawerFragment
 import com.google.android.material.tabs.TabLayout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,9 +30,6 @@ class TabsActivityNavigationTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val intent = Intent(instrumentation.targetContext, TabsActivity::class.java)
         val scenario = ActivityScenario.launch<TabsActivity>(intent)
-        var appBarTopPadding = -1
-        var contentBottomPadding = -1
-        var drawerTopPadding = -1
 
         try {
             scenario.onActivity { activity ->
@@ -49,6 +47,7 @@ class TabsActivityNavigationTest {
                 pager.setCurrentItem(1, false)
             }
             instrumentation.waitForIdleSync()
+            waitForSystemBarInsets(scenario)
 
             scenario.onActivity { activity ->
                 val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
@@ -64,13 +63,11 @@ class TabsActivityNavigationTest {
                 assertTrue(appBar.paddingTop >= (bars?.top ?: 0))
                 assertTrue(mainContent.paddingBottom >= (bars?.bottom ?: 0))
                 assertTrue(navDrawer.paddingTop >= (bars?.top ?: 0))
-                appBarTopPadding = appBar.paddingTop
-                contentBottomPadding = mainContent.paddingBottom
-                drawerTopPadding = navDrawer.paddingTop
             }
 
             scenario.recreate()
             instrumentation.waitForIdleSync()
+            waitForSystemBarInsets(scenario)
 
             scenario.onActivity { activity ->
                 val pager = activity.findViewById<ViewPager2>(R.id.tabs_pager)
@@ -78,12 +75,21 @@ class TabsActivityNavigationTest {
                 val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
                 val appBar = activity.findViewById<View>(R.id.appbar)
                 val navDrawer = activity.findViewById<View>(R.id.nav_drawer)
+                val bars = ViewCompat.getRootWindowInsets(drawerLayout)?.getInsets(
+                        WindowInsetsCompat.Type.systemBars() or
+                                WindowInsetsCompat.Type.displayCutout()
+                )
 
                 assertEquals(2, adapter.itemCount)
                 assertEquals(1, pager.currentItem)
-                assertEquals(appBarTopPadding, appBar.paddingTop)
-                assertEquals(contentBottomPadding, drawerLayout.getChildAt(0).paddingBottom)
-                assertEquals(drawerTopPadding, navDrawer.paddingTop)
+                assertEquals(bars?.top ?: 0, appBar.paddingTop)
+                assertEquals(bars?.bottom ?: 0, drawerLayout.getChildAt(0).paddingBottom)
+                assertEquals(bars?.top ?: 0, navDrawer.paddingTop)
+                assertEquals(
+                        1,
+                        activity.supportFragmentManager.fragments
+                                .filterIsInstance<NavDrawerFragment>().size
+                )
             }
         } finally {
             scenario.close()
@@ -142,6 +148,24 @@ class TabsActivityNavigationTest {
         val deadline = SystemClock.uptimeMillis() + timeoutMs
         while (!condition() && SystemClock.uptimeMillis() < deadline) {
             SystemClock.sleep(50L)
+        }
+    }
+
+    private fun waitForSystemBarInsets(scenario: ActivityScenario<TabsActivity>) {
+        waitUntil {
+            var applied = false
+            scenario.onActivity { activity ->
+                val drawerLayout = activity.findViewById<DrawerLayout>(R.id.nav_drawer_container)
+                val bars = ViewCompat.getRootWindowInsets(drawerLayout)?.getInsets(
+                        WindowInsetsCompat.Type.systemBars() or
+                                WindowInsetsCompat.Type.displayCutout()
+                )
+                applied = bars != null &&
+                        activity.findViewById<View>(R.id.appbar).paddingTop >= bars.top &&
+                        drawerLayout.getChildAt(0).paddingBottom >= bars.bottom &&
+                        activity.findViewById<View>(R.id.nav_drawer).paddingTop >= bars.top
+            }
+            applied
         }
     }
 

@@ -253,6 +253,9 @@ abstract class MimiActivity : AppCompatActivity(), PreferenceChangeListener,
     }
 
     protected fun createDrawers(@IdRes navRes: Int) {
+        if (supportFragmentManager.findFragmentByTag(TAG_NAV_DRAWER) != null) {
+            return
+        }
         val ft = supportFragmentManager.beginTransaction()
         val navDrawerFragment = NavDrawerFragment()
         val args = Bundle()

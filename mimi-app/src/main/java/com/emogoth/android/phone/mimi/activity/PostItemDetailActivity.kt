@@ -106,7 +106,9 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
         //
         // http://developer.android.com/guide/components/fragments.html
         //
-        if (savedInstanceState == null) {
+        threadFragment = supportFragmentManager.findFragmentByTag(POST_DETAIL_FRAGMENT_TAG)
+                as? MimiFragmentBase
+        if (threadFragment == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             val arguments = intent.extras
@@ -119,8 +121,6 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
             supportFragmentManager.beginTransaction()
                     .add(R.id.postitem_detail_container, threadFragment!!, POST_DETAIL_FRAGMENT_TAG)
                     .commit()
-        } else {
-            threadFragment = supportFragmentManager.findFragmentByTag(POST_DETAIL_FRAGMENT_TAG) as MimiFragmentBase?
         }
     }
 

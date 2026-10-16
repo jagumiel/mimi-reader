@@ -65,7 +65,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.PostItemListActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:label="@string/app_title" />
         <activity
@@ -87,13 +86,11 @@
             android:launchMode="singleTask" />
         <activity
             android:name=".activity.SlidingPanelActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:label="@string/app_title"
             android:launchMode="singleTask" />
         <activity
             android:name=".activity.PostItemDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:parentActivityName=".activity.PostItemListActivity">
             <meta-data
