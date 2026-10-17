@@ -552,12 +552,7 @@ public class IOUtils {
             return;
         }
 
-        final String type;
-        if (Utils.isVideoExtension(fileExt)) {
-            type = "video/*";
-        } else {
-            type = "image/*";
-        }
+        final String type = Utils.getMimeType(fileExt);
 
         final Uri uriToImage = destPath.getUri();
 

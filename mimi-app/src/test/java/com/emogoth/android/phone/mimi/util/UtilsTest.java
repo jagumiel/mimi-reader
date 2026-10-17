@@ -24,6 +24,19 @@ public class UtilsTest {
     }
 
     @Test
+    public void recognizesFlashAndImageExtensions() {
+        assertTrue(Utils.isFlashExtension(".swf"));
+        assertTrue(Utils.isFlashExtension(" SWF "));
+        assertFalse(Utils.isFlashExtension(".gif"));
+
+        assertTrue(Utils.isImageExtension(".jpg"));
+        assertTrue(Utils.isImageExtension("GIF"));
+        assertFalse(Utils.isImageExtension(".swf"));
+        assertFalse(Utils.isImageExtension(".pdf"));
+        assertEquals("application/x-shockwave-flash", Utils.getMimeType(".SWF"));
+    }
+
+    @Test
     public void normalizesExtensionForMimeLookup() {
         assertEquals("mp4", Utils.normalizeExtension(" .MP4 "));
         assertEquals("webm", Utils.normalizeExtension("..WEBM"));

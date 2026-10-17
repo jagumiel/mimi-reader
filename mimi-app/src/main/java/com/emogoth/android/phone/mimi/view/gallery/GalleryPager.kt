@@ -392,11 +392,7 @@ class GalleryPager @JvmOverloads constructor(
                         return@setOnMenuItemClickListener true
                     }
 
-                    val type = if (Utils.isVideoExtension(item.ext)) {
-                        Utils.getMimeType(item.ext)
-                    } else {
-                        "image/*"
-                    }
+                    val type = Utils.getMimeType(item.ext)
 
                     shareIntent.action = Intent.ACTION_SEND
                     shareIntent.setDataAndType(uri, type)
@@ -420,7 +416,7 @@ class GalleryPagerAdapter(
         private val pageEventListener: (Int, GalleryPageEvent) -> Unit
 ) : RecyclerView.Adapter<GalleryPagerItemViewHolder>() {
     enum class ItemType(val value: Int) {
-        UNKNOWN(0), IMAGE(1), GIF(2), VIDEO(3), PDF(4);
+        UNKNOWN(0), IMAGE(1), GIF(2), VIDEO(3), PDF(4), FLASH(5);
     }
 
     companion object {
@@ -448,6 +444,11 @@ class GalleryPagerAdapter(
             ItemType.GIF.value -> GalleryGifViewHolder(GifPage(parent.context, viewModel))
             ItemType.VIDEO.value -> GalleryVideoViewHolder(VideoPage(parent.context, viewModel, player))
             ItemType.PDF.value -> GalleryPdfViewHolder(PdfPage(parent.context, viewModel))
+            ItemType.FLASH.value -> {
+                val page = FlashPage(parent.context, viewModel)
+                flashPages.add(page)
+                GalleryFlashViewHolder(page)
+            }
             else -> GalleryImageViewHolder(ImagePage(parent.context, viewModel))
         }
     }
@@ -469,6 +470,7 @@ class GalleryPagerAdapter(
             Utils.isVideoExtension(extension) -> ItemType.VIDEO.value
             extension == ".gif" -> ItemType.GIF.value
             extension == ".pdf" -> ItemType.PDF.value
+            Utils.isFlashExtension(extension) -> ItemType.FLASH.value
             else -> ItemType.IMAGE.value
         }
     }
@@ -483,8 +485,11 @@ class GalleryPagerAdapter(
     }
 
     fun destroy() {
-        // no op
+        flashPages.forEach(FlashPage::release)
+        flashPages.clear()
     }
+
+    private val flashPages = Collections.newSetFromMap(WeakHashMap<FlashPage, Boolean>())
 
 }
 
@@ -524,3 +529,4 @@ class GalleryImageViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemVi
 class GalleryVideoViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
 class GalleryGifViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
 class GalleryPdfViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)
+class GalleryFlashViewHolder(itemView: View) : GalleryPagerItemViewHolder(itemView)

@@ -53,6 +53,10 @@ public class Utils {
 
     public static String getMimeType(final String extension) {
         final String ext = normalizeExtension(extension);
+        if (isFlashExtension(ext)) {
+            return "application/x-shockwave-flash";
+        }
+
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
         if (mimeType != null) {
             return mimeType;
@@ -77,6 +81,19 @@ public class Utils {
     public static boolean isVideoExtension(final String extension) {
         final String normalized = normalizeExtension(extension);
         return "webm".equals(normalized) || "mp4".equals(normalized);
+    }
+
+    public static boolean isFlashExtension(final String extension) {
+        return "swf".equals(normalizeExtension(extension));
+    }
+
+    public static boolean isImageExtension(final String extension) {
+        final String normalized = normalizeExtension(extension);
+        return "jpg".equals(normalized)
+                || "jpeg".equals(normalized)
+                || "png".equals(normalized)
+                || "gif".equals(normalized)
+                || "webp".equals(normalized);
     }
 
     /**

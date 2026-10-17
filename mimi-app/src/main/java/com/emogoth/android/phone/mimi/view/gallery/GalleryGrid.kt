@@ -189,7 +189,7 @@ class GalleryGridItemViewHolder(private val root: View, private val preloadEnabl
     var itemClicked: ((GalleryItem) -> (Unit))? = null
 
     fun bind(item: GalleryItem, mode: Int, itemSelected: Boolean) {
-        val useThumbnail = Utils.isVideoExtension(item.ext) || item.size >= 400000 || !preloadEnabled
+        val useThumbnail = !Utils.isImageExtension(item.ext) || item.size >= 400000 || !preloadEnabled
         val url = if (useThumbnail) item.thumbnailUrl else item.downloadUrl
         GlideApp.with(root)
                 .load(url)

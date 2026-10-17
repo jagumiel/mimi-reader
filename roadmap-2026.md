@@ -69,7 +69,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 3. Navegación e interfaz moderna
 
-- [ ] Añadir visualización de archivos Flash (`.swf`), evaluando una emulación local segura y compatible con Android 10 y Android 12.
+- [x] Añadir visualización de archivos Flash (`.swf`) mediante una emulación local segura y compatible con Android 10 y Android 12.
+  - [x] Integrar Ruffle 0.7.1 dentro de la APK, incluidas sus variantes WebAssembly estándar y de compatibilidad, sin depender de un CDN ni de Flash nativo.
+  - [x] Aislar el reproductor en un WebView con origen HTTPS interno, acceso a archivos deshabilitado y bloqueo de navegación, enlaces y peticiones de red externas.
+  - [x] Pausar los SWF fuera de pantalla o cuando la aplicación pasa a segundo plano, usar miniaturas en la cuadrícula y cubrir detección, MIME y aislamiento con pruebas.
 - [x] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales.
   - [x] Solicitar confirmación, ejecutar la limpieza fuera del hilo principal e informar del espacio liberado.
   - [x] Vaciar Glide, HTTP y los temporales internos/externos sin tocar descargas del usuario, base de datos, historial, marcadores ni preferencias.
@@ -116,9 +119,14 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Retirar Stetho y el registro de cabeceras HTTP, y actualizar la política incluida en la aplicación para describir los datos locales, permisos y conexiones reales.
   - [x] Generar en CI APK y AAB release minificados, su checksum SHA-256 y el `mapping.txt`, además de la APK de depuración.
 - [x] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
-  - [x] Configurar en CI la ejecución paralela de las 25 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
+  - [x] Configurar en CI la ejecución paralela de las 27 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
   - [x] Conservar durante 14 días informes HTML, resultados JUnit, información del dispositivo y logcat de cada API.
-  - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 25 pruebas superadas el 17 de octubre de 2026.
+  - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026, incluida la carga real de un SWF con Ruffle.
+- [ ] Ejecutar una fase final de refactorización y retirada de dependencias obsoletas antes de preparar el changelog.
+  - [ ] Inventariar dependencias directas y transitivas, retirar las que no se utilicen y sustituir las abandonadas o incompatibles con el mantenimiento futuro.
+  - [ ] Separar las clases con demasiadas responsabilidades y eliminar adaptadores, recursos y rutas heredadas que hayan quedado sin uso tras la modernización.
+  - [ ] Añadir pruebas unitarias o instrumentadas para cada sustitución y ejecutar la matriz completa de Android 10, 12, 14 y 16 para detectar regresiones.
+  - [ ] Comparar tamaño de artefactos, tiempos de arranque y comportamiento de R8 antes y después de la limpieza.
 - [ ] Antes de preparar el release, definir conjuntamente el alcance y el formato del changelog; no iniciar esta tarea sin consultar primero al responsable del proyecto.
   - La nueva versión se publicará como **8.0** debido al alcance excepcional de la modernización.
   - El changelog debe reconstruir y resumir todos los cambios desde **7.0.1**, punto de partida del fork.

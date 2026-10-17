@@ -119,7 +119,7 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
         eventListener?.invoke(GalleryPageEvent.PLAYBACK_COMPLETED)
     }
 
-    protected fun addMainChildView(child: View) {
+    protected fun addMainChildView(child: View, closeGalleryOnClick: Boolean = true) {
         if (progressView != null) {
             val v = progressView
             v?.visibility = View.GONE
@@ -129,10 +129,12 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
         params.gravity = Gravity.CENTER
         child.layoutParams = params
 
-        child.setOnClickListener {
-            if (context is Activity && MimiPrefs.closeGalleryOnClick(context)) {
-                val activity: Activity = context as Activity
-                activity.finish()
+        if (closeGalleryOnClick) {
+            child.setOnClickListener {
+                if (context is Activity && MimiPrefs.closeGalleryOnClick(context)) {
+                    val activity: Activity = context as Activity
+                    activity.finish()
+                }
             }
         }
 
