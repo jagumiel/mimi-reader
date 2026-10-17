@@ -66,6 +66,31 @@ public class FourChanApiContractTest {
     }
 
     @Test
+    public void requestsBoardsAndPagedBoardPaths() throws InterruptedException {
+        server.enqueue(jsonResponse("{\"boards\":[]}"));
+        api.fetchBoards().blockingGet();
+        assertEquals("/boards.json", takeRequest().getPath());
+
+        server.enqueue(jsonResponse("{\"page\":3,\"threads\":[]}"));
+        api.fetchPage(3, "g").blockingGet();
+        assertEquals("/g/3.json", takeRequest().getPath());
+    }
+
+    @Test
+    public void preservesAbsoluteArchiveUrlsAndRequiredUserAgent() throws InterruptedException {
+        server.enqueue(jsonResponse("[]"));
+        api.fetchArchives(server.url("/archive/g.json").toString()).blockingGet();
+        assertEquals("/archive/g.json", takeRequest().getPath());
+
+        server.enqueue(jsonResponse("{}"));
+        api.fetchArchivedThread(server.url("/archive/g/thread/123.json").toString())
+                .blockingGet();
+        final RecordedRequest request = takeRequest();
+        assertEquals("/archive/g/thread/123.json", request.getPath());
+        assertTrue(request.getHeader("User-Agent").startsWith("Mozilla/5.0"));
+    }
+
+    @Test
     public void propagatesNotFoundResponses() {
         assertHttpError(404);
     }

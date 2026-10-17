@@ -95,7 +95,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 4. Calidad y publicación
 
-- [ ] Crear pruebas unitarias para URLs, formatos multimedia, nombres de archivo y migraciones.
+- [x] Crear pruebas unitarias para URLs, formatos multimedia y nombres de archivo, y pruebas instrumentadas para migraciones.
+  - [x] Cubrir rutas API y enlaces externos, incluidas rutas inválidas y respuestas HTTP defectuosas.
+  - [x] Cubrir normalización de extensiones, detección MP4/WebM y nombres finales/temporales de descarga.
+  - [x] Validar las migraciones Room 21 -> 22 -> 23 y la migración de preferencias conservando datos existentes.
 - [ ] Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
 - [x] Automatizar compilación, lint y pruebas unitarias en integración continua.
   - [x] Validar el wrapper y ejecutar `freeDebug` con JDK 17 y Android SDK 36 en GitHub Actions.

@@ -3,6 +3,7 @@ package com.emogoth.android.phone.mimi.service;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BatchDownloadWorkerTest {
@@ -46,5 +47,24 @@ public class BatchDownloadWorkerTest {
         assertFalse(BatchDownloadWorker.isCompleteTransfer(
                 5_010_799L, 6_210_678L, 6_210_678L));
         assertFalse(BatchDownloadWorker.isCompleteTransfer(0L, 0L, -1L));
+    }
+
+    @Test
+    public void sanitizesMissingEmptyAndNestedFilenames() {
+        assertEquals("download", BatchDownloadWorker.sanitizeFilename(null));
+        assertEquals("download", BatchDownloadWorker.sanitizeFilename("   "));
+        assertEquals("photo.mp4", BatchDownloadWorker.sanitizeFilename("../photo.mp4"));
+        assertEquals("video.webm", BatchDownloadWorker.sanitizeFilename("my/video.webm"));
+        assertEquals("video.webm", BatchDownloadWorker.sanitizeFilename("my\\video.webm"));
+    }
+
+    @Test
+    public void createsTemporaryNamesThatRetainTheMediaExtension() {
+        assertEquals("photo.jpg.mimi-part.jpg",
+                BatchDownloadWorker.temporaryFilename("photo.jpg", "jpg"));
+        assertEquals("download.mimi-part",
+                BatchDownloadWorker.temporaryFilename("download", ""));
+        assertEquals("download.mimi-part",
+                BatchDownloadWorker.temporaryFilename("download", null));
     }
 }

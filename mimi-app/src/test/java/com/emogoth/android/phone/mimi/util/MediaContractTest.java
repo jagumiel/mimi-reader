@@ -30,7 +30,21 @@ public class MediaContractTest {
     public void normalizesChangedExtensionFormatting() {
         assertEquals(".webm", MediaContract.normalizedExtension(" WEBM "));
         assertEquals(".mp4", MediaContract.normalizedExtension(".MP4"));
+        assertEquals("..jpg", MediaContract.normalizedExtension("..JPG"));
+        assertEquals("", MediaContract.normalizedExtension("."));
         assertEquals("", MediaContract.normalizedExtension("  "));
+    }
+
+    @Test
+    public void trimsOriginalNamesAndFallsBackToTheRemoteIdentifier() {
+        ChanPost named = post(123L, "1786436977617243", ".jpg");
+        named.setFilename(" holiday photo ");
+        assertEquals("holiday photo", MediaContract.originalFilename(named));
+
+        ChanPost blank = post(123L, "1786436977617243", ".jpg");
+        blank.setFilename("  ");
+        assertEquals("1786436977617243", MediaContract.originalFilename(blank));
+        assertEquals("media", MediaContract.originalFilename(null));
     }
 
     private static ChanPost post(long id, String tim, String extension) {

@@ -38,7 +38,6 @@ import com.mimireader.chanlib.models.ChanPost;
 import com.mimireader.chanlib.models.ChanThread;
 import com.mimireader.chanlib.models.ErrorChanThread;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -436,9 +435,11 @@ public final class BatchDownloadWorker extends Worker {
         return BASE_NOTIFICATION_ID + Math.abs(getId().hashCode() % 7000);
     }
 
-    private static String sanitizeFilename(String filename) {
-        final String leafName = new File(filename == null ? "download" : filename).getName();
-        final String sanitized = leafName.replace('/', '_').replace('\\', '_').trim();
+    static String sanitizeFilename(String filename) {
+        final String normalized = (filename == null ? "download" : filename).replace('\\', '/');
+        final int separator = normalized.lastIndexOf('/');
+        final String leafName = normalized.substring(separator + 1);
+        final String sanitized = leafName.trim();
         return sanitized.isEmpty() ? "download" : sanitized;
     }
 
@@ -464,8 +465,8 @@ public final class BatchDownloadWorker extends Worker {
                 && (responseLength <= 0L || transferredLength == responseLength);
     }
 
-    private static String temporaryFilename(String filename, String extension) {
-        return TextUtils.isEmpty(extension)
+    static String temporaryFilename(String filename, String extension) {
+        return extension == null || extension.isEmpty()
                 ? filename + ".mimi-part"
                 : filename + ".mimi-part." + extension;
     }

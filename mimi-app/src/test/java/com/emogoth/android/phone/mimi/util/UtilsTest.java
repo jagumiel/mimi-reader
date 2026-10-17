@@ -27,5 +27,8 @@ public class UtilsTest {
     public void normalizesExtensionForMimeLookup() {
         assertEquals("mp4", Utils.normalizeExtension(" .MP4 "));
         assertEquals("webm", Utils.normalizeExtension("..WEBM"));
+        assertEquals("", Utils.normalizeExtension("..."));
+        assertEquals("", Utils.normalizeExtension("  "));
+        assertEquals("", Utils.normalizeExtension(null));
     }
 }
