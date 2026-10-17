@@ -19,6 +19,7 @@ package com.emogoth.android.phone.mimi.fourchan.models;
 
 import android.util.Log;
 
+import com.emogoth.android.phone.mimi.util.BoardCatalog;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.mimireader.chanlib.models.ChanBoard;
@@ -49,7 +50,7 @@ public class FourChanBoards {
         if (boards != null) {
             List<ChanBoard> chanBoards = new ArrayList<>();
             for (FourChanBoard board : boards) {
-                if (board != null && board.getName() != null && !board.getName().trim().isEmpty()) {
+                if (board != null && BoardCatalog.isPublicBoard(board.getName())) {
                     chanBoards.add(board.toBoard());
                 }
             }

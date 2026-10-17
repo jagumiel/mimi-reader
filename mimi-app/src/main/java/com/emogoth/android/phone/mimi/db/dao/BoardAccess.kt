@@ -13,6 +13,9 @@ abstract class BoardAccess : BaseDao<Board>() {
     @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE}")
     abstract fun getAll(): Flowable<List<Board>>
 
+    @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE}")
+    abstract fun getAllSnapshot(): List<Board>
+
     @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE} WHERE ${Board.VISIBLE} == 1")
     abstract fun getVisibleBoards(): Flowable<List<Board>>
 
@@ -36,6 +39,9 @@ abstract class BoardAccess : BaseDao<Board>() {
 
     @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE} WHERE ${Board.VISIBLE} == 1 ORDER BY ${Board.ORDER_INDEX} ASC")
     abstract fun getAllOrderByCustom(): Flowable<List<Board>>
+
+    @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE} WHERE ${Board.VISIBLE} == 1 ORDER BY ${Board.CATEGORY} ASC, ${Board.NAME} ASC")
+    abstract fun getAllOrderByCategory(): Flowable<List<Board>>
 
     @Query("SELECT * FROM ${MimiDatabase.BOARDS_TABLE} WHERE ${Board.NAME} = :boardName")
     abstract fun getBoard(boardName: String): Single<Board>

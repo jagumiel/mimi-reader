@@ -232,11 +232,22 @@
     <string name="board_order_last_access">Last Access</string>
     <string name="board_order_favorites">Favorites</string>
     <string name="board_order_custom">Custom</string>
+    <string name="board_order_category">Theme</string>
     <string name="board_filter_title">Filter By</string>
     <string name="board_filter_all">All Boards</string>
     <string name="board_filter_sfw">SFW Only</string>
     <string name="board_filter_nsfw">NSFW Only</string>
     <string name="board_sort_summary">%1$s · %2$s</string>
+    <string name="board_metadata">%1$s · %2$s</string>
+    <string name="board_sfw">SFW</string>
+    <string name="board_nsfw">NSFW</string>
+    <string name="board_category_japanese_culture">Japanese Culture</string>
+    <string name="board_category_video_games">Video Games</string>
+    <string name="board_category_interests">Interests</string>
+    <string name="board_category_creative">Creative</string>
+    <string name="board_category_other">Other</string>
+    <string name="board_category_misc">Misc.</string>
+    <string name="board_category_adult">Adult</string>
 
     <string name="error_opening_url">Could not find browser to open URL</string>
 

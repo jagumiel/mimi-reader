@@ -18,11 +18,90 @@
 <resources>
 
     <string-array name="boards">
-
+        <!-- Japanese Culture -->
+        <item>a</item>
+        <item>c</item>
+        <item>w</item>
+        <item>m</item>
+        <item>cgl</item>
+        <item>cm</item>
+        <item>f</item>
+        <item>n</item>
+        <item>jp</item>
+        <item>vt</item>
+        <!-- Video Games -->
+        <item>v</item>
+        <item>vg</item>
+        <item>vm</item>
+        <item>vmg</item>
+        <item>vp</item>
+        <item>vr</item>
+        <item>vrpg</item>
+        <item>vst</item>
+        <!-- Interests -->
+        <item>co</item>
+        <item>g</item>
+        <item>tv</item>
+        <item>k</item>
+        <item>o</item>
         <item>an</item>
+        <item>tg</item>
+        <item>sp</item>
+        <item>xs</item>
+        <item>pw</item>
+        <item>sci</item>
+        <item>his</item>
+        <item>int</item>
+        <item>out</item>
+        <item>toy</item>
+        <!-- Creative -->
+        <item>i</item>
+        <item>po</item>
+        <item>p</item>
         <item>ck</item>
+        <item>ic</item>
+        <item>wg</item>
+        <item>lit</item>
+        <item>mu</item>
+        <item>fa</item>
+        <item>3</item>
+        <item>gd</item>
         <item>diy</item>
-
+        <item>wsg</item>
+        <item>qst</item>
+        <!-- Other -->
+        <item>biz</item>
+        <item>trv</item>
+        <item>fit</item>
+        <item>x</item>
+        <item>adv</item>
+        <item>lgbt</item>
+        <item>mlp</item>
+        <item>news</item>
+        <item>wsr</item>
+        <item>vip</item>
+        <!-- Miscellaneous (NSFW) -->
+        <item>b</item>
+        <item>r9k</item>
+        <item>pol</item>
+        <item>bant</item>
+        <item>soc</item>
+        <item>s4s</item>
+        <item>trash</item>
+        <!-- Adult (NSFW) -->
+        <item>s</item>
+        <item>hc</item>
+        <item>hm</item>
+        <item>h</item>
+        <item>e</item>
+        <item>u</item>
+        <item>d</item>
+        <item>y</item>
+        <item>t</item>
+        <item>hr</item>
+        <item>gif</item>
+        <item>aco</item>
+        <item>r</item>
     </string-array>
 
     <string-array name="orderbyName">
@@ -34,6 +113,7 @@
         <item>Last Access</item>
         <item>Favorites</item>
         <item>Custom</item>
+        <item>Theme</item>
     </string-array>
 
     <string-array name="boardFilterName">
@@ -50,6 +130,7 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
+        <item>8</item>
     </string-array>
 
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.db.models.Board
+import com.emogoth.android.phone.mimi.util.BoardCatalog
 import com.mimireader.chanlib.models.ChanBoard
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -26,6 +27,7 @@ object BoardTableConnection {
                     5 -> db.getAllOrderByLastAccessed()
                     6 -> db.getAllOrderByFavorite()
                     7 -> db.getAllOrderByCustom()
+                    Board.ORDERBY_CATEGORY -> db.getAllOrderByCategory()
                     else -> db.getAllOrderByName()
                 }
         return boardsObs.first(emptyList())
@@ -46,6 +48,7 @@ object BoardTableConnection {
                     5 -> db.getAllOrderByLastAccessed()
                     6 -> db.getAllOrderByFavorite()
                     7 -> db.getAllOrderByCustom()
+                    Board.ORDERBY_CATEGORY -> db.getAllOrderByCategory()
                     else -> db.getAllOrderByName()
                 }
         return boardsObs.flatMap { Flowable.just(convertBoardDbModelsToChanBoards(it)) }
@@ -279,7 +282,16 @@ object BoardTableConnection {
     }
 
     private fun convertChanBoardToDbModel(chanBoard: ChanBoard): Board {
-        return Board(title = chanBoard.title, name = chanBoard.name, favorite = chanBoard.isFavorite, nsfw = chanBoard.wsBoard == 0, pages = chanBoard.pages, perPage = chanBoard.perPage, maxFileSize = chanBoard.maxFilesize)
+        return Board(
+                title = chanBoard.title,
+                name = chanBoard.name,
+                favorite = chanBoard.isFavorite,
+                nsfw = chanBoard.wsBoard == 0,
+                pages = chanBoard.pages,
+                perPage = chanBoard.perPage,
+                maxFileSize = chanBoard.maxFilesize,
+                visible = true,
+                category = BoardCatalog.categoryFor(chanBoard.name))
     }
 
     private fun convertChanBoardListToDbModel(chanBoards: List<ChanBoard>): List<Board> {
@@ -341,9 +353,49 @@ object BoardTableConnection {
             }
             val boards = convertChanBoardListToDbModel(chanBoards)
             val boardDao = MimiDatabase.getInstance()?.boards() ?: return@singleOnIo false
-            boardDao.upsert(boards)
+            boardDao.upsert(mergeBoardCatalog(boardDao.getAllSnapshot(), boards))
             true
         }
+    }
+
+    internal fun mergeBoardCatalog(existingBoards: List<Board>, incomingBoards: List<Board>): List<Board> {
+        val existingByName = existingBoards.associateBy { it.name }
+        val incomingNames = HashSet<String>()
+        var nextOrder = (existingBoards.maxOfOrNull { it.orderIndex } ?: -1) + 1
+
+        val merged = incomingBoards
+                .asSequence()
+                .filter { BoardCatalog.isPublicBoard(it.name) }
+                .distinctBy { it.name }
+                .map { incoming ->
+                    incomingNames.add(incoming.name)
+                    val existing = existingByName[incoming.name]
+                    if (existing == null) {
+                        incoming.copy(
+                                visible = true,
+                                orderIndex = nextOrder++,
+                                category = BoardCatalog.categoryFor(incoming.name))
+                    } else {
+                        existing.copy(
+                                title = incoming.title,
+                                nsfw = incoming.nsfw,
+                                perPage = incoming.perPage,
+                                pages = incoming.pages,
+                                maxFileSize = incoming.maxFileSize,
+                                visible = existing.visible || existing.category == BoardCatalog.UNKNOWN,
+                                category = BoardCatalog.categoryFor(incoming.name))
+                    }
+                }
+                .toMutableList()
+
+        existingBoards
+                .filter { it.name !in incomingNames }
+                .mapTo(merged) {
+                    it.copy(
+                            visible = false,
+                            category = BoardCatalog.categoryFor(it.name))
+                }
+        return merged
     }
 
     @JvmStatic

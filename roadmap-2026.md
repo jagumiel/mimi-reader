@@ -49,6 +49,7 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Conservar catálogos separados por board y reutilizarlos cuando falle una actualización.
   - [x] Mantener visibles boards, catálogos e hilos ya cargados, indicando que son contenido guardado y ofreciendo reintento.
 - [x] Añadir filtro persistente de boards: todas, solo SFW o solo NSFW, independiente del criterio de ordenación.
+  - [x] Sincronizar las 77 boards del API, incluidas `/r/` y `/trash/`, clasificarlas por tema y mostrar su estado SFW/NSFW usando `ws_board`.
 
 ### 2. Persistencia y migraciones
 

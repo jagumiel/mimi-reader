@@ -96,6 +96,7 @@ class BoardItemListFragment
     private var orderByAccess: TextView? = null
     private var orderByLast: TextView? = null
     private var orderByPost: TextView? = null
+    private var orderByCategory: TextView? = null
     private var orderbyCustom: TextView? = null
     private var filterByAll: TextView? = null
     private var filterBySfw: TextView? = null
@@ -589,6 +590,7 @@ class BoardItemListFragment
         orderByAccess = rootView.findViewById(R.id.board_order_type_access_count)
         orderByLast = rootView.findViewById(R.id.board_order_type_last_access)
         orderByPost = rootView.findViewById(R.id.board_order_type_post_count)
+        orderByCategory = rootView.findViewById(R.id.board_order_type_category)
         orderbyCustom = rootView.findViewById(R.id.board_order_type_custom)
         filterByAll = rootView.findViewById(R.id.board_filter_all)
         filterBySfw = rootView.findViewById(R.id.board_filter_sfw)
@@ -647,6 +649,7 @@ class BoardItemListFragment
         orderByAccess?.setOnClickListener { hideList(3) }
         orderByLast?.setOnClickListener { hideList(5) }
         orderByPost?.setOnClickListener { hideList(4) }
+        orderByCategory?.setOnClickListener { hideList(Board.ORDERBY_CATEGORY) }
         orderbyCustom?.setOnClickListener { hideList(7) }
         filterByAll?.setOnClickListener { selectFilter(BoardFilter.ALL) }
         filterBySfw?.setOnClickListener { selectFilter(BoardFilter.SFW_ONLY) }

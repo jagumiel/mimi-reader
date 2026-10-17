@@ -19,6 +19,7 @@ import com.emogoth.android.phone.mimi.db.BoardTableConnection.updateBoardOrder
 import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySchedulers
 import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySingleSchedulers
 import com.emogoth.android.phone.mimi.interfaces.MoveAndDismissable
+import com.emogoth.android.phone.mimi.util.BoardCatalog
 import com.emogoth.android.phone.mimi.util.MimiUtil
 import com.emogoth.android.phone.mimi.util.RxUtil
 import com.mimireader.chanlib.models.ChanBoard
@@ -98,7 +99,14 @@ class BoardListAdapter(context: Context, boards: MutableList<ChanBoard>) : Recyc
             holder.boardTitle.text = board.title
         }
         if (holder.boardName != null) {
-            holder.boardName.text = board.name
+            holder.boardName.text = "/${board.name}/"
+        }
+        val currentContext = context
+        if (holder.boardMetadata != null && currentContext != null) {
+            holder.boardMetadata.text = currentContext.getString(
+                    R.string.board_metadata,
+                    currentContext.getString(BoardCatalog.categoryLabel(BoardCatalog.categoryFor(board.name))),
+                    currentContext.getString(if (board.wsBoard == 1) R.string.board_sfw else R.string.board_nsfw))
         }
         if (holder.dragHandle != null) {
             holder.dragHandle.setOnTouchListener(View.OnTouchListener { v: View?, event: MotionEvent? ->
@@ -235,6 +243,7 @@ class BoardListAdapter(context: Context, boards: MutableList<ChanBoard>) : Recyc
     class BoardViewHolder(root: View) : RecyclerView.ViewHolder(root) {
         val root: View?
         val boardName: TextView?
+        val boardMetadata: TextView?
         val boardTitle: TextView?
         val dragHandle: View?
         val favorite: TextView?
@@ -242,6 +251,7 @@ class BoardListAdapter(context: Context, boards: MutableList<ChanBoard>) : Recyc
         init {
             this.root = root
             boardName = root.findViewById(R.id.board_name)
+            boardMetadata = root.findViewById(R.id.board_metadata)
             boardTitle = root.findViewById(R.id.board_title)
             dragHandle = root.findViewById(R.id.drag_handle)
             favorite = root.findViewById(R.id.favorite)

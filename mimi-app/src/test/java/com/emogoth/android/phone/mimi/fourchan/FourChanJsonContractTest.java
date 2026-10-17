@@ -4,6 +4,7 @@ import com.emogoth.android.phone.mimi.fourchan.models.FourChanPost;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanBoards;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanThread;
 import com.emogoth.android.phone.mimi.fourchan.models.FourChanThreadPage;
+import com.emogoth.android.phone.mimi.util.BoardCatalog;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -14,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -66,6 +68,28 @@ public class FourChanJsonContractTest {
         assertTrue(boards.getBoards().isEmpty());
         assertTrue(boards.toBoardList().isEmpty());
         assertTrue(pages.get(0).getThreads().isEmpty());
+    }
+
+    @Test
+    public void convertsAllApiBoardsWithTheirSafetyAndTheme() {
+        final FourChanBoards boards = GSON.fromJson("{\"boards\":["
+                + "{\"board\":\"g\",\"title\":\"Technology\",\"ws_board\":1},"
+                + "{\"board\":\"gif\",\"title\":\"Adult GIF\",\"ws_board\":0},"
+                + "{\"board\":\"r\",\"title\":\"Adult Requests\",\"ws_board\":0},"
+                + "{\"board\":\"trash\",\"title\":\"Off-Topic\",\"ws_board\":0}]} ",
+                FourChanBoards.class);
+
+        assertEquals(4, boards.toBoardList().size());
+        assertEquals("g", boards.toBoardList().get(0).getName());
+        assertEquals(1, boards.toBoardList().get(0).getWsBoard());
+        assertEquals("gif", boards.toBoardList().get(1).getName());
+        assertEquals(0, boards.toBoardList().get(1).getWsBoard());
+        assertFalse(BoardCatalog.categoryFor(boards.toBoardList().get(0).getName())
+                == BoardCatalog.categoryFor(boards.toBoardList().get(1).getName()));
+        assertEquals(BoardCatalog.ADULT,
+                BoardCatalog.categoryFor(boards.toBoardList().get(2).getName()));
+        assertEquals(BoardCatalog.MISC,
+                BoardCatalog.categoryFor(boards.toBoardList().get(3).getName()));
     }
 
     @Test(expected = JsonSyntaxException.class)

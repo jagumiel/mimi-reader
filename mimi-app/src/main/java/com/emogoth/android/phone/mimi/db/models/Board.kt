@@ -72,7 +72,7 @@ data class Board(
         val ORDERBY_NONE = 0
         val ORDERBY_NAME = 1
         val ORDERBY_PATH = 2
-        val ORDERBY_CATEGORY = 3 // Don't use this yet
+        const val ORDERBY_CATEGORY = 8
         val ORDERBY_ACCESS_COUNT = 4
         val ORDERBY_POST_COUNT = 5
         val ORDERBY_LAST_ACCESSED = 6
@@ -94,8 +94,8 @@ data class Board(
         newBoard.isFavorite = favorite == 1
         newBoard.perPage = postsPerPage
         newBoard.pages = pages
+        newBoard.category = category
 
         return newBoard
     }
 }
-        

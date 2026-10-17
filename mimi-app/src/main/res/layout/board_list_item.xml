@@ -22,8 +22,8 @@
     android:layout_height="?attr/font_board_height"
     android:background="?android:attr/selectableItemBackground"
     android:orientation="horizontal"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp">
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <com.emogoth.android.phone.mimi.view.IconTextView
         android:id="@+id/drag_handle"
@@ -39,27 +39,43 @@
         android:textSize="?attr/font_xlarge"
         android:visibility="visible" />
 
-    <TextView
-        android:id="@+id/board_title"
-        style="?defaultTextColor"
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:singleLine="true"
-        android:textSize="?attr/font_medium"
-        android:textStyle="bold"
-        tools:text="Technology" />
+        android:paddingEnd="5dp">
+
+        <TextView
+            android:id="@+id/board_title"
+            style="?defaultTextColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="?attr/font_medium"
+            android:textStyle="bold"
+            tools:text="Technology" />
+
+        <TextView
+            android:id="@+id/board_metadata"
+            style="?defaultTextColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="?attr/font_label_xsmall"
+            tools:text="Interests · SFW" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/board_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="1"
         android:gravity="center_vertical|end"
         android:paddingEnd="4dp"
         android:textSize="?attr/font_label_small"

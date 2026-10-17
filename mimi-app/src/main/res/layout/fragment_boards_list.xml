@@ -146,6 +146,17 @@
                 android:textSize="?attr/font_label_small" />
 
             <TextView
+                android:id="@+id/board_order_type_category"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?attr/mimiPrimaryColorDark"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/board_order_category"
+                android:textColor="@color/sort_by_text_color_selector"
+                android:textSize="?attr/font_label_small" />
+
+            <TextView
                 android:id="@+id/board_order_type_custom"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
