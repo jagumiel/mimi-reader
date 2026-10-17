@@ -94,7 +94,6 @@ data class Board(
         newBoard.isFavorite = favorite == 1
         newBoard.perPage = postsPerPage
         newBoard.pages = pages
-        newBoard.category = category
 
         return newBoard
     }
