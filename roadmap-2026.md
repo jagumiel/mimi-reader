@@ -100,17 +100,18 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Cubrir rutas API y enlaces externos, incluidas rutas inválidas y respuestas HTTP defectuosas.
   - [x] Cubrir normalización de extensiones, detección MP4/WebM y nombres finales/temporales de descarga.
   - [x] Validar las migraciones Room 21 -> 22 -> 23 y la migración de preferencias conservando datos existentes.
-- [ ] Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
+- [x] Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
   - [x] Verificar que el launcher respeta la pantalla de inicio configurada, conserva los extras y recupera el destino predeterminado ante preferencias inválidas.
   - [x] Verificar creación, sustitución, límite y restauración de pestañas, navegación Atrás y recreación de la actividad.
   - [x] Verificar reproducción, autoplay y transición entre imágenes, GIF y vídeos con recursos locales en un dispositivo Android 12.
-  - [ ] Verificar inicio, cancelación, reintento y recuperación de descargas persistentes.
+  - [x] Verificar inicio, cancelación, reintento y recuperación de descargas persistentes con WorkManager en un dispositivo Android 12.
 - [x] Automatizar compilación, lint y pruebas unitarias en integración continua.
   - [x] Validar el wrapper y ejecutar `freeDebug` con JDK 17 y Android SDK 36 en GitHub Actions.
   - [x] Hacer que lint bloquee errores nuevos y corregir los diez errores heredados que impedían activarlo.
   - [x] Conservar durante 14 días la APK y los informes de pruebas y lint de cada ejecución.
 - [ ] Revisar reglas R8, firma, versionado, privacidad y artefactos de publicación.
 - [ ] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
+- [ ] Como última tarea, actualizar el `README.md` con una descripción actual de la aplicación, los cambios incorporados durante la modernización, las instrucciones de compilación e instalación y la aclaración de que Mimi ya no está disponible en Google Play.
 
 ### 5. Publicación de contenido (prioridad baja)
 

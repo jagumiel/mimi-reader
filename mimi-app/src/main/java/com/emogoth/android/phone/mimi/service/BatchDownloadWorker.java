@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -57,7 +58,7 @@ import okio.Okio;
 
 public final class BatchDownloadWorker extends Worker {
     private static final String LOG_TAG = BatchDownloadWorker.class.getSimpleName();
-    private static final String WORK_TAG = "mimi_batch_download";
+    static final String WORK_TAG = "mimi_batch_download";
     private static final String KEY_DIRECTORY_URI = "directory_uri";
     private static final String KEY_BOARD = "board";
     private static final String KEY_THREAD_ID = "thread_id";
@@ -77,11 +78,37 @@ public final class BatchDownloadWorker extends Worker {
         super(appContext, workerParams);
     }
 
-    public static void enqueue(@NonNull Context context,
+    @NonNull
+    public static UUID enqueue(@NonNull Context context,
                                @NonNull Uri directoryUri,
                                @NonNull String board,
                                long threadId,
                                @NonNull long[] postIds) {
+        return enqueue(context, directoryUri, board, threadId, postIds, 0L);
+    }
+
+    @NonNull
+    static UUID enqueue(@NonNull Context context,
+                        @NonNull Uri directoryUri,
+                        @NonNull String board,
+                        long threadId,
+                        @NonNull long[] postIds,
+                        long initialDelayMillis) {
+        final OneTimeWorkRequest request = createWorkRequest(
+                directoryUri, board, threadId, postIds, initialDelayMillis);
+        WorkManager.getInstance(context.getApplicationContext()).enqueueUniqueWork(
+                uniqueWorkName(directoryUri, board, threadId, postIds),
+                androidx.work.ExistingWorkPolicy.KEEP,
+                request);
+        return request.getId();
+    }
+
+    @NonNull
+    static OneTimeWorkRequest createWorkRequest(@NonNull Uri directoryUri,
+                                                @NonNull String board,
+                                                long threadId,
+                                                @NonNull long[] postIds,
+                                                long initialDelayMillis) {
         final Data input = new Data.Builder()
                 .putString(KEY_DIRECTORY_URI, directoryUri.toString())
                 .putString(KEY_BOARD, board)
@@ -93,20 +120,28 @@ public final class BatchDownloadWorker extends Worker {
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
-        final OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(BatchDownloadWorker.class)
+        final OneTimeWorkRequest.Builder request =
+                new OneTimeWorkRequest.Builder(BatchDownloadWorker.class)
                 .setInputData(input)
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                         BackoffPolicy.EXPONENTIAL,
                         WorkRequest.MIN_BACKOFF_MILLIS,
                         TimeUnit.MILLISECONDS)
-                .addTag(WORK_TAG)
-                .build();
+                .addTag(WORK_TAG);
+        if (initialDelayMillis > 0L) {
+            request.setInitialDelay(initialDelayMillis, TimeUnit.MILLISECONDS);
+        }
+        return request.build();
+    }
 
-        final String uniqueName = WORK_TAG + ':' + board + ':' + threadId + ':'
+    @NonNull
+    static String uniqueWorkName(@NonNull Uri directoryUri,
+                                 @NonNull String board,
+                                 long threadId,
+                                 @NonNull long[] postIds) {
+        return WORK_TAG + ':' + board + ':' + threadId + ':'
                 + directoryUri.hashCode() + ':' + Arrays.hashCode(postIds);
-        WorkManager.getInstance(context.getApplicationContext())
-                .enqueueUniqueWork(uniqueName, androidx.work.ExistingWorkPolicy.KEEP, request);
     }
 
     @NonNull
