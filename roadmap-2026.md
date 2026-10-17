@@ -115,7 +115,13 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Hacer configurables `versionCode` y `versionName`, y documentar la creación, verificación y conservación de APK, AAB, checksums y mapas de ofuscación.
   - [x] Retirar Stetho y el registro de cabeceras HTTP, y actualizar la política incluida en la aplicación para describir los datos locales, permisos y conexiones reales.
   - [x] Generar en CI APK y AAB release minificados, su checksum SHA-256 y el `mapping.txt`, además de la APK de depuración.
-- [ ] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
+- [x] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
+  - [x] Configurar en CI la ejecución paralela de las 25 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
+  - [x] Conservar durante 14 días informes HTML, resultados JUnit, información del dispositivo y logcat de cada API.
+  - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 25 pruebas superadas el 17 de octubre de 2026.
+- [ ] Antes de preparar el release, definir conjuntamente el alcance y el formato del changelog; no iniciar esta tarea sin consultar primero al responsable del proyecto.
+  - La nueva versión se publicará como **8.0** debido al alcance excepcional de la modernización.
+  - El changelog debe reconstruir y resumir todos los cambios desde **7.0.1**, punto de partida del fork.
 - [ ] Como última tarea, actualizar el `README.md` con una descripción actual de la aplicación, los cambios incorporados durante la modernización, las instrucciones de compilación e instalación y la aclaración de que Mimi ya no está disponible en Google Play.
 
 ### 5. Publicación de contenido (prioridad baja)

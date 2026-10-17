@@ -37,8 +37,13 @@ The build fails early if the properties file exists but any required signing val
 
 Install the signed APK as an update on a device that already contains the previous release. Android will reject it if the signing certificate differs, which protects existing installations from an unintended key change.
 
+## Next release gate
+
+The next public version is **8.0**, reflecting the unusually large scope of the modernization. Its changelog must cover the complete history since **7.0.1**, where this fork began. Do not start drafting that changelog until the project owner has been consulted and has agreed its scope and format.
+
 ## Release checklist
 
+- Agree and complete the 8.0 changelog before preparing public artifacts.
 - Run unit tests, lint, and both release artifact tasks.
 - Confirm the version code and version name in the built artifact.
 - Verify the APK signature and record a SHA-256 checksum.
