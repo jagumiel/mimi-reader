@@ -101,6 +101,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Cubrir normalización de extensiones, detección MP4/WebM y nombres finales/temporales de descarga.
   - [x] Validar las migraciones Room 21 -> 22 -> 23 y la migración de preferencias conservando datos existentes.
 - [ ] Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
+  - [x] Verificar que el launcher respeta la pantalla de inicio configurada, conserva los extras y recupera el destino predeterminado ante preferencias inválidas.
+  - [x] Verificar creación, sustitución, límite y restauración de pestañas, navegación Atrás y recreación de la actividad.
+  - [ ] Verificar reproducción, autoplay y transición entre imágenes, GIF y vídeos.
+  - [ ] Verificar inicio, cancelación, reintento y recuperación de descargas persistentes.
 - [x] Automatizar compilación, lint y pruebas unitarias en integración continua.
   - [x] Validar el wrapper y ejecutar `freeDebug` con JDK 17 y Android SDK 36 en GitHub Actions.
   - [x] Hacer que lint bloquee errores nuevos y corregir los diez errores heredados que impedían activarlo.
