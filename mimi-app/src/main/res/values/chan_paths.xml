@@ -30,11 +30,11 @@
     <string name="board_path">/%s/</string>
     <string name="first_post_path">/%s/</string>
     <string name="api_thread_path">/%1$s/thread/%2$s.json</string>
-    <string name="raw_thread_path">/%1$s/thread/%2$s</string>
+    <string name="raw_thread_path">/%1$s/thread/%2$d</string>
     <string name="catalog_path">/%s/catalog.json</string>
     <string name="api_thread_list_path">/%1$s/%2$s.json</string>
     <string name="raw_thread_list_path">/%1$s/%2$s</string>
-    <string name="report_path">/%1$s/imgboard.php?mode=report&amp;no=%2$s</string>
+    <string name="report_path">/%1$s/imgboard.php?mode=report&amp;no=%2$d</string>
 
     <!-- /{board}/thumb/{tim}s{ext} -->
     <string name="thumb_path">/%1$s/%2$ss.jpg</string>

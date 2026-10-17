@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 16 de octubre de 2026.
+Última revisión: 17 de octubre de 2026.
 
 ## Objetivo
 
@@ -95,11 +95,14 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 4. Calidad y publicación
 
-- Crear pruebas unitarias para URLs, formatos multimedia, nombres de archivo y migraciones.
-- Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
-- Automatizar compilación, lint y pruebas en integración continua.
-- Revisar reglas R8, firma, versionado, privacidad y artefactos de publicación.
-- Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
+- [ ] Crear pruebas unitarias para URLs, formatos multimedia, nombres de archivo y migraciones.
+- [ ] Añadir pruebas instrumentadas de arranque, pestañas, reproducción y descargas.
+- [x] Automatizar compilación, lint y pruebas unitarias en integración continua.
+  - [x] Validar el wrapper y ejecutar `freeDebug` con JDK 17 y Android SDK 36 en GitHub Actions.
+  - [x] Hacer que lint bloquee errores nuevos y corregir los diez errores heredados que impedían activarlo.
+  - [x] Conservar durante 14 días la APK y los informes de pruebas y lint de cada ejecución.
+- [ ] Revisar reglas R8, firma, versionado, privacidad y artefactos de publicación.
+- [ ] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
 
 ### 5. Publicación de contenido (prioridad baja)
 

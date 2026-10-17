@@ -22,6 +22,7 @@
         android:id="@+id/badge"
         android:icon="@drawable/new_unread_count"
         android:orderInCategory="99"
+        android:title="@string/new_posts"
         mimi:actionLayout="@layout/feed_update_count"
         mimi:showAsAction="always"
         android:visible="true" />

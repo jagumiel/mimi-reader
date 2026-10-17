@@ -23,12 +23,12 @@ package com.emogoth.android.phone.mimi.view;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.util.Typefaces;
 
-public class IconTextView extends TextView {
+public class IconTextView extends AppCompatTextView {
 
     public IconTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);

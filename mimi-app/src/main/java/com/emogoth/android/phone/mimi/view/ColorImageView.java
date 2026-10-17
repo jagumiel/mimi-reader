@@ -21,16 +21,16 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import com.emogoth.android.phone.mimi.R;
 
 /**
  * Created by ferranribell on 19/08/15.
  */
-public class ColorImageView extends ImageView {
+public class ColorImageView extends AppCompatImageView {
 
     private int mColor;
     private int mBorderColor;

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MimiReader/mimi-reader.svg?branch=master)](https://travis-ci.org/MimiReader/mimi-reader)
+[![Android CI](https://github.com/jagumiel/mimi-reader/actions/workflows/android-ci.yml/badge.svg)](https://github.com/jagumiel/mimi-reader/actions/workflows/android-ci.yml)
 
 # README #
 

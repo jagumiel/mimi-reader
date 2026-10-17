@@ -72,7 +72,6 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
     private var highlightPostBackground = 0
     private var highlightTextBackground = 0
     private var selectedTextBackground = 0
-    private var lastPosition = 0
 
     //    private List<Long> userPostList;
     private val repliesText: MutableList<String> = ArrayList()
@@ -224,9 +223,10 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         val startTime = System.currentTimeMillis()
         val viewHolder = vh as ViewHolder
         val postItem = items[position] ?: return
-        if (lastPosition < position) {
-            lastPosition = position
-        }
+        val postTime = timeMap[position]
+        val userColor = colorList[position]
+        val replyText = repliesText[position]
+        val imageText = imagesText[position]
         val searchResult = getSearchResultByPostId(postItem.no)
         //        final int postPosition = getListPositionFromResultPosition(foundPos);
 //        final boolean selected = foundPos >= 0 && position == postPosition;
@@ -249,15 +249,15 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         }
         val thumbUrl: String?
         val imageUrl: String?
-        if (items[position] is ArchivedChanPost) {
-            thumbUrl = (postItem as ArchivedChanPost).thumbLink
+        if (postItem is ArchivedChanPost) {
+            thumbUrl = postItem.thumbLink
             imageUrl = postItem.mediaLink
         } else {
             thumbUrl = if (!imageSpoilersEnabled) {
                 thumbUrlMap[postItem.no]
-            } else if (items[position].spoiler > 0 && items[position].customSpoiler > 0) {
-                String.format(customSpoilerUrl, boardName, items[position].customSpoiler)
-            } else if (items[position].spoiler > 0) {
+            } else if (postItem.spoiler > 0 && postItem.customSpoiler > 0) {
+                String.format(customSpoilerUrl, boardName, postItem.customSpoiler)
+            } else if (postItem.spoiler > 0) {
                 spoilerUrl
             } else {
                 thumbUrlMap[postItem.no]
@@ -326,7 +326,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
 
         viewHolder.menuButton.setOnClickListener { v: View ->
             val menu = PopupMenu(v.context, v)
-            if (position == 0) {
+            if (viewHolder.bindingAdapterPosition == 0) {
                 menu.inflate(R.menu.thread_first_post_menu)
             } else {
                 menu.inflate(R.menu.thread_menu)
@@ -372,7 +372,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                     }
                     R.id.copy_text -> {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("hread info", items[position].comment)
+                        val clip = ClipData.newPlainText("thread info", postItem.comment)
                         clipboard.setPrimaryClip(clip)
                         Toast.makeText(context, R.string.text_copied_to_clipboard, Toast.LENGTH_SHORT).show()
                         return@setOnMenuItemClickListener true
@@ -388,7 +388,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                         if (viewHolder.menuButton.context is Activity) {
                             val activity = viewHolder.menuButton.context as Activity
                             val reportUrl = "https://" + context.getString(R.string.sys_link)
-                            val reportPath = context.getString(R.string.report_path, boardName, items[position].no)
+                            val reportPath = context.getString(R.string.report_path, boardName, postItem.no)
                             val reportIntent = Intent(Intent.ACTION_VIEW, Uri.parse(reportUrl + reportPath))
                             activity.startActivity(reportIntent)
                         }
@@ -416,7 +416,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         }
         viewHolder.threadId.text = postItem.no.toString()
         viewHolder.userName.text = postItem.displayedName
-        viewHolder.postTime.text = timeMap[position]
+        viewHolder.postTime.text = postTime
         if (!TextUtils.isEmpty(postItem.subject)) {
             val data: MutableList<Pair<Int, Int>>? = searchResult.textLocation[TextLocation.LOCATION_SUBJECT]
             if (data != null) {
@@ -433,7 +433,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
             viewHolder.subject.visibility = View.GONE
         }
         if (!TextUtils.isEmpty(postItem.id)) {
-            viewHolder.userId.setBackgroundColor(colorList[position])
+            viewHolder.userId.setBackgroundColor(userColor)
             viewHolder.userId.text = postItem.id
             viewHolder.userId.visibility = View.VISIBLE
             viewHolder.userId.setOnClickListener { v: View ->
@@ -488,7 +488,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
             viewHolder.comment.text = ""
         }
         if (viewHolder.replyButton != null) {
-            if (postItem.isClosed || items[position] is ArchivedChanPost) {
+            if (postItem.isClosed || postItem is ArchivedChanPost) {
                 viewHolder.replyButton?.visibility = View.GONE
             } else {
                 viewHolder.replyButton?.visibility = View.VISIBLE
@@ -500,7 +500,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
             }
         }
         if (postItem.repliesFrom.size > 0 || viewHolder.galleryImageCount != null && postItem.images > 0) {
-            viewHolder.replyCount.text = repliesText[position]
+            viewHolder.replyCount.text = replyText
             viewHolder.replyCount.setOnClickListener { v: View ->
                 if (v.context is AppCompatActivity) {
                     val activity = viewHolder.menuButton.context as AppCompatActivity
@@ -508,7 +508,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                 }
             }
             if (viewHolder.galleryImageCount != null) {
-                viewHolder.galleryImageCount?.text = imagesText[position]
+                viewHolder.galleryImageCount?.text = imageText
                 viewHolder.galleryImageCount?.setOnClickListener { v: View -> start(v.context, 0, postItem.no, boardName, postItem.no, LongArray(0)) }
                 viewHolder.galleryImageCount?.visibility = View.VISIBLE
             }
