@@ -49,6 +49,7 @@ class GalleryPager @JvmOverloads constructor(
     private var adapter: GalleryPagerAdapter? = null
     private var player: MediaPlayerHelper? = null
     private val autoplayController = GalleryAutoplayController(MimiPrefs.galleryAutoplayEnabled(context))
+    private val contentReadyPositions = mutableSetOf<Int>()
     private var scheduledAutoplayPosition = RecyclerView.NO_POSITION
     private val imageAutoplayRunnable = Runnable {
         val position = scheduledAutoplayPosition
@@ -105,9 +106,7 @@ class GalleryPager @JvmOverloads constructor(
         pager.attachSnapHelperWithListener(PagerSnapHelper(), SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL, object : OnSnapPositionChangeListener {
             override fun onSnapPositionChange(previous: Int, current: Int) {
                 cancelImageAutoplay()
-                pagerPosition = current
-                autoplayController.onPageSelected(current, getItems().size)
-                galleryViewModel?.prioritizeDownloads(current)
+                recordPageSelection(current)
 
                 Log.d(LOG_TAG, "Gallery Position: $current (previous=$previous)")
                 if (player?.isPlaying == true) {
@@ -241,9 +240,12 @@ class GalleryPager @JvmOverloads constructor(
         return pager.findViewHolderForAdapterPosition(pagerPosition) as? GalleryPagerItemViewHolder
     }
 
-    private fun onPageEvent(position: Int, event: GalleryPageEvent) {
+    internal fun onPageEvent(position: Int, event: GalleryPageEvent) {
         when (event) {
-            GalleryPageEvent.CONTENT_READY -> scheduleImageAutoplay(position)
+            GalleryPageEvent.CONTENT_READY -> {
+                contentReadyPositions.add(position)
+                scheduleImageAutoplay(position)
+            }
             GalleryPageEvent.PLAYBACK_COMPLETED -> advanceFrom(position)
         }
     }
@@ -260,7 +262,8 @@ class GalleryPager @JvmOverloads constructor(
         }
 
         val holder = pager.findViewHolderForAdapterPosition(position) as? GalleryPagerItemViewHolder
-        if (!autoplayController.shouldScheduleImage(position, holder?.contentReady == true)) {
+        val ready = position in contentReadyPositions || holder?.contentReady == true
+        if (!autoplayController.shouldScheduleImage(position, ready)) {
             return
         }
 
@@ -277,7 +280,16 @@ class GalleryPager @JvmOverloads constructor(
         val nextPosition = autoplayController.requestAdvance(position) ?: return
         cancelImageAutoplay()
         player?.pause()
+        // Keep autoplay state in sync even when a programmatic scroll does not
+        // produce a snap callback (for example while the host is resuming).
+        recordPageSelection(nextPosition)
         pager.smoothScrollToPosition(nextPosition)
+    }
+
+    private fun recordPageSelection(position: Int) {
+        pagerPosition = position
+        autoplayController.onPageSelected(position, getItems().size)
+        galleryViewModel?.prioritizeDownloads(position)
     }
 
     private fun inflateView() {
@@ -295,6 +307,7 @@ class GalleryPager @JvmOverloads constructor(
 
         val viewModel: GalleryViewModel = galleryViewModel as GalleryViewModel
         if (adapter == null) {
+            contentReadyPositions.clear()
             adapter = GalleryPagerAdapter(items, viewModel, player) { position, event ->
                 if (autoplayController.enabled) {
                     pager.post { onPageEvent(position, event) }
