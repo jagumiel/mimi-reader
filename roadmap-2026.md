@@ -109,7 +109,12 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Validar el wrapper y ejecutar `freeDebug` con JDK 17 y Android SDK 36 en GitHub Actions.
   - [x] Hacer que lint bloquee errores nuevos y corregir los diez errores heredados que impedían activarlo.
   - [x] Conservar durante 14 días la APK y los informes de pruebas y lint de cada ejecución.
-- [ ] Revisar reglas R8, firma, versionado, privacidad y artefactos de publicación.
+- [x] Revisar reglas R8, firma, versionado, privacidad y artefactos de publicación.
+  - [x] Sustituir las reglas heredadas que ocultaban advertencias por reglas R8 acotadas para Retrofit, Gson, Parcelable, fragments, workers y bibliotecas nativas.
+  - [x] Permitir compilaciones release reproducibles y sin firmar en CI, cargando la firma únicamente desde un `keystore.properties` local validado.
+  - [x] Hacer configurables `versionCode` y `versionName`, y documentar la creación, verificación y conservación de APK, AAB, checksums y mapas de ofuscación.
+  - [x] Retirar Stetho y el registro de cabeceras HTTP, y actualizar la política incluida en la aplicación para describir los datos locales, permisos y conexiones reales.
+  - [x] Generar en CI APK y AAB release minificados, su checksum SHA-256 y el `mapping.txt`, además de la APK de depuración.
 - [ ] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
 - [ ] Como última tarea, actualizar el `README.md` con una descripción actual de la aplicación, los cambios incorporados durante la modernización, las instrucciones de compilación e instalación y la aclaración de que Mimi ya no está disponible en Google Play.
 

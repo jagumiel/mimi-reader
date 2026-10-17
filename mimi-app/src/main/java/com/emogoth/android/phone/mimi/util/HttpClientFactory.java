@@ -25,7 +25,6 @@ import androidx.preference.PreferenceManager;
 import com.emogoth.android.phone.mimi.BuildConfig;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.app.MimiApplication;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.CookiePersistor;
@@ -34,8 +33,6 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import java.io.IOException;
 import java.io.File;
 import java.net.Socket;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -141,7 +138,6 @@ public class HttpClientFactory {
 
         if (BuildConfig.DEBUG) {
             builder.addNetworkInterceptor(loggingInterceptor());
-            builder.addNetworkInterceptor(new StethoInterceptor());
         }
         return builder;
     }
@@ -186,12 +182,8 @@ public class HttpClientFactory {
         return chain -> {
             Request request = chain.request();
             Log.d(LOG_TAG, "[Secure] " + (chain.connection().socket() instanceof javax.net.ssl.SSLSocket));
-            Log.d(LOG_TAG, "[URL] " + request.url().toString());
-            for (Map.Entry<String, List<String>> stringListEntry : request.headers().toMultimap().entrySet()) {
-                for (String s : stringListEntry.getValue()) {
-                    Log.d(LOG_TAG, "[Header] " + stringListEntry.getKey() + ": " + s);
-                }
-            }
+            Log.d(LOG_TAG, "[Request] " + request.method() + " "
+                    + request.url().host() + request.url().encodedPath());
             return chain.proceed(request);
         };
     }

@@ -2,6 +2,26 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+def appVersionCode = providers.gradleProperty('mimiVersionCode').getOrElse('230').toInteger()
+def appVersionName = providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+if (appVersionCode < 1 || appVersionName.trim().isEmpty()) {
+    throw new GradleException('mimiVersionCode must be positive and mimiVersionName must not be empty.')
+}
+
+def releaseSigningPropertiesFile = rootProject.file('keystore.properties')
+def releaseSigningProperties = new Properties()
+def releaseSigningConfigured = releaseSigningPropertiesFile.isFile()
+if (releaseSigningConfigured) {
+    releaseSigningPropertiesFile.withInputStream { releaseSigningProperties.load(it) }
+    def requiredSigningProperties = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword']
+    def missingSigningProperties = requiredSigningProperties.findAll {
+        !releaseSigningProperties.getProperty(it)?.trim()
+    }
+    if (!missingSigningProperties.isEmpty()) {
+        throw new GradleException("Missing release signing properties: ${missingSigningProperties.join(', ')}")
+    }
+}
+
 android {
     namespace 'com.emogoth.android.phone.mimi'
     compileSdkVersion 36
@@ -10,8 +30,8 @@ android {
         minSdkVersion 23
         targetSdkVersion 36
 
-        versionCode 230
-        versionName "7.0.1"
+        versionCode appVersionCode
+        versionName appVersionName
 
         applicationId "com.emogoth.android.phone.mimi"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -35,11 +55,16 @@ android {
         debug {
             storeFile file('debug.keystore')
         }
-        release {
-            storeFile file('release.keystore')
-            keyAlias 'fake'
-            keyPassword 'fake'
-            storePassword 'fake'
+        if (releaseSigningConfigured) {
+            release {
+                def configuredStoreFile = new File(releaseSigningProperties.getProperty('storeFile'))
+                storeFile configuredStoreFile.isAbsolute()
+                        ? configuredStoreFile
+                        : rootProject.file(configuredStoreFile.path)
+                storePassword releaseSigningProperties.getProperty('storePassword')
+                keyAlias releaseSigningProperties.getProperty('keyAlias')
+                keyPassword releaseSigningProperties.getProperty('keyPassword')
+            }
         }
     }
     flavorDimensions "default"
@@ -58,14 +83,15 @@ android {
             minifyEnabled true
             shrinkResources true
             buildConfigField "boolean", "SHOW_ALL_BOARDS", "true"
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
             debuggable false
             zipAlignEnabled true
-            signingConfig signingConfigs.release
+            if (releaseSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
         }
 
         debug {
-            ext.enableCrashlytics = false
             applicationIdSuffix '.beta'
             versionNameSuffix ' (DEBUG)'
             signingConfig signingConfigs.debug
@@ -99,22 +125,6 @@ android {
 
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas")
-    }
-}
-
-allprojects {
-    afterEvaluate { project ->
-        def propsFile = rootProject.file('keystore.properties')
-        def configName = 'release'
-
-        if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
-            def props = new Properties()
-            props.load(new FileInputStream(propsFile))
-            android.signingConfigs[configName].storeFile = file(props['storeFile'])
-            android.signingConfigs[configName].storePassword = props['storePassword']
-            android.signingConfigs[configName].keyAlias = props['keyAlias']
-            android.signingConfigs[configName].keyPassword = props['keyPassword']
-        }
     }
 }
 
@@ -205,10 +215,6 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$room_version"
 
     implementation 'com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1'
-    implementation 'com.facebook.stetho:stetho:1.5.1'
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
-
-
 //    implementation 'com.github.barteksc:android-pdf-viewer:3.2.0-beta.1'
     implementation 'com.github.MimiReader:AndroidPdfViewer:3.2.0-beta.2'
 

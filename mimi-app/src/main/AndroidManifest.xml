@@ -9,19 +9,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission
-        android:name="android.permission.ACCESS_COARSE_LOCATION"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.GET_ACCOUNTS"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.USE_CREDENTIALS"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.READ_PHONE_STATE"
-        tools:node="remove" />
-
     <application
         android:name=".app.MimiApplication"
         android:allowBackup="false"
@@ -31,9 +18,8 @@
         android:label="@string/app_title"
         android:largeHeap="true"
         android:enableOnBackInvokedCallback="true"
-        android:testOnly="false"
         android:theme="@style/Theme.Mimi.Light.Toolbar.Default"
-        tools:replace="android:theme, icon, label, allowBackup">
+        tools:replace="android:allowBackup">
         <activity
             android:name=".prefs.SettingsActivity"
             android:exported="false"
