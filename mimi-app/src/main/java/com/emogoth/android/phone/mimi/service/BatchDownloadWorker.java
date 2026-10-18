@@ -32,6 +32,7 @@ import com.emogoth.android.phone.mimi.util.HttpClientFactory;
 import com.emogoth.android.phone.mimi.util.NetworkError;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.MediaContract;
 import com.emogoth.android.phone.mimi.util.NotificationUtils;
 import com.emogoth.android.phone.mimi.viewmodel.ChanDataSource;
 import com.mimireader.chanlib.models.ChanPost;
@@ -207,9 +208,8 @@ public final class BatchDownloadWorker extends Worker {
                     ? post.getFilename() + extension
                     : post.getTim() + extension;
             final String filename = sanitizeFilename(remoteName);
-            final String path = context.getString(
-                    R.string.full_image_path, board, post.getTim(), extension);
-            final String url = MimiUtil.https() + context.getString(R.string.image_link) + path;
+            final String url = MediaContract.mediaUrl(
+                    MimiUtil.https() + context.getString(R.string.image_link), board, post);
 
             final DownloadResult downloadResult = downloadFile(
                     downloadPath, filename, url, post.getFsize(), completed, postIds.length);

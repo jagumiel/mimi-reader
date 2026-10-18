@@ -10,6 +10,8 @@ ruffle-player {
 }
 
 #player-error {
+    position: absolute;
+    inset: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 24px;

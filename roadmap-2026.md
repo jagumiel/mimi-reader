@@ -69,10 +69,20 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 
 ### 3. Navegación e interfaz moderna
 
-- [x] Añadir visualización de archivos Flash (`.swf`) mediante una emulación local segura y compatible con Android 10 y Android 12.
+- [ ] Hacer funcional y validar con contenido real la visualización de archivos Flash (`.swf`).
   - [x] Integrar Ruffle 0.7.1 dentro de la APK, incluidas sus variantes WebAssembly estándar y de compatibilidad, sin depender de un CDN ni de Flash nativo.
   - [x] Aislar el reproductor en un WebView con origen HTTPS interno, acceso a archivos deshabilitado y bloqueo de navegación, enlaces y peticiones de red externas.
-  - [x] Pausar los SWF fuera de pantalla o cuando la aplicación pasa a segundo plano, usar miniaturas en la cuadrícula y cubrir detección, MIME y aislamiento con pruebas.
+  - [x] Pausar los SWF fuera de pantalla o cuando la aplicación pasa a segundo plano y cubrir detección, MIME y aislamiento con pruebas.
+  - [x] Corregir la causa principal: `/f/` enlaza los SWF mediante el nombre original codificado, no mediante `tim`. Compartir ese contrato entre galería, enlaces de los posts y descargas por lotes; conservar las URL propias de los archivos archivados.
+  - [x] Mostrar tarjetas SWF locales y pulsables en catálogo, hilos, respuestas, cuadrícula, historial y marcadores: `/f/` devuelve `tn_w=0`/`tn_h=0` y no proporciona JPEG de previsualización. Estas tarjetas identifican el formato; no son fotogramas del archivo.
+  - [x] Distinguir los archivos realmente ausentes del CDN (HTTP 404), mostrar un mensaje explícito y permitir reintentar; el descargador antiguo aceptaba el HTML del error como si fuese contenido válido.
+  - [x] Rechazar respuestas HTTP erróneas y descargas incompletas, escribir mediante archivos parciales, comprobar la firma `FWS`/`CWS`/`ZWS` antes de iniciar Ruffle y corregir la CSP que deformaba sus controles.
+  - [x] Esperar al evento de película cargada de Ruffle antes de marcar el contenido como listo; propagar los errores de carga al contenedor nativo y evitar que una parada temporal de la actividad cancele para siempre la carga inicial de la galería.
+  - [x] Validar en el Motorola Edge 20 con Android 12/API 31 la descarga y reproducción de tres archivos reales de `/f/`: `quixabelle.swf` (166.351 bytes), `susu_hiragana_anti_pexeso.swf` (2.582.366 bytes) y `tv_show.swf` (10.334.903 bytes). Comprobar metadatos, canvas activo y capturas; prueba instrumentada optativa `FlashBoardSmokeTest` con `flashThreadIds` para no depender del CDN en CI.
+  - [x] Ampliar la validación a `daijobuu.swf` y `partysover.swf`, y confirmar con el usuario la reproducción de `daijobuu.swf`. El 18 de octubre de 2026, 16 de las 28 URL del catálogo respondían HTTP 200 y 12 respondían HTTP 404, incluida `jesus on the cross.swf`; que un archivo siga listado no garantiza que el CDN lo entregue.
+  - [x] Sustituir el fixture vacío de Ruffle por una película original de dos fotogramas, con dimensiones y colores conocidos, para comprobar carga, pausa y reanudación en CI.
+  - [x] Probar tarjetas SWF visibles y pulsables con dimensiones de miniatura nulas y el mensaje/reintento de HTTP 404. Corregir la recursión del cálculo de columnas del catálogo que la prueba de cuadrícula puso de manifiesto.
+  - [ ] Repetir la validación de SWF reales en Android 10 y ampliar la muestra con archivos ActionScript 3 e interacción táctil. La disponibilidad del archivo y las limitaciones de emulación de Ruffle siguen condicionando cada SWF.
 - [x] Añadir una opción de menú para borrar la caché de la aplicación: imágenes, vídeos y archivos temporales.
   - [x] Solicitar confirmación, ejecutar la limpieza fuera del hilo principal e informar del espacio liberado.
   - [x] Vaciar Glide, HTTP y los temporales internos/externos sin tocar descargas del usuario, base de datos, historial, marcadores ni preferencias.
@@ -121,9 +131,13 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
 - [x] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
   - [x] Configurar en CI la ejecución paralela de las 27 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
   - [x] Conservar durante 14 días informes HTML, resultados JUnit, información del dispositivo y logcat de cada API.
-  - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026, incluida la carga real de un SWF con Ruffle.
+  - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026. El 18 de octubre se amplió la prueba técnica de Ruffle a una película de dos fotogramas y se verificaron además tres SWF reales de `/f/` mediante una prueba optativa con red.
 - [ ] Ejecutar una fase final de refactorización y retirada de dependencias obsoletas antes de preparar el changelog.
   - [ ] Inventariar dependencias directas y transitivas, retirar las que no se utilicen y sustituir las abandonadas o incompatibles con el mantenimiento futuro.
+  - [ ] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
+  - [ ] Añadir a GitHub Actions una validación del SBOM y un análisis de vulnerabilidades conocidas (CVE/GHSA), publicar los resultados en SARIF y bloquear inicialmente solo vulnerabilidades `high` o `critical` no justificadas.
+    - [ ] Ejecutar el análisis en cada `pull_request`, al actualizar el SBOM y de forma programada para detectar vulnerabilidades publicadas después del último cambio de código.
+    - [ ] Identificar Ruffle y cualquier componente manual mediante versión y Package URL; documentar excepciones temporales con caducidad para evitar que los falsos positivos se conviertan en exclusiones permanentes.
   - [ ] Separar las clases con demasiadas responsabilidades y eliminar adaptadores, recursos y rutas heredadas que hayan quedado sin uso tras la modernización.
   - [ ] Añadir pruebas unitarias o instrumentadas para cada sustitución y ejecutar la matriz completa de Android 10, 12, 14 y 16 para detectar regresiones.
   - [ ] Comparar tamaño de artefactos, tiempos de arranque y comportamiento de R8 antes y después de la limpieza.

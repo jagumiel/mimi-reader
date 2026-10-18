@@ -37,6 +37,7 @@ import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.MimiPrefs.Companion.imageSpoilersEnabled
 import com.emogoth.android.phone.mimi.util.MimiUtil
 import com.emogoth.android.phone.mimi.util.MediaContract
+import com.emogoth.android.phone.mimi.util.MediaThumbnail
 import com.emogoth.android.phone.mimi.view.LongClickLinkMovementMethod
 import com.emogoth.android.phone.mimi.view.gallery.GalleryPagerAdapter.Companion.getPostsWithImages
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -99,8 +100,8 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE)
             if (MediaContract.hasRemoteMedia(post)) {
-                thumbUrlMap.put(post.no, MimiUtil.https() + context.getString(R.string.thumb_link) + context.getString(R.string.thumb_path, boardName, post.tim))
-                fullImageUrlMap.put(post.no, MimiUtil.https() + context.getString(R.string.image_link) + context.getString(R.string.full_image_path, boardName, post.tim, MediaContract.normalizedExtension(post.ext)))
+                thumbUrlMap.put(post.no, MediaContract.thumbnailUrl(MimiUtil.https() + context.getString(R.string.thumb_link), boardName, post))
+                fullImageUrlMap.put(post.no, MediaContract.mediaUrl(MimiUtil.https() + context.getString(R.string.image_link), boardName, post))
             }
             repliesText.add(context.resources.getQuantityString(R.plurals.replies_plural, post.repliesFrom.size, post.repliesFrom.size))
             imagesText.add(context.resources.getQuantityString(R.plurals.image_plural, post.images, post.images))
@@ -250,8 +251,8 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         val thumbUrl: String?
         val imageUrl: String?
         if (postItem is ArchivedChanPost) {
-            thumbUrl = postItem.thumbLink
-            imageUrl = postItem.mediaLink
+            thumbUrl = postItem.thumbLink ?: thumbUrlMap[postItem.no]
+            imageUrl = postItem.mediaLink ?: fullImageUrlMap[postItem.no]
         } else {
             thumbUrl = if (!imageSpoilersEnabled) {
                 thumbUrlMap[postItem.no]
@@ -541,10 +542,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
                 viewHolder.fileExt.text = info
             }
             viewHolder.thumbnailContainer.visibility = View.VISIBLE
-            GlideApp.with(viewHolder.thumbnailContainer)
-                    .load(thumbUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(viewHolder.thumbUrl)
+            MediaThumbnail.load(viewHolder.thumbUrl, thumbUrl, postItem.ext)
         } else {
             viewHolder.thumbnailContainer.visibility = View.GONE
             if (viewHolder.thumbnailInfoContainer != null) {

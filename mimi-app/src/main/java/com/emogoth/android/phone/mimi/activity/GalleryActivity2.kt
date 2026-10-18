@@ -651,13 +651,9 @@ class GalleryActivity2 : AppCompatActivity() {
 //        RefreshScheduler.getInstance().register(this)
 //    }
 
-    override fun onStop() {
-        super.onStop()
-        threadDisposable?.dispose()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
+        threadDisposable?.dispose()
         galleryPager?.release()
     }
 

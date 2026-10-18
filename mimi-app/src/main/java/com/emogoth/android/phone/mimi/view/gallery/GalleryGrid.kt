@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.app.MimiApplication
-import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.MimiPrefs
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.MediaThumbnail
 import com.emogoth.android.phone.mimi.util.Utils
 import com.emogoth.android.phone.mimi.viewmodel.GalleryItem
 import java.util.*
@@ -191,11 +191,7 @@ class GalleryGridItemViewHolder(private val root: View, private val preloadEnabl
     fun bind(item: GalleryItem, mode: Int, itemSelected: Boolean) {
         val useThumbnail = !Utils.isImageExtension(item.ext) || item.size >= 400000 || !preloadEnabled
         val url = if (useThumbnail) item.thumbnailUrl else item.downloadUrl
-        GlideApp.with(root)
-                .load(url)
-                .optionalCenterCrop()
-                .into(thumbView)
-                .clearOnDetach()
+        MediaThumbnail.load(thumbView, url, item.ext)
 
         this.selected = itemSelected
 

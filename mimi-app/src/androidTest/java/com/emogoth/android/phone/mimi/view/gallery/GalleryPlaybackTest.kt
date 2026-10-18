@@ -1,6 +1,9 @@
 package com.emogoth.android.phone.mimi.view.gallery
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
@@ -11,18 +14,24 @@ import android.view.WindowManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.activity.TabsActivity
+import com.emogoth.android.phone.mimi.adapter.PostItemsAdapter
 import com.emogoth.android.phone.mimi.util.MediaPlayerHelper
+import com.emogoth.android.phone.mimi.util.MediaDownloadHttpException
 import com.emogoth.android.phone.mimi.view.MimiWebView
+import com.emogoth.android.phone.mimi.view.GridItemImageView
+import com.mimireader.chanlib.models.ChanPost
 import com.emogoth.android.phone.mimi.viewmodel.GalleryItem
 import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
 import org.junit.After
@@ -38,6 +47,7 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicBoolean
 
 @RunWith(AndroidJUnit4::class)
 class GalleryPlaybackTest {
@@ -221,6 +231,10 @@ class GalleryPlaybackTest {
             val shell = loader.shouldInterceptRequest(Uri.parse(FlashContentLoader.PLAYER_URL))
             assertEquals(200, shell.statusCode)
             assertEquals("text/html", shell.mimeType)
+            assertTrue(
+                    shell.responseHeaders["Content-Security-Policy"].orEmpty()
+                            .contains("style-src 'self' 'unsafe-inline'")
+            )
             assertTrue(shell.data.bufferedReader().use { it.readText() }.contains("/ruffle/ruffle.js"))
 
             val wasm = loader.shouldInterceptRequest(
@@ -248,8 +262,104 @@ class GalleryPlaybackTest {
                     ).statusCode
             )
             assertFalse(loader.isAllowedNavigation(Uri.parse("https://boards.4chan.org/f/")))
+
+            val htmlMasqueradingAsSwf = File.createTempFile("gallery-flash-error", ".swf", context.cacheDir)
+                    .apply { writeText("<html>Not found</html>") }
+            loader.swfFile = htmlMasqueradingAsSwf
+            try {
+                assertFalse(loader.isValidSwf(htmlMasqueradingAsSwf))
+                assertEquals(
+                        404,
+                        loader.shouldInterceptRequest(
+                                Uri.parse("https://appassets.androidplatform.net/movie/current.swf")
+                        ).statusCode
+                )
+            } finally {
+                htmlMasqueradingAsSwf.delete()
+            }
         } finally {
             swfFile.delete()
+        }
+    }
+
+    @Test
+    fun missingFlashFilesShowAnExplicitServerErrorAndRetry() {
+        val scenario = launchHostActivity()
+        var page: FlashPage? = null
+        try {
+            scenario.onActivity { activity ->
+                prepareHostWindow(activity)
+                val flash = FlashPage(activity, GalleryViewModel.empty())
+                page = flash
+                activity.addContentView(flash, FrameLayout.LayoutParams(320, 240))
+                flash.onError(MediaDownloadHttpException(404, "https://i.4cdn.org/f/missing.swf"))
+                val message = flash.findViewWithTag<TextView>("flash-error-text")
+                assertEquals(context.getString(R.string.flash_file_unavailable), message.text.toString())
+                assertFalse(flash.contentReady)
+            }
+            waitUntil(LAYOUT_TIMEOUT_MS) {
+                var visible = false
+                scenario.onActivity {
+                    visible = page!!.findViewWithTag<TextView>("flash-error-text").isShown &&
+                            page!!.findViewWithTag<android.widget.Button>("flash-retry").isShown
+                }
+                visible
+            }
+        } finally {
+            scenario.onActivity { page?.release() }
+            scenario.close()
+        }
+    }
+
+    @Test
+    fun flashCatalogHasVisibleClickableThumbnailsWithoutServerImages() {
+        val scenario = launchHostActivity()
+        lateinit var recycler: RecyclerView
+        val post = ChanPost().apply {
+            no = 123L
+            tim = "1744563833311673"
+            filename = "Flash sample"
+            ext = ".swf"
+            fsize = 166351
+            // /f/ supplies zero thumbnail dimensions and no JPEG.
+            thumbnailWidth = 0
+            thumbnailHeight = 0
+        }
+        try {
+            scenario.onActivity { activity ->
+                prepareHostWindow(activity)
+                recycler = RecyclerView(activity).apply {
+                    val manager = GridLayoutManager(activity, 2)
+                    layoutManager = manager
+                    adapter = PostItemsAdapter("f", "Flash", listOf(post), null).apply {
+                        setLayoutManager(manager)
+                    }
+                }
+                activity.addContentView(recycler, FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            }
+            waitUntil(LAYOUT_TIMEOUT_MS) {
+                var visible = false
+                scenario.onActivity {
+                    val thumb = recycler.findViewHolderForAdapterPosition(0)?.itemView
+                            ?.findViewById<GridItemImageView>(R.id.header_thumbnail)
+                    visible = thumb?.drawable != null && thumb.width > 0 && thumb.height > 0
+                }
+                visible
+            }
+            scenario.onActivity {
+                val thumb = recycler.findViewHolderForAdapterPosition(0)!!.itemView
+                        .findViewById<GridItemImageView>(R.id.header_thumbnail)
+                assertTrue(thumb.isShown)
+                assertTrue(thumb.hasOnClickListeners())
+                val bitmap = Bitmap.createBitmap(160, 120, Bitmap.Config.ARGB_8888)
+                thumb.drawable.setBounds(0, 0, 160, 120)
+                thumb.drawable.draw(Canvas(bitmap))
+                assertEquals(Color.rgb(239, 108, 0), bitmap.getPixel(50, 20))
+                bitmap.recycle()
+            }
+        } finally {
+            scenario.close()
         }
     }
 
@@ -261,6 +371,7 @@ class GalleryPlaybackTest {
         val scenario = launchHostActivity()
         val loader = FlashContentLoader(context).apply { this.swfFile = swfFile }
         val loadError = AtomicReference<String?>()
+        val movieReady = AtomicBoolean(false)
         lateinit var webView: WebView
 
         try {
@@ -274,7 +385,7 @@ class GalleryPlaybackTest {
                     settings.mediaPlaybackRequiresUserGesture = false
                     webViewClient = FlashWebViewClient(
                             loader,
-                            onPageReady = {},
+                            onPageReady = { movieReady.set(true) },
                             onLoadError = { loadError.set("page load failed") },
                             onRendererGone = { loadError.set("WebView renderer stopped") }
                     )
@@ -284,9 +395,13 @@ class GalleryPlaybackTest {
             }
 
             waitUntil(RUFFLE_TIMEOUT_MS) {
-                loadError.get() == null && evaluateBoolean(scenario, webView, "Boolean(window.mimiRuffleLoaded)")
+                loadError.get() == null && movieReady.get() &&
+                        evaluateBoolean(scenario, webView, "Boolean(window.mimiRuffleLoaded)")
             }
             assertNull(loadError.get())
+            assertTrue(evaluateBoolean(scenario, webView,
+                    "document.getElementById('ruffle-player').ruffle().metadata.width === 320 && " +
+                            "document.getElementById('ruffle-player').ruffle().metadata.height === 240"))
 
             assertTrue(evaluateBoolean(scenario, webView, "window.mimiSetRuffleActive(true); true"))
             waitUntil(JS_EVALUATION_TIMEOUT_MS) {
@@ -414,10 +529,15 @@ class GalleryPlaybackTest {
         const val PLAYBACK_TIMEOUT_MS = 8_000L
         const val RUFFLE_TIMEOUT_MS = 20_000L
         const val JS_EVALUATION_TIMEOUT_MS = 2_000L
-        val MINIMAL_SWF = byteArrayOf(
-                0x46, 0x57, 0x53, 0x06, 0x10, 0x00, 0x00, 0x00,
-                0x08, 0x00, 0x00, 0x0C, 0x01, 0x00, 0x00, 0x00
-        )
+        // Original test fixture: 320x240, two frames at 2 fps, alternating red/blue backgrounds.
+        // A real timeline exercises metadata and frame loading, unlike an empty SWF header.
+        val MINIMAL_SWF = intArrayOf(
+                0x46, 0x57, 0x53, 0x06, 0x24, 0x00, 0x00, 0x00,
+                0x70, 0x00, 0x0c, 0x80, 0x00, 0x00, 0x96, 0x00,
+                0x00, 0x02, 0x02, 0x00,
+                0x43, 0x02, 0xe0, 0x40, 0x20, 0x40, 0x00,
+                0x43, 0x02, 0x20, 0x40, 0xe0, 0x40, 0x00, 0x00, 0x00
+        ).map { it.toByte() }.toByteArray()
         const val MP4_BASE64 = "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM3bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAAfQAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmJ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAAfQAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAKAAAAB4AAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAH0AAAAAAABAAAAAAHabWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAFABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAUVzdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAKAAeABIAAAASAAAAAAAAAABFUxhdmM2Mi4xNS4xMDAgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAe/+EAF2dCwB7ZAoR+XARAAAADAEAAAAUDxYuSAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAusAAAAAAAAAAYc3R0cwAAAAAAAAABAAAABQAABAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAABQAAAAEAAAAoc3RzegAAAAAAAAAAAAAABQAAAsEAAAALAAAACwAAAAoAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA2cAAABhdWR0YQAAAFltZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAACxpbHN0AAAAJKl0b28AAAAcZGF0YQAAAAEAAAAATGF2ZjYyLjUuMTAwAAAACGZyZWUAAALzbWRhdAAAAnEGBf//bdxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjUgcjMyMjIgYjM1NjA1YSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjUgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0wIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDE6MHgxMTEgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz00IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTEwIHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAASGWIhA/yYoAAw+ycnJycnJycnJ11111111111111111111111111111111111111111111111111111111111111111111114AAAAAdBmjgf4FGAAAAAB0GaVAf4FGAAAAAGQZpgO8CjAAAABkGagDfAow=="
         const val GIF_BASE64 = "R0lGODlhBAAEAPcfMQAAACQAAEgAAGwAAJAAALQAANgAAPwAAAAkACQkAEgkAGwkAJAkALQkANgkAPwkAABIACRIAEhIAGxIAJBIALRIANhIAPxIAABsACRsAEhsAGxsAJBsALRsANhsAPxsAACQACSQAEiQAGyQAJCQALSQANiQAPyQAAC0ACS0AEi0AGy0AJC0ALS0ANi0APy0AADYACTYAEjYAGzYAJDYALTYANjYAPzYAAD8ACT8AEj8AGz8AJD8ALT8ANj8APz8AAAAVSQAVUgAVWwAVZAAVbQAVdgAVfwAVQAkVSQkVUgkVWwkVZAkVbQkVdgkVfwkVQBIVSRIVUhIVWxIVZBIVbRIVdhIVfxIVQBsVSRsVUhsVWxsVZBsVbRsVdhsVfxsVQCQVSSQVUiQVWyQVZCQVbSQVdiQVfyQVQC0VSS0VUi0VWy0VZC0VbS0Vdi0Vfy0VQDYVSTYVUjYVWzYVZDYVbTYVdjYVfzYVQD8VST8VUj8VWz8VZD8VbT8Vdj8Vfz8VQAAqiQAqkgAqmwAqpAAqrQAqtgAqvwAqgAkqiQkqkgkqmwkqpAkqrQkqtgkqvwkqgBIqiRIqkhIqmxIqpBIqrRIqthIqvxIqgBsqiRsqkhsqmxsqpBsqrRsqthsqvxsqgCQqiSQqkiQqmyQqpCQqrSQqtiQqvyQqgC0qiS0qki0qmy0qpC0qrS0qti0qvy0qgDYqiTYqkjYqmzYqpDYqrTYqtjYqvzYqgD8qiT8qkj8qmz8qpD8qrT8qtj8qvz8qgAA/yQA/0gA/2wA/5AA/7QA/9gA//wA/wAk/yQk/0gk/2wk/5Ak/7Qk/9gk//wk/wBI/yRI/0hI/2xI/5BI/7RI/9hI//xI/wBs/yRs/0hs/2xs/5Bs/7Rs/9hs//xs/wCQ/ySQ/0iQ/2yQ/5CQ/7SQ/9iQ//yQ/wC0/yS0/0i0/2y0/5C0/7S0/9i0//y0/wDY/yTY/0jY/2zY/5DY/7TY/9jY//zY/wD8/yT8/0j8/2z8/5D8/7T8/9j8//z8/yH/C05FVFNDQVBFMi4wAwEBAAAh+QQEFAAfACwAAAAABAAEAAAIEQAPHAAGTCBBgQCAGDgABEhAACH5BAUUAAAALAMAAwABAAEAAAgEAAEEBAA7"
     }

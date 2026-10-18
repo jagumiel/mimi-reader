@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.emogoth.android.phone.mimi.activity.GalleryActivity2
 import com.emogoth.android.phone.mimi.app.MimiApplication
 import com.emogoth.android.phone.mimi.util.*
-import com.mimireader.chanlib.models.ArchivedChanPost
 import com.mimireader.chanlib.models.ChanPost
 import com.mimireader.chanlib.models.ChanThread
 import io.reactivex.Single
@@ -94,7 +93,8 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
                             post.width,
                             post.height,
                             File(MimiUtil.getInstance().cacheDir, "/$DOWNLOAD_DIR/${post.remoteFileName}"),
-                            post.originalFileName
+                            post.originalFileName,
+                            post.size.toLong()
                     ))
         }
 
@@ -201,13 +201,10 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
         return if (MediaContract.hasRemoteMedia(post)) {
             val tim: String = post.tim ?: ""
             val ext = MediaContract.normalizedExtension(post.ext)
-            val thumb = if (post is ArchivedChanPost) (post.thumbLink
-                    ?: "$imageBaseUrl/$boardName/${tim}s.jpg") else "$imageBaseUrl/$boardName/${tim}s.jpg"
-            val remoteFileName = "${tim}${ext}"
+            val thumb = MediaContract.thumbnailUrl(imageBaseUrl, boardName, post)
             val localFileName = "${tim}${ext}"
             val originalFileName = "${MediaContract.originalFilename(post)}${ext}"
-            val img = if (post is ArchivedChanPost) (post.mediaLink
-                    ?: "$imageBaseUrl/$boardName/$remoteFileName") else "$imageBaseUrl/$boardName/$remoteFileName"
+            val img = MediaContract.mediaUrl(imageBaseUrl, boardName, post)
             GalleryItem(post.no, thumb, img, post.fsize.coerceAtLeast(0), post.width, post.height, boardName, ext, localFileName, originalFileName)
         } else {
             GalleryItem.empty()

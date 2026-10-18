@@ -124,7 +124,7 @@ class DownloadManager(
         }
 
         try {
-            downloadToFile(client, item.url, item.file)
+            downloadToFile(client, item.url, item.file, item.expectedSize)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(object : FlowableSubscriber<Int> {
@@ -316,15 +316,16 @@ internal class GalleryDownloadQueue(
     }
 }
 
-fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int> {
-    if (BuildConfig.DEBUG) {
-        Log.d(DownloadManager.TAG, "Downloading file: ${file?.absolutePath}")
-    }
+fun downloadToFile(
+    client: OkHttpClient,
+    url: String,
+    file: File?,
+    expectedSize: Long = -1L
+): Flowable<Int> {
     return Flowable.create({ emitter ->
-        if (file != null && file.exists() && file.length() > 0L) {
-            if (BuildConfig.DEBUG) {
-                Log.d(DownloadManager.TAG, "File exists: ${file.absolutePath}; manually calling onComplete()")
-            }
+        val existingFileIsComplete = file != null && file.exists() && file.length() > 0L &&
+                (expectedSize <= 0L || file.length() == expectedSize)
+        if (existingFileIsComplete) {
             emitter.onComplete()
             return@create
         }
@@ -332,9 +333,8 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
             file.delete()
         }
 
-        if (BuildConfig.DEBUG) {
-            Log.d(DownloadManager.TAG, "Starting file download: ${file?.absolutePath}")
-        }
+        val partialFile = file?.let { File(it.parentFile, "${it.name}.part") }
+        partialFile?.delete()
 
         val req = Request.Builder().url(url).get().build()
         val call = client.newCall(req)
@@ -346,7 +346,15 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
+                var completed = false
                 try {
+                    if (!response.isSuccessful) {
+                        emitter.tryOnError(
+                                MediaDownloadHttpException(response.code, url)
+                        )
+                        return
+                    }
+
                     val body = response.body
                     if (body == null) {
                         emitter.tryOnError(IllegalStateException("Response from $url returned an empty body"))
@@ -355,9 +363,10 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
 
                     val contentLength = body.contentLength()
                     val source = body.source()
-                    val sink = if (file != null) {
-                        file.createNewFile()
-                        file.sink().buffer()
+                    val sink = if (partialFile != null) {
+                        partialFile.parentFile?.mkdirs()
+                        partialFile.createNewFile()
+                        partialFile.sink().buffer()
                     } else null
                     val sinkBuffer = sink?.buffer
 
@@ -373,8 +382,13 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
                         sink.emit()
 
                         totalBytes += count
-                        val progress = ((totalBytes.toFloat() / contentLength) * 100).toInt()
-                        emitter.onNext(progress)
+                        val progressLength = if (expectedSize > 0L) expectedSize else contentLength
+                        if (progressLength > 0L) {
+                            val progress = ((totalBytes.toFloat() / progressLength) * 100)
+                                    .toInt()
+                                    .coerceIn(0, 100)
+                            emitter.onNext(progress)
+                        }
                     }
 
                     sink.flush()
@@ -383,28 +397,54 @@ fun downloadToFile(client: OkHttpClient, url: String, file: File?): Flowable<Int
                     source.close()
 
                     if (emitter.isCancelled) {
-                        file?.delete()
+                        return
                     }
 
                     if (totalBytes <= 0L) {
                         val fileException = if (file == null) Exception("Could not write to null file") else NoSuchFileException(file, null, "Wrote a 0-byte file")
-                        Log.e(DownloadManager.TAG, "Error writing file", fileException)
-
                         emitter.tryOnError(fileException)
+                    } else if (contentLength > 0L && totalBytes != contentLength) {
+                        emitter.tryOnError(
+                                IOException("Incomplete download from $url: expected $contentLength bytes, received $totalBytes")
+                        )
+                    } else if (expectedSize > 0L && totalBytes != expectedSize) {
+                        emitter.tryOnError(
+                                IOException("Unexpected download size from $url: expected $expectedSize bytes, received $totalBytes")
+                        )
+                    } else if (file == null || partialFile == null) {
+                        emitter.tryOnError(IllegalStateException("Could not write to file; File object is null"))
+                    } else if (!partialFile.renameTo(file)) {
+                        emitter.tryOnError(IOException("Could not finalize download to ${file.absolutePath}"))
                     } else {
+                        completed = true
                         emitter.onComplete()
                     }
                 } catch (e: Exception) {
                     emitter.tryOnError(e)
                 } finally {
                     response.close()
+                    if (!completed) {
+                        partialFile?.delete()
+                    }
                 }
             }
         })
     }, BackpressureStrategy.BUFFER)
 }
 
-data class DownloadItem(val id: Long, val url: String, val thumbUrl: String, val width: Int, val height: Int, val file: File, val saveFileName: String) {
+class MediaDownloadHttpException(val statusCode: Int, url: String) :
+        IOException("HTTP $statusCode while downloading $url")
+
+data class DownloadItem(
+    val id: Long,
+    val url: String,
+    val thumbUrl: String,
+    val width: Int,
+    val height: Int,
+    val file: File,
+    val saveFileName: String,
+    val expectedSize: Long = -1L
+) {
     companion object {
         fun empty(): DownloadItem {
             return DownloadItem(-1, "", "", 0, 0, File(""), "")

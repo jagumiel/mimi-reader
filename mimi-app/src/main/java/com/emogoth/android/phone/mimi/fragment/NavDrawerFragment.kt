@@ -17,7 +17,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.activity.MimiActivity
 import com.emogoth.android.phone.mimi.activity.StartupActivity
@@ -37,6 +36,7 @@ import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.LayoutType
 import com.emogoth.android.phone.mimi.util.MimiPrefs.Companion.navDrawerBookmarkCount
 import com.emogoth.android.phone.mimi.util.MimiUtil
+import com.emogoth.android.phone.mimi.util.MediaThumbnail
 import com.emogoth.android.phone.mimi.util.RxUtil
 import com.emogoth.android.phone.mimi.view.DrawerViewHolder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -262,11 +262,8 @@ class NavDrawerFragment : Fragment() {
             val thumbBaseUrl = activity?.getString(R.string.thumb_link)
             val thumbPath = activity?.getString(R.string.thumb_path, bookmark.boardName, bookmark.tim)
             val url = MimiUtil.https() + thumbBaseUrl + thumbPath
-            GlideApp.with(activity as Activity)
-                    .load(url)
-                    .error(R.drawable.placeholder_image)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(viewHolder.image)
+            MediaThumbnail.load(viewHolder.image, if (bookmark.boardName == "f") "" else url,
+                    if (bookmark.boardName == "f") ".swf" else "")
             viewHolder.image.visibility = View.VISIBLE
         } else {
             viewHolder.image.visibility = View.INVISIBLE

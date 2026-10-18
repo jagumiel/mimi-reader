@@ -30,7 +30,6 @@ import android.widget.TextView;
 import androidx.core.view.MotionEventCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.autorefresh.RefreshScheduler2;
 import com.emogoth.android.phone.mimi.db.DatabaseUtils;
@@ -38,6 +37,7 @@ import com.emogoth.android.phone.mimi.db.HistoryTableConnection;
 import com.emogoth.android.phone.mimi.db.models.History;
 import com.emogoth.android.phone.mimi.util.GlideApp;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.MediaThumbnail;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 ;
 
@@ -106,11 +106,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
             viewHolder.image.setVisibility(View.VISIBLE);
 
-            GlideApp.with(context)
-                    .load(url)
-                    .error(R.drawable.placeholder_image)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(viewHolder.image);
+            MediaThumbnail.load(viewHolder.image,
+                    "f".equals(historyItem.getBoardName()) ? "" : url,
+                    "f".equals(historyItem.getBoardName()) ? ".swf" : "");
         } else {
             viewHolder.image.setVisibility(View.INVISIBLE);
             GlideApp.with(context).clear(viewHolder.image);

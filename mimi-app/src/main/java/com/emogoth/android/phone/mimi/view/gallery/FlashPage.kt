@@ -3,10 +3,15 @@ package com.emogoth.android.phone.mimi.view.gallery
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.webkit.CookieManager
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
@@ -15,10 +20,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.emogoth.android.phone.mimi.R
+import com.emogoth.android.phone.mimi.util.MediaDownloadHttpException
 import com.emogoth.android.phone.mimi.view.MimiWebView
 import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
-import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -26,20 +33,34 @@ import java.io.FileInputStream
 @SuppressLint("ViewConstructor", "SetJavaScriptEnabled")
 class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(context, viewModel) {
     private val contentLoader = FlashContentLoader(context.applicationContext)
-    private var hostResumed = true
+    private var hostResumed = (context as? LifecycleOwner)?.lifecycle?.currentState
+            ?.isAtLeast(Lifecycle.State.RESUMED) ?: true
     private var released = false
+    private lateinit var flashClient: FlashWebViewClient
 
     val view = MimiWebView(context)
+    private val errorView = createErrorView(context)
+    private val retryButton = errorView.findViewWithTag<Button>(RETRY_BUTTON_TAG)
+    private val errorText = errorView.findViewWithTag<TextView>(ERROR_TEXT_TAG)
 
     init {
         configureWebView()
         addMainChildView(view, closeGalleryOnClick = false)
+        addView(
+                errorView,
+                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER)
+        )
     }
 
     override fun onViewBind() {
         contentLoader.swfFile = null
+        errorView.visibility = View.GONE
+        view.visibility = View.VISIBLE
         if (!released) {
+            setPlayerActive(false)
+            flashClient.cancelPendingLoad()
             view.stopLoading()
+            view.loadUrl("about:blank")
         }
     }
 
@@ -50,11 +71,13 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
         }
 
         val file = downloadItem.file
-        if (!file.isFile || !file.name.endsWith(".swf", ignoreCase = true)) {
-            showLoadError()
+        if (!contentLoader.isValidSwf(file)) {
+            file.delete()
+            showLoadError(allowRetry = true)
             return
         }
 
+        errorView.visibility = View.GONE
         contentLoader.swfFile = file
         loaded = false
         view.loadUrl(FlashContentLoader.PLAYER_URL)
@@ -63,6 +86,13 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
     override fun onPageSelectedChange(selected: Boolean) {
         super.onPageSelectedChange(selected)
         syncPlaybackState()
+    }
+
+    override fun onError(t: Throwable) {
+        super.onError(t)
+        contentLoader.swfFile = null
+        loaded = false
+        showLoadError(allowRetry = true, unavailable = t is MediaDownloadHttpException && t.statusCode == 404)
     }
 
     override fun onHostPause() {
@@ -85,6 +115,7 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
     fun release() {
         if (released) return
         released = true
+        flashClient.cancelPendingLoad()
         contentLoader.swfFile = null
         view.stopLoading()
         view.clearHistory()
@@ -115,14 +146,17 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
             }
         }
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, false)
-        view.webViewClient = FlashWebViewClient(
+        flashClient = FlashWebViewClient(
                 contentLoader,
                 onPageReady = {
                     loaded = true
                     notifyContentReady()
                     syncPlaybackState()
                 },
-                onLoadError = { showLoadError() },
+                onLoadError = {
+                    loaded = false
+                    showLoadError(allowRetry = true)
+                },
                 onRendererGone = {
                     released = true
                     removeView(view)
@@ -130,6 +164,7 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
                     showLoadError()
                 }
         )
+        view.webViewClient = flashClient
     }
 
     private fun syncPlaybackState() {
@@ -145,11 +180,48 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
         )
     }
 
-    private fun showLoadError() {
+    private fun showLoadError(allowRetry: Boolean = false, unavailable: Boolean = false) {
         Log.w(LOG_TAG, "Unable to load Flash content")
         if (isAttachedToWindow) {
-            Snackbar.make(this, R.string.could_not_load_flash, Snackbar.LENGTH_LONG).show()
+            errorText.setText(if (unavailable) R.string.flash_file_unavailable else R.string.could_not_load_flash)
+            view.visibility = View.INVISIBLE
+            retryButton.visibility = if (allowRetry) View.VISIBLE else View.GONE
+            retryButton.setOnClickListener {
+                errorView.visibility = View.GONE
+                if (!retryDownload()) {
+                    errorView.visibility = View.VISIBLE
+                }
+            }
+            errorView.visibility = View.VISIBLE
         }
+    }
+
+    private fun createErrorView(context: Context): LinearLayout {
+        val padding = (24 * resources.displayMetrics.density).toInt()
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(padding, padding, padding, padding)
+            setBackgroundColor(Color.BLACK)
+            visibility = View.GONE
+            isClickable = true
+
+            addView(TextView(context).apply {
+                tag = ERROR_TEXT_TAG
+                setText(R.string.could_not_load_flash)
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+            })
+            addView(Button(context).apply {
+                tag = RETRY_BUTTON_TAG
+                setText(R.string.retry)
+            })
+        }
+    }
+
+    companion object {
+        private const val RETRY_BUTTON_TAG = "flash-retry"
+        private const val ERROR_TEXT_TAG = "flash-error-text"
     }
 }
 
@@ -159,6 +231,16 @@ internal class FlashWebViewClient(
         private val onLoadError: () -> Unit,
         private val onRendererGone: () -> Unit
 ) : WebViewClient() {
+    private var navigation = 0
+
+    fun cancelPendingLoad() {
+        navigation++
+    }
+
+    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+        navigation++
+    }
+
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse {
         return contentLoader.shouldInterceptRequest(request.url)
     }
@@ -169,17 +251,37 @@ internal class FlashWebViewClient(
 
     override fun onPageFinished(view: WebView, url: String) {
         if (url == FlashContentLoader.PLAYER_URL) {
-            onPageReady()
+            awaitMovie(view, navigation, 0)
+        }
+    }
+
+    // Finishing the HTML document does not mean the WASM runtime or the SWF is ready.
+    // Poll only the trusted shell, without exposing an Android JavaScript interface to movies.
+    private fun awaitMovie(view: WebView, currentNavigation: Int, attempt: Int) {
+        if (currentNavigation != navigation || view.url != FlashContentLoader.PLAYER_URL) return
+        view.evaluateJavascript("window.mimiRuffleState || 'loading'") { state ->
+            if (currentNavigation != navigation) return@evaluateJavascript
+            when (state) {
+                "\"ready\"" -> onPageReady()
+                "\"error\"" -> onLoadError()
+                else -> if (attempt >= 450) {
+                    onLoadError()
+                } else {
+                    view.postDelayed({ awaitMovie(view, currentNavigation, attempt + 1) }, 100L)
+                }
+            }
         }
     }
 
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: android.webkit.WebResourceError) {
         if (request.isForMainFrame) {
+            cancelPendingLoad()
             onLoadError()
         }
     }
 
     override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+        navigation++
         onRendererGone()
         return true
     }
@@ -223,6 +325,28 @@ internal class FlashContentLoader(context: Context) {
         return uri.toString() == PLAYER_URL || uri.toString() == "about:blank"
     }
 
+    fun isValidSwf(file: File?): Boolean {
+        if (file == null || !file.isFile || file.length() < 8L || !file.name.endsWith(".swf", ignoreCase = true)) {
+            return false
+        }
+
+        return try {
+            file.inputStream().use { input ->
+                val signature = ByteArray(3)
+                input.read(signature) == signature.size &&
+                        signature[1] == 'W'.code.toByte() &&
+                        signature[2] == 'S'.code.toByte() &&
+                        signature[0] in byteArrayOf(
+                                'F'.code.toByte(),
+                                'C'.code.toByte(),
+                                'Z'.code.toByte()
+                        )
+            }
+        } catch (error: Exception) {
+            false
+        }
+    }
+
     private fun serveRuffleAsset(path: String): WebResourceResponse {
         if (path !in RUFFLE_ASSETS) {
             return response(404, "Not Found")
@@ -236,7 +360,7 @@ internal class FlashContentLoader(context: Context) {
             if (path == "player.html") {
                 headers["Content-Security-Policy"] =
                         "default-src 'none'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; " +
-                                "style-src 'self'; connect-src 'self'; img-src 'self' data:; " +
+                                "style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; " +
                                 "media-src 'self'; worker-src 'self' blob:"
             }
             WebResourceResponse(
@@ -255,8 +379,7 @@ internal class FlashContentLoader(context: Context) {
 
     private fun serveMovie(path: String): WebResourceResponse {
         val file = swfFile
-        if (path != "current.swf" || file == null || !file.isFile ||
-                !file.name.endsWith(".swf", ignoreCase = true)) {
+        if (path != "current.swf" || !isValidSwf(file)) {
             return response(404, "Not Found")
         }
 

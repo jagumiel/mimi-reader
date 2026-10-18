@@ -65,6 +65,7 @@ import com.emogoth.android.phone.mimi.util.GlideApp;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
 import com.emogoth.android.phone.mimi.util.MediaContract;
+import com.emogoth.android.phone.mimi.util.MediaThumbnail;
 import com.emogoth.android.phone.mimi.view.GridItemImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.mimireader.chanlib.models.ChanPost;
@@ -108,7 +109,6 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private String numberImages;
 
     private Boolean imageSpoilersEnabled;
-    private String thumbUrl;
     private String spoilerUrl;
     private String customSpoilerUrl;
 
@@ -152,7 +152,6 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         numberImages = appContext.getString(R.string.number_images);
 
         imageSpoilersEnabled = MimiPrefs.imageSpoilersEnabled(appContext);
-        thumbUrl = MimiUtil.https() + appContext.getString(R.string.thumb_link) + appContext.getString(R.string.thumb_path);
         spoilerUrl = MimiUtil.https() + appContext.getString(R.string.spoiler_link) + appContext.getString(R.string.spoiler_path);
         customSpoilerUrl = MimiUtil.https() + appContext.getString(R.string.spoiler_link) + appContext.getString(R.string.custom_spoiler_path);
     }
@@ -236,10 +235,8 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public int getGridSpan(int position) {
-        if (layoutManager instanceof GridLayoutManager) {
-            return ((GridLayoutManager) layoutManager).getSpanSizeLookup().getSpanSize(position);
-        }
-
+        // Catalog entries occupy one column. The installed lookup calls this method,
+        // so querying the lookup here would recurse until the app crashes.
         return 1;
     }
 
@@ -361,18 +358,16 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             final String url;
             if (!imageSpoilersEnabled) {
-                url = String.format(thumbUrl, boardName, threadItem.getTim());
+                url = MediaContract.thumbnailUrl(MimiUtil.https() + MimiApplication.getInstance().getString(R.string.thumb_link), boardName, threadItem);
             } else if (threadItem.spoiler > 0 && threadItem.getCustomSpoiler() > 0) {
                 url = String.format(customSpoilerUrl, boardName, threadItem.getCustomSpoiler());
             } else if (threadItem.spoiler > 0) {
                 url = spoilerUrl;
             } else {
-                url = String.format(thumbUrl, boardName, threadItem.getTim());
+                url = MediaContract.thumbnailUrl(MimiUtil.https() + MimiApplication.getInstance().getString(R.string.thumb_link), boardName, threadItem);
             }
 //            final String url = chanConnector.getThumbUrl(boardName, threadItem.getTim());
-            GlideApp.with(viewHolder.thumbUrl.getContext())
-                    .load(url)
-                    .into(viewHolder.thumbUrl);
+            MediaThumbnail.load(viewHolder.thumbUrl, url, threadItem.getExt());
 
         } else {
             viewHolder.thumbUrl.setVisibility(View.GONE);

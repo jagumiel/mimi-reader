@@ -653,6 +653,7 @@
     <string name="gallery_preload_disabled">Disabled</string>
     <string name="could_not_load_gif">Could not load GIF</string>
     <string name="could_not_load_flash">Could not load Flash content</string>
+    <string name="flash_file_unavailable">This Flash file is no longer available on the server (404).</string>
     <string name="batch_dowmload_no_items_selected">No selected items found for batch download</string>
     <string name="error_opening_gallery">Error opening gallery; Restart the app and try again</string>
     <string name="mimi_logo">Mimi Logo</string>

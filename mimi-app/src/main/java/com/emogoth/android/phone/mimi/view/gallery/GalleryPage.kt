@@ -95,6 +95,7 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
 
     fun bind(item: GalleryItem, listener: (GalleryPageEvent) -> Unit) {
         eventListener = listener
+        retryCount = 0
         loaded = false
         onViewBind()
         if (item != GalleryItem.empty()) {
@@ -146,6 +147,11 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
     protected fun retryDownload(): Boolean {
         if (retryCount < MAX_RETRIES) {
             retryCount++
+            downloadComplete = false
+            loaded = false
+            progress = 0
+            progressView?.visibility = View.VISIBLE
+            childView?.visibility = View.INVISIBLE
             viewModel.retryDownload(downloadItem)
             return true
         }
@@ -184,6 +190,8 @@ abstract class GalleryPage(context: Context, private val viewModel: GalleryViewM
 
     override fun onError(t: Throwable) {
         downloadComplete = true
+        progressView?.visibility = View.GONE
+        childView?.visibility = View.VISIBLE
         Log.e(LOG_TAG, "Error downloading file", t)
     }
 
