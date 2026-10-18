@@ -1,0 +1,4 @@
+# Preserve vendored runtime and license bytes: their SHA-256 values are inventoried.
+/mimi-app/src/main/assets/ruffle/* -text
+# Keep versioned generated snapshots identical on Windows and Linux.
+/sbom/*.json text eol=lf

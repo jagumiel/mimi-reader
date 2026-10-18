@@ -45,8 +45,10 @@ The next public version is **8.0**, reflecting the unusually large scope of the 
 
 - Agree and complete the 8.0 changelog before preparing public artifacts.
 - Run unit tests, lint, and both release artifact tasks.
+- Verify the dependency snapshots with `verifySbom testSbomValidation` and generate
+  a release-version SBOM as described in [the SBOM guide](SBOM.md).
 - Confirm the version code and version name in the built artifact.
 - Verify the APK signature and record a SHA-256 checksum.
 - Smoke-test startup, tabs, gallery playback, cache clearing, and a SAF download.
 - Test an in-place update to confirm that preferences and the Room database remain intact.
-- Archive the APK/AAB, `mapping.txt`, checksum, changelog, and signing-key backup securely.
+- Archive the APK/AAB, `mapping.txt`, checksum, matching SBOM, changelog, and signing-key backup securely.

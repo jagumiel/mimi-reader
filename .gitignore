@@ -2,6 +2,7 @@
 .git.bak/
 .idea/
 .gradle/
+.kotlin/
 captures/
 build/
 ant_build/

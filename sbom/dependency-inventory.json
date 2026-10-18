@@ -1,0 +1,2869 @@
+{
+    "buildDependencies": [
+        "com.android.tools.build:gradle:8.13.2",
+        "org.cyclonedx.bom:org.cyclonedx.bom.gradle.plugin:3.5.1",
+        "org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21"
+    ],
+    "buildTools": {
+        "cyclonedxGradlePlugin": "3.5.1",
+        "cyclonedxValidator": "13.2.0",
+        "gradle": "8.13"
+    },
+    "declarations": [
+        {
+            "configuration": "androidTestImplementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-testing:2.8.5"
+        },
+        {
+            "configuration": "androidTestImplementation",
+            "project": ":mimi-app",
+            "requested": "androidx.test.ext:junit:1.2.1"
+        },
+        {
+            "configuration": "androidTestImplementation",
+            "project": ":mimi-app",
+            "requested": "androidx.test:runner:1.6.2"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "androidx.core:core-ktx:1.3.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "com.google.code.gson:gson:2.14.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "com.squareup.retrofit2:converter-gson:2.11.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "com.squareup.retrofit2:retrofit:2.11.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "io.reactivex.rxjava2:rxandroid:2.1.1"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "io.reactivex.rxjava2:rxjava:2.2.19"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "org.jsoup:jsoup:1.23.2"
+        },
+        {
+            "configuration": "api",
+            "project": ":mimi-app",
+            "requested": "androidx.databinding:viewbinding:8.13.2"
+        },
+        {
+            "configuration": "api",
+            "project": ":mimi-app",
+            "requested": "project::chanlib"
+        },
+        {
+            "configuration": "coreLibraryDesugaring",
+            "project": ":chanlib",
+            "requested": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
+        },
+        {
+            "configuration": "coreLibraryDesugaring",
+            "project": ":mimi-app",
+            "requested": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.activity:activity-ktx:1.13.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.annotation:annotation:1.1.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.appcompat:appcompat:1.2.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.browser:browser:1.2.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.cardview:cardview:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.constraintlayout:constraintlayout:2.0.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.core:core-ktx:1.18.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.core:core:1.18.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.gridlayout:gridlayout:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.legacy:legacy-support-core-ui:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.legacy:legacy-support-core-utils:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.legacy:legacy-support-v4:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.lifecycle:lifecycle-livedata:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.lifecycle:lifecycle-process:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.lifecycle:lifecycle-runtime:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.lifecycle:lifecycle-viewmodel:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.media3:media3-exoplayer:1.10.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.media3:media3-ui:1.10.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.percentlayout:percentlayout:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.preference:preference-ktx:1.1.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.preference:preference:1.1.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.recyclerview:recyclerview:1.4.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-guava:2.8.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-ktx:2.8.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-runtime:2.8.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-rxjava2:2.8.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.viewpager2:viewpager2:1.1.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.webkit:webkit:1.15.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.work:work-runtime-ktx:2.10.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.work:work-runtime:2.10.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.work:work-rxjava2:2.10.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.davemorrissey.labs:subsampling-scale-image-view:3.10.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.MimiReader:AndroidPdfViewer:3.2.0-beta.2"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.bumptech.glide:glide:4.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.bumptech.glide:okhttp3-integration:4.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.franmontiel:PersistentCookieJar:1.0.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.google.android.material:material:1.2.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.google.code.gson:gson:2.14.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.squareup.okhttp3:okhttp:4.12.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.squareup.retrofit2:converter-gson:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "com.squareup.retrofit2:retrofit:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "commons-codec:commons-codec:1.12"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "io.reactivex.rxjava2:rxandroid:2.1.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "io.reactivex.rxjava2:rxjava:2.2.19"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "io.reactivex.rxjava2:rxkotlin:2.4.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "org.apache.commons:commons-lang3:3.11"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "org.jsoup:jsoup:1.23.2"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "pl.droidsonroids.gif:android-gif-drawable:1.2.21"
+        },
+        {
+            "configuration": "kapt",
+            "project": ":mimi-app",
+            "requested": "androidx.annotation:annotation:1.1.0"
+        },
+        {
+            "configuration": "kapt",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-compiler:2.8.5"
+        },
+        {
+            "configuration": "kapt",
+            "project": ":mimi-app",
+            "requested": "com.github.bumptech.glide:compiler:4.11.0"
+        },
+        {
+            "configuration": "testImplementation",
+            "project": ":chanlib",
+            "requested": "junit:junit:4.12"
+        },
+        {
+            "configuration": "testImplementation",
+            "project": ":mimi-app",
+            "requested": "androidx.room:room-testing:2.8.5"
+        },
+        {
+            "configuration": "testImplementation",
+            "project": ":mimi-app",
+            "requested": "com.squareup.okhttp3:mockwebserver:4.12.0"
+        },
+        {
+            "configuration": "testImplementation",
+            "project": ":mimi-app",
+            "requested": "junit:junit:4.13.2"
+        }
+    ],
+    "formatVersion": 1,
+    "resolvedConfigurations": {
+        "chanlibUnitTestRuntimeClasspath": [
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.arch.core:core-common:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.core:core:1.3.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-common:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.versionedparcelable:versionedparcelable:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.48.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okhttp3:okhttp:3.14.9"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okio:okio:1.17.2"
+            },
+            {
+                "direct": false,
+                "id": "org.hamcrest:hamcrest-core:1.3"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:13.0"
+            },
+            {
+                "direct": false,
+                "id": "org.reactivestreams:reactive-streams:1.0.4"
+            },
+            {
+                "direct": true,
+                "id": "androidx.core:core-ktx:1.3.0"
+            },
+            {
+                "direct": true,
+                "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:converter-gson:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:retrofit:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxandroid:2.1.1"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxjava:2.2.21"
+            },
+            {
+                "direct": true,
+                "id": "junit:junit:4.12"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+            },
+            {
+                "direct": true,
+                "id": "org.jsoup:jsoup:1.23.2"
+            }
+        ],
+        "coreLibraryDesugaring": [
+            {
+                "direct": false,
+                "id": "com.android.tools:desugar_jdk_libs_configuration_nio:2.1.5"
+            },
+            {
+                "direct": true,
+                "id": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
+            }
+        ],
+        "freeDebugAndroidTestRuntimeClasspath": [
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-testing-android:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.test.services:storage:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.test:core:1.6.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.test:monitor:1.7.2"
+            },
+            {
+                "direct": false,
+                "id": "junit:junit:4.13.2"
+            },
+            {
+                "direct": false,
+                "id": "org.hamcrest:hamcrest-core:1.3"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation-experimental:1.5.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation:1.9.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.arch.core:core-common:2.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.arch.core:core-runtime:2.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.collection:collection-jvm:1.5.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.collection:collection:1.5.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.concurrent:concurrent-futures-ktx:1.1.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.concurrent:concurrent-futures:1.1.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-common-jvm:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-common:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-common-jvm:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-common:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-runtime-android:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-runtime:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-testing:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.sqlite:sqlite-android:2.6.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.sqlite:sqlite-framework-android:2.6.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.sqlite:sqlite-framework:2.6.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.sqlite:sqlite:2.6.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.test.ext:junit:1.2.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.test:runner:1.6.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.tracing:tracing:1.2.0"
+            },
+            {
+                "direct": true,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains:annotations:23.0.0"
+            },
+            {
+                "direct": true,
+                "id": "org.jspecify:jspecify:1.0.0"
+            }
+        ],
+        "freeDebugUnitTestRuntimeClasspath": [
+            {
+                "direct": false,
+                "id": "androidx.activity:activity:1.13.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-experimental:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.appcompat:appcompat-resources:1.3.0-alpha02"
+            },
+            {
+                "direct": false,
+                "id": "androidx.arch.core:core-common:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.arch.core:core-runtime:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection-jvm:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection-ktx:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.compose.runtime:runtime-annotation-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.compose.runtime:runtime-annotation:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.concurrent:concurrent-futures-ktx:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.concurrent:concurrent-futures:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.constraintlayout:constraintlayout-solver:2.0.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.core:core-viewtree:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.cursoradapter:cursoradapter:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.customview:customview-poolingcontainer:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.customview:customview:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.documentfile:documentfile:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.exifinterface:exifinterface:1.3.6"
+            },
+            {
+                "direct": false,
+                "id": "androidx.fragment:fragment-ktx:1.2.4"
+            },
+            {
+                "direct": false,
+                "id": "androidx.fragment:fragment:1.3.0-alpha08"
+            },
+            {
+                "direct": false,
+                "id": "androidx.interpolator:interpolator:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-common-jvm:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-common:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-livedata-core:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-service:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.loader:loader:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-common:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-container:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-database:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-datasource:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-decoder:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-extractor:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media:media:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.navigationevent:navigationevent-android:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.navigationevent:navigationevent:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.print:print:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.profileinstaller:profileinstaller:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-runtime-android:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-testing-android:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate-android:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate-ktx:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-android:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-framework-android:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-framework:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.startup:startup-runtime:1.1.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.tracing:tracing-ktx:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.tracing:tracing:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.transition:transition:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.vectordrawable:vectordrawable:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.versionedparcelable:versionedparcelable:1.1.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.viewpager:viewpager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.barteksc:pdfium-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:annotations:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:disklrucache:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:gifdecoder:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.48.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:failureaccess:1.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:guava:33.3.1-android"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okio:okio-jvm:3.6.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okio:okio:3.6.0"
+            },
+            {
+                "direct": false,
+                "id": "org.hamcrest:hamcrest-core:1.3"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-bom:1.8.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-common:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:23.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jspecify:jspecify:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.reactivestreams:reactive-streams:1.0.4"
+            },
+            {
+                "direct": false,
+                "id": "pl.droidsonroids:relinker:1.3.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.activity:activity-ktx:1.13.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation:1.9.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.appcompat:appcompat:1.3.0-alpha02"
+            },
+            {
+                "direct": true,
+                "id": "androidx.browser:browser:1.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.cardview:cardview:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.constraintlayout:constraintlayout:2.0.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.core:core-ktx:1.18.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.core:core:1.18.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.databinding:viewbinding:8.13.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.gridlayout:gridlayout:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-v4:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-livedata:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-process:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-runtime:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-viewmodel:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.media3:media3-exoplayer:1.10.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.media3:media3-ui:1.10.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.percentlayout:percentlayout:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.preference:preference-ktx:1.1.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.preference:preference:1.1.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.recyclerview:recyclerview:1.4.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-guava:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-ktx:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-runtime:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-rxjava2:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-testing:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.viewpager2:viewpager2:1.1.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.webkit:webkit:1.15.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-runtime-ktx:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-runtime:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-rxjava2:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "com.davemorrissey.labs:subsampling-scale-image-view:3.10.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.MimiReader:AndroidPdfViewer:3.2.0-beta.2"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:glide:4.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:okhttp3-integration:4.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.franmontiel:PersistentCookieJar:1.0.1"
+            },
+            {
+                "direct": true,
+                "id": "com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1"
+            },
+            {
+                "direct": true,
+                "id": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
+            },
+            {
+                "direct": true,
+                "id": "com.google.android.material:material:1.2.1"
+            },
+            {
+                "direct": true,
+                "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.okhttp3:mockwebserver:4.12.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.okhttp3:okhttp:4.12.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:converter-gson:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:retrofit:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "commons-codec:commons-codec:1.12"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxandroid:2.1.1"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxjava:2.2.21"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxkotlin:2.4.0"
+            },
+            {
+                "direct": true,
+                "id": "junit:junit:4.13.2"
+            },
+            {
+                "direct": true,
+                "id": "org.apache.commons:commons-lang3:3.11"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jsoup:jsoup:1.23.2"
+            },
+            {
+                "direct": true,
+                "id": "pl.droidsonroids.gif:android-gif-drawable:1.2.21"
+            },
+            {
+                "direct": true,
+                "id": "project::chanlib"
+            }
+        ],
+        "freeReleaseRuntimeClasspath": [
+            {
+                "direct": false,
+                "id": "androidx.activity:activity:1.13.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-experimental:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.appcompat:appcompat-resources:1.3.0-alpha02"
+            },
+            {
+                "direct": false,
+                "id": "androidx.arch.core:core-common:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.arch.core:core-runtime:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection-jvm:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection-ktx:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.collection:collection:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.compose.runtime:runtime-annotation-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.compose.runtime:runtime-annotation:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.concurrent:concurrent-futures-ktx:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.concurrent:concurrent-futures:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.constraintlayout:constraintlayout-solver:2.0.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.core:core-viewtree:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.cursoradapter:cursoradapter:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.customview:customview-poolingcontainer:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.customview:customview:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.documentfile:documentfile:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.exifinterface:exifinterface:1.3.6"
+            },
+            {
+                "direct": false,
+                "id": "androidx.fragment:fragment-ktx:1.2.4"
+            },
+            {
+                "direct": false,
+                "id": "androidx.fragment:fragment:1.3.0-alpha08"
+            },
+            {
+                "direct": false,
+                "id": "androidx.interpolator:interpolator:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-common-jvm:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-common:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-livedata-core:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-runtime-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-service:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.11.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.loader:loader:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-common:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-container:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-database:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-datasource:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-decoder:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media3:media3-extractor:1.10.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.media:media:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.navigationevent:navigationevent-android:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.navigationevent:navigationevent:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.print:print:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.profileinstaller:profileinstaller:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-runtime-android:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate-android:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate-ktx:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.savedstate:savedstate:1.4.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-android:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-framework-android:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite-framework:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.sqlite:sqlite:2.6.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.startup:startup-runtime:1.1.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.tracing:tracing-ktx:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.tracing:tracing:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.transition:transition:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.vectordrawable:vectordrawable:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.versionedparcelable:versionedparcelable:1.1.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.viewpager:viewpager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.barteksc:pdfium-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:annotations:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:disklrucache:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:gifdecoder:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.48.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:failureaccess:1.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:guava:33.3.1-android"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okio:okio-jvm:3.6.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup.okio:okio:3.6.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-bom:1.8.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-common:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:23.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jspecify:jspecify:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.reactivestreams:reactive-streams:1.0.4"
+            },
+            {
+                "direct": false,
+                "id": "pl.droidsonroids:relinker:1.3.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.activity:activity-ktx:1.13.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation:1.9.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.appcompat:appcompat:1.3.0-alpha02"
+            },
+            {
+                "direct": true,
+                "id": "androidx.browser:browser:1.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.cardview:cardview:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.constraintlayout:constraintlayout:2.0.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.core:core-ktx:1.18.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.core:core:1.18.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.databinding:viewbinding:8.13.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.gridlayout:gridlayout:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.legacy:legacy-support-v4:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-livedata:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-process:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-runtime:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.lifecycle:lifecycle-viewmodel:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.media3:media3-exoplayer:1.10.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.media3:media3-ui:1.10.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.percentlayout:percentlayout:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.preference:preference-ktx:1.1.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.preference:preference:1.1.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.recyclerview:recyclerview:1.4.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-guava:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-ktx:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-runtime:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-rxjava2:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.viewpager2:viewpager2:1.1.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.webkit:webkit:1.15.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-runtime-ktx:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-runtime:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.work:work-rxjava2:2.10.5"
+            },
+            {
+                "direct": true,
+                "id": "com.davemorrissey.labs:subsampling-scale-image-view:3.10.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.MimiReader:AndroidPdfViewer:3.2.0-beta.2"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:glide:4.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:okhttp3-integration:4.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.github.franmontiel:PersistentCookieJar:1.0.1"
+            },
+            {
+                "direct": true,
+                "id": "com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1"
+            },
+            {
+                "direct": true,
+                "id": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
+            },
+            {
+                "direct": true,
+                "id": "com.google.android.material:material:1.2.1"
+            },
+            {
+                "direct": true,
+                "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.okhttp3:okhttp:4.12.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:converter-gson:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.retrofit2:retrofit:2.11.0"
+            },
+            {
+                "direct": true,
+                "id": "commons-codec:commons-codec:1.12"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxandroid:2.1.1"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxjava:2.2.21"
+            },
+            {
+                "direct": true,
+                "id": "io.reactivex.rxjava2:rxkotlin:2.4.0"
+            },
+            {
+                "direct": true,
+                "id": "org.apache.commons:commons-lang3:3.11"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jsoup:jsoup:1.23.2"
+            },
+            {
+                "direct": true,
+                "id": "pl.droidsonroids.gif:android-gif-drawable:1.2.21"
+            },
+            {
+                "direct": true,
+                "id": "project::chanlib"
+            }
+        ],
+        "kaptFreeRelease": [
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-compiler-processing:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-external-antlr:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:annotations:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.auto.value:auto-value-annotations:1.6.3"
+            },
+            {
+                "direct": false,
+                "id": "com.google.auto:auto-common:1.2.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.code.findbugs:jsr305:3.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.devtools.ksp:symbol-processing-api:2.0.10-1.0.24"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.26.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:failureaccess:1.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:guava:33.2.1-jre"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.intellij:annotations:12.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:javapoet:1.13.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet-javapoet:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet-jvm:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "commons-codec:commons-codec:1.15"
+            },
+            {
+                "direct": false,
+                "id": "org.checkerframework:checker-qual:3.42.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-metadata-jvm:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-reflect:2.0.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:13.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jspecify:jspecify:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.xerial:sqlite-jdbc:3.41.2.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.annotation:annotation:1.9.1"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-compiler:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:compiler:4.11.0"
+            }
+        ],
+        "rootBuildscriptClasspath": [
+            {
+                "direct": false,
+                "id": "androidx.databinding:databinding-common:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "androidx.databinding:databinding-compiler-common:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "aopalliance:aopalliance:1.0"
+            },
+            {
+                "direct": false,
+                "id": "com.android.databinding:baseLibrary:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.analytics-library:crash:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.analytics-library:protos:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.analytics-library:shared:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.analytics-library:tracker:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build.jetifier:jetifier-core:1.0.0-beta10"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build.jetifier:jetifier-processor:1.0.0-beta10"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:aapt2-proto:8.13.2-14304508"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:aaptcompiler:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:apksig:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:apkzlib:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:builder-model:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:builder-test-api:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:builder:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:bundletool:1.18.1"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:gradle-api:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:gradle-common-api:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:gradle-settings-api:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:manifest-merger:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.build:transform-api:2.0.0-deprecated-use-gradle-api"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.ddms:ddmlib:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.layoutlib:layoutlib-api:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.lint:lint-model:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.lint:lint-typedef-remover:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-device-provider-ddmlib-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-device-provider-profile-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-host-apk-installer-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-host-coverage-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-host-emulator-control-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-host-logcat-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:annotations:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:common:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:dvlib:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:repository:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:sdk-common:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android.tools:sdklib:31.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android:signflinger:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.android:zipflinger:8.13.2"
+            },
+            {
+                "direct": false,
+                "id": "com.ethlo.time:itu:1.14.0"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson.core:jackson-annotations:2.22"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson.core:jackson-core:2.22.2"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson.core:jackson-databind:2.22.2"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.2"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.2"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.jackson:jackson-bom:2.22.2"
+            },
+            {
+                "direct": false,
+                "id": "com.fasterxml.woodstox:woodstox-core:7.2.0"
+            },
+            {
+                "direct": false,
+                "id": "com.github.package-url:packageurl-java:1.5.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.android:annotations:4.1.1.4"
+            },
+            {
+                "direct": false,
+                "id": "com.google.api.grpc:proto-google-common-protos:2.48.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.auto.value:auto-value-annotations:1.6.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.code.findbugs:jsr305:3.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.crypto.tink:tink:1.7.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.dagger:dagger:2.28.3"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.50.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.flatbuffers:flatbuffers-java:1.12.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:failureaccess:1.0.3"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:guava:33.7.1-jre"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.google.inject:guice:5.1.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.j2objc:j2objc-annotations:3.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.jimfs:jimfs:1.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.protobuf:protobuf-java-util:3.25.5"
+            },
+            {
+                "direct": false,
+                "id": "com.google.protobuf:protobuf-java:3.25.5"
+            },
+            {
+                "direct": false,
+                "id": "com.google.testing.platform:core-proto:0.0.9-alpha03"
+            },
+            {
+                "direct": false,
+                "id": "com.googlecode.juniversalchardet:juniversalchardet:1.0.3"
+            },
+            {
+                "direct": false,
+                "id": "com.networknt:json-schema-validator:2.0.4"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:javapoet:1.10.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:javawriter:2.5.0"
+            },
+            {
+                "direct": false,
+                "id": "com.sun.activation:javax.activation:1.2.0"
+            },
+            {
+                "direct": false,
+                "id": "com.sun.istack:istack-commons-runtime:3.0.8"
+            },
+            {
+                "direct": false,
+                "id": "com.sun.xml.fastinfoset:FastInfoset:1.2.16"
+            },
+            {
+                "direct": false,
+                "id": "commons-codec:commons-codec:1.22.1"
+            },
+            {
+                "direct": false,
+                "id": "commons-io:commons-io:2.16.1"
+            },
+            {
+                "direct": false,
+                "id": "commons-logging:commons-logging:1.2"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-api:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-context:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-core:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-inprocess:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-netty:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-protobuf-lite:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-protobuf:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-stub:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.grpc:grpc-util:1.69.1"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-buffer:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-codec-http2:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-codec-http:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-codec-socks:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-codec:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-common:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-handler-proxy:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-handler:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-resolver:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-transport-native-unix-common:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.netty:netty-transport:4.1.110.Final"
+            },
+            {
+                "direct": false,
+                "id": "io.perfmark:perfmark-api:0.27.0"
+            },
+            {
+                "direct": false,
+                "id": "jakarta.activation:jakarta.activation-api:1.2.1"
+            },
+            {
+                "direct": false,
+                "id": "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+            },
+            {
+                "direct": false,
+                "id": "javax.annotation:javax.annotation-api:1.3.2"
+            },
+            {
+                "direct": false,
+                "id": "javax.inject:javax.inject:1"
+            },
+            {
+                "direct": false,
+                "id": "net.java.dev.jna:jna-platform:5.6.0"
+            },
+            {
+                "direct": false,
+                "id": "net.java.dev.jna:jna:5.6.0"
+            },
+            {
+                "direct": false,
+                "id": "net.sf.jopt-simple:jopt-simple:4.9"
+            },
+            {
+                "direct": false,
+                "id": "net.sf.kxml:kxml2:2.3.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.commons:commons-compress:1.21"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.httpcomponents:httpclient:4.5.14"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.httpcomponents:httpcore:4.4.16"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.httpcomponents:httpmime:4.5.6"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-api:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-connector-basic:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-impl:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-named-locks:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-spi:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-transport-apache:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-transport-file:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven.resolver:maven-resolver-util:2.0.24"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-artifact:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-builder-support:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-core:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-model-builder:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-model:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-plugin-api:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-repository-metadata:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-resolver-provider:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-settings-builder:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.apache.maven:maven-settings:3.10.0"
+            },
+            {
+                "direct": false,
+                "id": "org.bitbucket.b_c:jose4j:0.9.5"
+            },
+            {
+                "direct": false,
+                "id": "org.bouncycastle:bcpkix-jdk18on:1.79"
+            },
+            {
+                "direct": false,
+                "id": "org.bouncycastle:bcprov-jdk18on:1.79"
+            },
+            {
+                "direct": false,
+                "id": "org.bouncycastle:bcutil-jdk18on:1.79"
+            },
+            {
+                "direct": false,
+                "id": "org.checkerframework:checker-qual:2.5.8"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.mojo:animal-sniffer-annotations:1.24"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-cipher:2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-classworlds:2.12.1"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-component-annotations:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-interpolation:1.30.0"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-sec-dispatcher:2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.plexus:plexus-utils:3.6.2"
+            },
+            {
+                "direct": false,
+                "id": "org.codehaus.woodstox:stax2-api:4.3.0"
+            },
+            {
+                "direct": false,
+                "id": "org.cyclonedx:cyclonedx-core-java:13.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.cyclonedx:cyclonedx-gradle-plugin:3.5.1"
+            },
+            {
+                "direct": false,
+                "id": "org.eclipse.sisu:org.eclipse.sisu.inject:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "org.eclipse.sisu:org.eclipse.sisu.plexus:1.1.0"
+            },
+            {
+                "direct": false,
+                "id": "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+            },
+            {
+                "direct": false,
+                "id": "org.glassfish.jaxb:txw2:2.3.2"
+            },
+            {
+                "direct": false,
+                "id": "org.jdom:jdom2:2.0.6"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:abi-tools-api:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:fus-statistics-gradle-plugin:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-build-statistics:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-build-tools-api:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-compiler-runner:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-daemon-client:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugin-api:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugins-bom:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-klib-commonizer-api:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-native-utils:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-reflect:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-tooling-core:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-util-io:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-util-klib-metadata:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-util-klib:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:23.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jspecify:jspecify:1.0.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jvnet.staxex:stax-ex:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.ow2.asm:asm-analysis:9.8"
+            },
+            {
+                "direct": false,
+                "id": "org.ow2.asm:asm-commons:9.8"
+            },
+            {
+                "direct": false,
+                "id": "org.ow2.asm:asm-tree:9.8"
+            },
+            {
+                "direct": false,
+                "id": "org.ow2.asm:asm-util:9.8"
+            },
+            {
+                "direct": false,
+                "id": "org.ow2.asm:asm:9.10.1"
+            },
+            {
+                "direct": false,
+                "id": "org.slf4j:jcl-over-slf4j:2.0.19"
+            },
+            {
+                "direct": false,
+                "id": "org.slf4j:slf4j-api:2.0.19"
+            },
+            {
+                "direct": false,
+                "id": "org.tensorflow:tensorflow-lite-metadata:0.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.yaml:snakeyaml:2.5"
+            },
+            {
+                "direct": true,
+                "id": "com.android.tools.build:gradle:8.13.2"
+            },
+            {
+                "direct": true,
+                "id": "org.cyclonedx.bom:org.cyclonedx.bom.gradle.plugin:3.5.1"
+            },
+            {
+                "direct": true,
+                "id": "org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21"
+            }
+        ]
+    },
+    "variant": "freeRelease"
+}

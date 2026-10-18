@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 17 de octubre de 2026.
+Última revisión: 18 de octubre de 2026.
 
 ## Objetivo
 
@@ -134,8 +134,13 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026. El 18 de octubre se amplió la prueba técnica de Ruffle a una película de dos fotogramas y se verificaron además tres SWF reales de `/f/` mediante una prueba optativa con red.
 - [ ] Ejecutar una fase final de refactorización y retirada de dependencias obsoletas antes de preparar el changelog.
   - [ ] Inventariar dependencias directas y transitivas, retirar las que no se utilicen y sustituir las abandonadas o incompatibles con el mantenimiento futuro.
-  - [ ] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
+    - [x] Generar un inventario versionado de declaraciones y resoluciones de Gradle: release, desugaring, pruebas, procesadores y herramientas de compilación. Documentar candidatos de limpieza y diferencias entre versiones declaradas y resueltas en `docs/DEPENDENCIES.md`.
+    - [ ] Retirar o sustituir los candidatos confirmados en cambios incrementales con sus pruebas.
+  - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
+    - [x] Cubrir el grafo de `freeRelease` antes de R8 mediante CycloneDX 1.6: 155 componentes Maven, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
+    - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
   - [ ] Añadir a GitHub Actions una validación del SBOM y un análisis de vulnerabilidades conocidas (CVE/GHSA), publicar los resultados en SARIF y bloquear inicialmente solo vulnerabilidades `high` o `critical` no justificadas.
+    - [x] Validar el formato y la frescura del SBOM en CI; el análisis CVE/GHSA y SARIF sigue pendiente.
     - [ ] Ejecutar el análisis en cada `pull_request`, al actualizar el SBOM y de forma programada para detectar vulnerabilidades publicadas después del último cambio de código.
     - [ ] Identificar Ruffle y cualquier componente manual mediante versión y Package URL; documentar excepciones temporales con caducidad para evitar que los falsos positivos se conviertan en exclusiones permanentes.
   - [ ] Separar las clases con demasiadas responsabilidades y eliminar adaptadores, recursos y rutas heredadas que hayan quedado sin uso tras la modernización.

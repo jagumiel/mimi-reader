@@ -42,6 +42,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.cyclonedx.bom' version '3.5.1'
+}
+
 allprojects {
     repositories {
         google()
@@ -54,3 +58,5 @@ allprojects {
         }
     }
 }
+
+apply from: 'gradle/sbom.gradle'

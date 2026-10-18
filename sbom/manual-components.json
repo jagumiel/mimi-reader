@@ -1,0 +1,26 @@
+{
+  "components": [
+    {
+      "name": "ruffle",
+      "version": "0.7.1",
+      "purl": "pkg:github/ruffle-rs/ruffle@v0.7.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://github.com/ruffle-rs/ruffle/releases/tag/v0.7.1",
+      "archive": "ruffle-0.7.1-web-selfhosted.zip",
+      "archiveSha256": "ef12edbee135d581a9cd523837d746da30a07a64dbf1cf472d2e472c656f4b5e",
+      "directory": "mimi-app/src/main/assets/ruffle",
+      "files": {
+        "172de42e6619eac8f371.wasm": "1ed33b9b71a6b01b9aafafed660be343ffeb2d246c5d79e6425a32bf93e38207",
+        "878d548199cddef07035.wasm": "af9b6a13a8f5e8d305bc3ce28a4edf3f6242df1183e8576ad4ca086e9f21eaea",
+        "core.ruffle.16d61072ac7fdc4d5013.js": "d27c6bdce2a34afb32e8dfa40970bc7e86cbcb912f92db7eb3e1ac70e943bd82",
+        "core.ruffle.994eeef0a471a88cd0e3.js": "d89e507ee60d550629e9229aa1e4dd4f9e75ec7db271e0135cbc87dab042ea51",
+        "LICENSE_APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "LICENSE_MIT": "4de9338a7879c68e911742a7d691f0797ff1ef8d8a6fb978b0c711e258fe959c",
+        "ruffle.js": "26036a94567088dfb3de88a759e8ed10a4cea07b29500af36f345eef42420098"
+      }
+    }
+  ],
+  "firstPartyFiles": [
+    "mimi-app/src/main/assets/ruffle/player.js"
+  ]
+}

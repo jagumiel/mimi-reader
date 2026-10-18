@@ -1,0 +1,305 @@
+import org.cyclonedx.Version
+import org.gradle.api.file.RegularFile
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.cyclonedx.parsers.JsonParser
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+
+buildscript {
+    repositories { mavenCentral() }
+    dependencies { classpath 'org.cyclonedx:cyclonedx-core-java:13.2.0' }
+}
+
+// A release runtime graph includes :chanlib and its transitive dependencies.
+// Debug/test/build tooling is inventoried separately, not attributed to the shipped app.
+allprojects {
+    tasks.named('cyclonedxDirectBom') {
+        includeConfigs = ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring']
+        includeBomSerialNumber = false
+        includeBuildSystem = false
+        // Plugin 3.5.1 defaults to CycloneDX 1.6; validation also requires 1.6.
+        componentName = project.name == rootProject.name ? 'mimi-reader' : project.name
+        componentVersion = project.name == 'chanlib' ? '1.0' :
+                providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+        xmlOutput.convention((RegularFile) null)
+        enabled = project.path == ':mimi-app'
+    }
+}
+
+def app = project(':mimi-app')
+def outputDirectory = layout.buildDirectory.dir('reports/sbom')
+def manifestFile = file('sbom/manual-components.json')
+def snapshots = ['mimi-reader-free-release.cdx.json', 'dependency-inventory.json']
+def sha256 = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
+def readJson = { File input -> new JsonSlurper().parse(input, 'UTF-8') }
+def deepCopy = { value -> new JsonSlurper().parseText(JsonOutput.toJson(value)) }
+
+// Only SBOM set-like arrays occur in these documents. Sorting them and map keys removes
+// graph iteration order, timestamps and machine/CI-specific metadata from the snapshots.
+Closure canonical
+canonical = { value ->
+    if (value instanceof Map) {
+        return new TreeMap(value.collectEntries { key, item -> [(key): canonical(item)] })
+    }
+    if (value instanceof List || value instanceof Set) {
+        return value.collect { canonical(it) }.sort { JsonOutput.toJson(it) }
+    }
+    value
+}
+def jsonText = { value ->
+    JsonOutput.prettyPrint(JsonOutput.toJson(canonical(value))).replaceAll('(?m)[\\t ]+$', '') + '\n'
+}
+def fail = { String message -> throw new GradleException(message) }
+
+def verifyManualFiles = { Map manifest ->
+    def accounted = manifest.firstPartyFiles as Set
+    manifest.components.each { component ->
+        def provenance = file("${component.directory}/SOURCE.md").getText('UTF-8')
+        if (!provenance.contains(component.version) || !provenance.contains(component.archiveSha256)) {
+            fail("Ruffle provenance differs from ${manifestFile.name}; update both deliberately.")
+        }
+        component.files.each { path, hash ->
+            def relative = "${component.directory}/$path".toString()
+            def asset = file(relative)
+            if (!asset.isFile() || sha256(asset) != hash) fail("Manual component hash mismatch: $relative")
+            accounted.add(relative)
+        }
+    }
+    def bundled = fileTree(rootDir) {
+        include '**/src/main/assets/**/*.js', '**/src/main/assets/**/*.wasm'
+        include '**/src/main/jniLibs/**/*.so', '**/libs/**/*.jar', '**/libs/**/*.aar'
+        exclude '**/build/**', '.gradle/**', '.git/**'
+    }.files.collect { rootDir.toPath().relativize(it.toPath()).toString().replace('\\', '/') } as Set
+    def unknown = bundled - accounted
+    if (unknown) fail("Uninventoried bundled components: $unknown. Update sbom/manual-components.json.")
+}
+
+def normalizeBom = { Map input, Map manifest ->
+    def bom = deepCopy(input)
+    def version = providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+    def appRef = "pkg:generic/mimi-reader@$version?variant=freeRelease".toString()
+    def replacements = [(bom.metadata.component['bom-ref']): appRef]
+    bom.components.findAll { it.purl?.contains('project_path=') }.each { component ->
+        if (component.name != 'chanlib') fail("Unexpected local project in release SBOM: ${component.name}")
+        def localVersion = project(':chanlib').android.defaultConfig.versionName
+        def ref = "pkg:generic/mimi-reader/chanlib@$localVersion".toString()
+        replacements[component['bom-ref']] = ref
+        component['bom-ref'] = ref
+        component.purl = ref
+        component.version = localVersion
+        component.group = 'mimi-reader'
+        component.licenses = [[license: [id: 'Apache-2.0']]]
+    }
+    bom.remove('serialNumber')
+    bom.metadata.remove('timestamp')
+    bom.metadata.component = [
+            type: 'application', name: 'mimi-reader', version: version,
+            'bom-ref': appRef, purl: appRef,
+            licenses: [[license: [id: 'Apache-2.0']]],
+            properties: [[name: 'mimi:variant', value: 'freeRelease'],
+                         [name: 'mimi:versionCode', value: providers.gradleProperty('mimiVersionCode').getOrElse('230')],
+                         [name: 'mimi:coverage', value: 'resolved-runtime-and-desugaring-before-R8']]
+    ]
+    bom.components.each { component ->
+        // One modern digest suffices to identify the exact input artifact.
+        if (component.hashes) component.hashes = component.hashes.findAll { it.alg == 'SHA-256' }
+    }
+    bom.dependencies.each { dependency ->
+        dependency.ref = replacements.get(dependency.ref, dependency.ref)
+        dependency.dependsOn = dependency.dependsOn.collect { replacements.get(it, it) }.unique()
+    }
+    def rootDependency = bom.dependencies.find { it.ref == appRef }
+    manifest.components.each { manual ->
+        def ref = manual.purl
+        def bundledFiles = manual.files.collect { path, hash ->
+            def relative = "${manual.directory}/$path".toString()
+            [type: 'file', name: relative, 'bom-ref': "urn:mimi:file:$relative".toString(),
+             hashes: [[alg: 'SHA-256', content: hash]]]
+        }
+        bom.components.add([
+                type: 'library', name: manual.name, version: manual.version,
+                'bom-ref': ref, purl: ref,
+                licenses: [[expression: manual.license]],
+                externalReferences: [[type: 'distribution', url: manual.source]],
+                properties: [[name: 'mimi:upstreamArchive', value: manual.archive],
+                             [name: 'mimi:upstreamArchiveSha256', value: manual.archiveSha256]],
+                components: bundledFiles
+        ])
+        rootDependency.dependsOn.add(ref)
+        bom.dependencies.add([ref: ref, dependsOn: bundledFiles.collect { it['bom-ref'] }])
+        bundledFiles.each { bom.dependencies.add([ref: it['bom-ref'], dependsOn: []]) }
+    }
+    canonical(bom)
+}
+
+def validateBom = { Map bom ->
+    def errors = new JsonParser().validate(JsonOutput.toJson(bom), Version.VERSION_16)
+    if (errors) fail("Invalid CycloneDX 1.6 SBOM: ${errors*.message.join('; ')}")
+    if (bom.specVersion != '1.6' || bom.serialNumber || bom.metadata.timestamp) fail('Non-canonical SBOM metadata')
+    def all = [bom.metadata.component] + bom.components.collectMany { [it] + (it.components ?: []) }
+    def refs = all.collect { it['bom-ref'] }
+    if (refs.any { !it } || refs.toSet().size() != refs.size()) fail('Missing or duplicate component references')
+    def known = refs.toSet()
+    def graph = bom.dependencies.collectEntries { [(it.ref): it.dependsOn] }
+    if (graph.size() != bom.dependencies.size()) fail('Duplicate dependency graph nodes')
+    if (graph.keySet() != known) fail('Dependency graph does not cover every component')
+    graph.each { ref, targets ->
+        if (!known.containsAll(targets)) fail("Dangling dependency reference from $ref")
+    }
+    def reachable = [] as Set
+    def pending = [bom.metadata.component['bom-ref']]
+    while (pending) {
+        def ref = pending.remove(0)
+        if (reachable.add(ref)) pending.addAll(graph[ref])
+    }
+    if (reachable != known) fail('SBOM contains components unreachable from the application')
+    all.findAll { it.type != 'file' }.each {
+        if (!it.version || !it.purl) fail("Missing version or Package URL: ${it.name}")
+    }
+    def selected = ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring'].collectMany { name ->
+        app.configurations.getByName(name).incoming.resolutionResult.allComponents.collect { it.id }
+                .findAll { it instanceof ModuleComponentIdentifier }
+                .collect { "$it.group:$it.module:$it.version".toString() }
+    } as Set
+    def reported = bom.components.findAll { it.purl?.startsWith('pkg:maven/') }
+            .collect { "$it.group:$it.name:$it.version".toString() } as Set
+    if (reported != selected) fail('SBOM Maven components do not match the resolved release/desugaring graph')
+    if (!bom.components.any { it.name == 'desugar_jdk_libs_nio' }) fail('Missing desugaring runtime')
+    readJson(manifestFile).components.each { expected ->
+        def found = bom.components.find { it.purl == expected.purl }
+        if (!found || found.version != expected.version || found.components?.size() != expected.files.size()) {
+            fail("Missing or incomplete manual component: ${expected.name}")
+        }
+    }
+}
+
+def componentId = { id ->
+    if (id instanceof ModuleComponentIdentifier) return "$id.group:$id.module:$id.version".toString()
+    if (id instanceof ProjectComponentIdentifier) return "project:${id.projectPath}".toString()
+    fail("Unsupported dependency identifier: $id")
+}
+def inventoryGraph = { config ->
+    def resolution = config.incoming.resolutionResult
+    def root = resolution.rootComponent.get()
+    def direct = root.dependencies.findAll { it instanceof ResolvedDependencyResult }
+            .collect { componentId(it.selected.id) } as Set
+    def unresolved = resolution.allDependencies.findAll { !(it instanceof ResolvedDependencyResult) }
+    if (unresolved) fail("Unresolved inventory dependencies in ${config.name}: $unresolved")
+    resolution.allComponents.findAll { it.id != root.id }.collect {
+        def id = componentId(it.id)
+        [id: id, direct: direct.contains(id)]
+    }
+}
+def buildInventory = {
+    def declarations = []
+    allprojects.each { owner ->
+        owner.configurations.findAll {
+            it.name in ['api', 'implementation', 'runtimeOnly', 'compileOnly', 'coreLibraryDesugaring',
+                        'kapt', 'testImplementation', 'androidTestImplementation', 'debugImplementation']
+        }.each { config ->
+            config.dependencies.each { dependency ->
+                if (dependency instanceof ProjectDependency) {
+                    declarations.add([project: owner.path, configuration: config.name,
+                                      requested: "project:${dependency.dependencyProject.path}".toString()])
+                } else if (dependency.group && dependency.name) {
+                    declarations.add([project: owner.path, configuration: config.name,
+                                      requested: "$dependency.group:$dependency.name:${dependency.version ?: '(managed)'}".toString()])
+                }
+            }
+        }
+    }
+    def graphs = [:]
+    ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring', 'freeDebugUnitTestRuntimeClasspath',
+     'freeDebugAndroidTestRuntimeClasspath', 'kaptFreeRelease'].each { name ->
+        graphs[name] = inventoryGraph(app.configurations.getByName(name))
+    }
+    graphs['rootBuildscriptClasspath'] = inventoryGraph(rootProject.buildscript.configurations.classpath)
+    graphs['chanlibUnitTestRuntimeClasspath'] = inventoryGraph(
+            project(':chanlib').configurations.getByName('freeDebugUnitTestRuntimeClasspath'))
+    [formatVersion: 1, variant: 'freeRelease', declarations: declarations,
+     resolvedConfigurations: graphs,
+     buildTools: [gradle: gradle.gradleVersion, cyclonedxGradlePlugin: '3.5.1', cyclonedxValidator: '13.2.0'],
+     buildDependencies: rootProject.buildscript.configurations.classpath.dependencies.collect {
+         "$it.group:$it.name:$it.version".toString()
+     }]
+}
+
+tasks.register('generateSbom') {
+    group = 'verification'
+    description = 'Generate a canonical release SBOM and dependency inventory in build/reports/sbom.'
+    dependsOn ':mimi-app:cyclonedxDirectBom'
+    // Always inspect current source files and resolution results, including newly bundled assets.
+    outputs.upToDateWhen { false }
+    doLast {
+        def manifest = readJson(manifestFile)
+        verifyManualFiles(manifest)
+        def raw = readJson(app.layout.buildDirectory.file('reports/cyclonedx-direct/bom.json').get().asFile)
+        def bom = normalizeBom(raw, manifest)
+        validateBom(bom)
+        def directory = outputDirectory.get().asFile
+        directory.mkdirs()
+        new File(directory, snapshots[0]).setText(jsonText(bom), 'UTF-8')
+        new File(directory, snapshots[1]).setText(jsonText(buildInventory()), 'UTF-8')
+        logger.lifecycle("SBOM: ${bom.components.size()} components plus bundled files; ${directory}")
+    }
+}
+
+tasks.register('updateSbom', Copy) {
+    group = 'verification'
+    description = 'Refresh the versioned SBOM and inventory after reviewing dependency changes.'
+    dependsOn 'generateSbom'
+    from(outputDirectory) { include snapshots }
+    into layout.projectDirectory.dir('sbom')
+}
+
+tasks.register('verifySbom') {
+    group = 'verification'
+    description = 'Validate the release SBOM and reject stale versioned dependency snapshots.'
+    dependsOn 'generateSbom'
+    doLast {
+        snapshots.each { name ->
+            def committed = file("sbom/$name")
+            def generated = new File(outputDirectory.get().asFile, name)
+            if (!committed.isFile() || committed.getText('UTF-8').replace('\r\n', '\n') != generated.getText('UTF-8')) {
+                fail("Stale sbom/$name. Run ./gradlew updateSbom, review and commit the snapshot changes.")
+            }
+        }
+    }
+}
+
+tasks.register('testSbomValidation') {
+    group = 'verification'
+    description = 'Exercise rejection of invalid schemas, dependency graphs and missing manual components.'
+    dependsOn 'generateSbom'
+    doLast {
+        def valid = readJson(new File(outputDirectory.get().asFile, snapshots[0]))
+        def cases = [
+                { it.specVersion = '0.0' },
+                { it.components.add(deepCopy(it.components[0])) },
+                { it.dependencies[0].dependsOn.add('urn:missing:dependency') },
+                { it.components.removeAll { it.name == 'ruffle' } }
+        ]
+        cases.eachWithIndex { mutate, index ->
+            def broken = deepCopy(valid)
+            mutate(broken)
+            boolean rejected = false
+            try { validateBom(broken) } catch (GradleException expected) { rejected = true }
+            if (!rejected) fail("SBOM verifier accepted negative test $index")
+        }
+        def raw = readJson(app.layout.buildDirectory.file('reports/cyclonedx-direct/bom.json').get().asFile)
+        def first = jsonText(normalizeBom(raw, readJson(manifestFile)))
+        raw.metadata.timestamp = '2099-01-01T00:00:00Z'
+        raw.serialNumber = 'urn:uuid:11111111-1111-4111-8111-111111111111'
+        raw.components = raw.components.reverse()
+        if (first != jsonText(normalizeBom(raw, readJson(manifestFile)))) fail('SBOM normalization is not reproducible')
+        def manifest = readJson(manifestFile)
+        manifest.components[0].files['ruffle.js'] = '0' * 64
+        boolean rejected = false
+        try { verifyManualFiles(manifest) } catch (GradleException expected) { rejected = true }
+        if (!rejected) fail('Manual asset verifier accepted an incorrect SHA-256')
+        logger.lifecycle('SBOM validation: 4 malformed documents rejected, asset hash checked, canonical output stable.')
+    }
+}

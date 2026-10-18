@@ -39,6 +39,11 @@ jobs:
       - name: Install Android SDK 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Generate and verify release SBOM
+        run: >-
+          ./gradlew --no-daemon --stacktrace
+          verifySbom testSbomValidation
+
       - name: Build and verify freeDebug
         run: >-
           ./gradlew --no-daemon --stacktrace
@@ -76,6 +81,17 @@ jobs:
           name: mimi-reader-free-debug-${{ github.sha }}
           path: mimi-app/build/outputs/apk/free/debug/mimi-app-free-debug.apk
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload release SBOM and dependency inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mimi-reader-sbom-${{ github.sha }}
+          path: |
+            build/reports/sbom/*.json
+            sbom/manual-components.json
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Upload unsigned freeRelease artifacts
