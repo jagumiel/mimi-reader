@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 18 de octubre de 2026.
+Última revisión: 19 de octubre de 2026.
 
 ## Objetivo
 
@@ -130,10 +130,10 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Generar en CI APK y AAB release minificados, su checksum SHA-256 y el `mapping.txt`, además de la APK de depuración.
 - [x] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
   - [x] Investigar los fallos de las ejecuciones 11–13: WebView antiguo en API 29, fallo de shaders de Ruffle/wgpu en API 31/36 y descarga incompleta de la imagen API 34. Preferir WebGL compatible, informar de WebView incompatible y errores de arranque, fijar/verificar un proveedor de pruebas solo para el emulador API 29 y reintentar únicamente la preparación del SDK. Detalles y procedencia en `docs/CI.md`.
-  - [ ] Confirmar que la nueva ejecución remota supera los cuatro trabajos instrumentados tras publicar la corrección; la validación local y del Motorola no sustituye esta comprobación.
+  - [x] Confirmar en la ejecución remota 15 (`eee2ebd`) los cuatro trabajos instrumentados de Android 10, 12, 14 y 16, además de compilación, lint y SBOM. Cada limpieza posterior requiere volver a pasar CI con su propio commit.
     - [x] Confirmar en la ejecución 14 que compilación/SBOM y las suites de Android 12, 14 y 16 pasan. La comprobación del WebView original de Android 10 también pasa; corregir el rechazo erróneo de su respuesta `Success` al seleccionar el proveedor fijado y verificar el paquete/versión realmente activos. Ampliar las pruebas auxiliares de CI a 21 casos.
-    - [ ] Confirmar en una nueva ejecución la suite completa de Android 10 después de instalar/seleccionar el WebView de pruebas; la ejecución 14 se detuvo antes de llegar a esta fase.
-  - [x] Repetir la suite completa del Motorola con el teléfono desbloqueado: el 19 de octubre, 30 pruebas superadas y 2 optativas omitidas, sin fallos; comprobar además por separado la prueba optativa de capacidad/reproducción del WebView original (1 prueba superada con WebView 155). Se han validado también 80 pruebas unitarias, 18 pruebas auxiliares de CI, lint, SBOM y APK/AAB release. La matriz remota y la rama de WebView antiguo de API 29 siguen pendientes.
+    - [x] Confirmar en la ejecución 15 la suite completa de Android 10 después de instalar/seleccionar el WebView de pruebas, sin omitir la reproducción SWF obligatoria.
+  - [x] Repetir la suite completa del Motorola con el teléfono desbloqueado: el 19 de octubre, 30 pruebas superadas y 2 optativas omitidas, sin fallos; comprobar además por separado la prueba optativa de capacidad/reproducción del WebView original (1 prueba superada con WebView 155). Se han validado también 80 pruebas unitarias, lint, SBOM y APK/AAB release. La ejecución remota 15 confirma la matriz completa y la comprobación del proveedor original de API 29; las pruebas auxiliares de CI se ampliaron a 21.
   - [x] Configurar en CI la ejecución paralela de las 27 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
   - [x] Conservar durante 14 días informes HTML, resultados JUnit, información del dispositivo y logcat de cada API.
   - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026. El 18 de octubre se amplió la prueba técnica de Ruffle a una película de dos fotogramas y se verificaron además tres SWF reales de `/f/` mediante una prueba optativa con red.
@@ -141,8 +141,12 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [ ] Inventariar dependencias directas y transitivas, retirar las que no se utilicen y sustituir las abandonadas o incompatibles con el mantenimiento futuro.
     - [x] Generar un inventario versionado de declaraciones y resoluciones de Gradle: release, desugaring, pruebas, procesadores y herramientas de compilación. Documentar candidatos de limpieza y diferencias entre versiones declaradas y resueltas en `docs/DEPENDENCIES.md`.
     - [ ] Retirar o sustituir los candidatos confirmados en cambios incrementales con sus pruebas.
+      - [x] Primer bloque: retirar `commons-codec:1.12`, `room-guava:2.8.5` y el falso procesador `kapt androidx.annotation`; conservar las anotaciones normales y las integraciones Rx utilizadas. El SBOM pasa de 157 a 154 componentes al desaparecer también `kotlinx-coroutines-guava`; no cambian las versiones de los componentes conservados. Inventario actualizado de 77 a 74 declaraciones.
+        - [x] Retirar además la supresión amplia de advertencias Apache en R8. Validar 80 pruebas unitarias de aplicación, 21 auxiliares de CI, lint, SBOM, APK/AAB release y la suite del Motorola (30 superadas, 2 optativas omitidas). Registrar tamaños antes/después y el fallo interno inicial de lint en `docs/DEPENDENCIES.md`.
+        - [ ] Confirmar la matriz remota de Android 10/12/14/16 con el commit de esta limpieza, no solo con la versión anterior.
+      - [ ] Segundo bloque: comprobar y retirar código/recursos huérfanos, empezando por interfaces sin consumidores y layouts antiguos de anuncios/YouTube/galería. Revisar los avisos de lint y referencias en XML, manifiesto, view binding y variantes; no borrar archivos solo porque sean de 2016/2019. Hallazgos en `docs/DEPENDENCIES.md`.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
-    - [x] Cubrir el grafo de `freeRelease` antes de R8 mediante CycloneDX 1.6: 155 componentes Maven, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
+    - [x] Cubrir el grafo de `freeRelease` antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
   - [ ] Añadir a GitHub Actions una validación del SBOM y un análisis de vulnerabilidades conocidas (CVE/GHSA), publicar los resultados en SARIF y bloquear inicialmente solo vulnerabilidades `high` o `critical` no justificadas.
     - [x] Validar el formato y la frescura del SBOM en CI; el análisis CVE/GHSA y SARIF sigue pendiente.

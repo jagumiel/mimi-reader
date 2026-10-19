@@ -38,8 +38,10 @@ failures and checks the exact **current-provider** package/version line in
 `dumpsys webviewupdate`, independently of success-message wording. An eligible
 provider elsewhere in the dump is not sufficient. The 21 helper/contract tests
 include both response formats and reject wrong/missing active providers or
-versions. A new remote run is still required to validate API 29 playback after
-provider installation.
+versions. [Run 15](https://github.com/jagumiel/mimi-reader/actions/runs/39318200289)
+then passed build/SBOM checks and all four instrumentation jobs, including the
+full API 29 suite after provider installation. This closes the original Flash/CI
+regression; subsequent dependency changes still require their own green run.
 
 ## Application changes
 
@@ -133,11 +135,12 @@ After the user unlocked the phone on 19 October 2026, the complete suite passed:
 32 cases, 30 passed, 2 expected opt-in skips, no failures or errors. The
 original-provider capability/playback check was then explicitly enabled and also
 passed separately (1 test). This validates its supported-provider path on
-WebView 155; the legacy-provider path still requires the API 29 CI run.
+WebView 155; run 15 also confirms the API 29 original-provider check and full
+suite with the pinned provider.
 Local Windows API 29/31 emulators did not reach ADB availability, so no local
-emulator-matrix success is claimed. Remote confirmation remains pending.
+emulator-matrix success is claimed. The remote baseline is green in run 15.
 
-Final local checks passed: 80 app unit tests, 18 CI-helper/contract tests, debug
+Final local checks passed: 80 app unit tests, 21 CI-helper/contract tests, debug
 lint, SBOM freshness/negative tests, minified release APK/AAB generation, and the
 isolated instrumented startup-error test (both error states, without needing an
 unlocked display). The temporary phone stay-awake setting was restored.

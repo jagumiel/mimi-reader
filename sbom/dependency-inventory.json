@@ -203,11 +203,6 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.room:room-guava:2.8.5"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "androidx.room:room-ktx:2.8.5"
         },
         {
@@ -318,11 +313,6 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "commons-codec:commons-codec:1.12"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "io.reactivex.rxjava2:rxandroid:2.1.1"
         },
         {
@@ -359,11 +349,6 @@
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "pl.droidsonroids.gif:android-gif-drawable:1.2.21"
-        },
-        {
-            "configuration": "kapt",
-            "project": ":mimi-app",
-            "requested": "androidx.annotation:annotation:1.1.0"
         },
         {
             "configuration": "kapt",
@@ -1055,10 +1040,6 @@
             },
             {
                 "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.9.0"
-            },
-            {
-                "direct": false,
                 "id": "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.9.0"
             },
             {
@@ -1191,10 +1172,6 @@
             },
             {
                 "direct": true,
-                "id": "androidx.room:room-guava:2.8.5"
-            },
-            {
-                "direct": true,
                 "id": "androidx.room:room-ktx:2.8.5"
             },
             {
@@ -1288,10 +1265,6 @@
             {
                 "direct": true,
                 "id": "com.squareup.retrofit2:retrofit:2.11.0"
-            },
-            {
-                "direct": true,
-                "id": "commons-codec:commons-codec:1.12"
             },
             {
                 "direct": true,
@@ -1693,10 +1666,6 @@
             },
             {
                 "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.9.0"
-            },
-            {
-                "direct": false,
                 "id": "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.9.0"
             },
             {
@@ -1821,10 +1790,6 @@
             },
             {
                 "direct": true,
-                "id": "androidx.room:room-guava:2.8.5"
-            },
-            {
-                "direct": true,
                 "id": "androidx.room:room-ktx:2.8.5"
             },
             {
@@ -1913,10 +1878,6 @@
             },
             {
                 "direct": true,
-                "id": "commons-codec:commons-codec:1.12"
-            },
-            {
-                "direct": true,
                 "id": "io.reactivex.rxjava2:rxandroid:2.1.1"
             },
             {
@@ -1956,6 +1917,10 @@
             {
                 "direct": false,
                 "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation:1.9.1"
             },
             {
                 "direct": false,
@@ -2088,10 +2053,6 @@
             {
                 "direct": false,
                 "id": "org.xerial:sqlite-jdbc:3.41.2.2"
-            },
-            {
-                "direct": true,
-                "id": "androidx.annotation:annotation:1.9.1"
             },
             {
                 "direct": true,

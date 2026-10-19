@@ -37,6 +37,3 @@
 }
 -keep public class pl.droidsonroids.gif.GifIOException { <init>(int); }
 -keep class pl.droidsonroids.gif.GifInfoHandle { <init>(long,int,int,int); }
-
-# Some optional Apache APIs are referenced by commons-codec but not used on Android.
--dontwarn org.apache.**

@@ -1,13 +1,60 @@
 # Dependency inventory and cleanup plan
 
-Baseline: 18 October 2026, following the SWF playback correction. This iteration
-adds visibility and verification; application library versions are unchanged.
+Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
+19 October after the first bounded dependency cleanup; retained library versions
+are unchanged.
 
-The canonical release SBOM has **157 top-level components**: 155 Maven components,
+The canonical release SBOM has **154 top-level components**: 152 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **77 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 77 distinct libraries.
+files. The inventory records **74 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 74 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
+
+## First cleanup: removed declarations
+
+| Declaration | Evidence and scope |
+| --- | --- |
+| `implementation commons-codec:commons-codec:1.12` | No imports/usages in either module or generated application code. Gradle dependency insight and the previous release graph showed only the application's direct declaration as its incoming runtime path. Removed from the app runtime, not from build tooling. |
+| `implementation androidx.room:room-guava:2.8.5` | DAOs/generated implementations use Room's Rx integration, not `GuavaRoom`, Guava `Optional`, or `ListenableFuture`. Retain `room-rxjava2`; removing this optional adapter also removes its now-unreachable `kotlinx-coroutines-guava:1.9.0` runtime dependency. |
+| `kapt androidx.annotation:annotation:1.1.0` | The inspected annotation JAR has no annotation-processor service registration. Keep the normal `implementation` annotation declaration and the actual Room/Glide processors. Annotation artifacts still occur transitively in the processor graph. |
+
+The release graph loses exactly three components, from 157 to 154, without
+changing any retained release component's version/Package URL. Direct
+declarations drop from 77 to 74. Guava remains required by Media3; do not exclude
+it globally. Commons Codec also remains in the separate build/processor
+inventory at versions resolved by those tools. That is not evidence that the
+removed 1.12 runtime declaration is still shipped.
+
+This change does not remove source/assets/resources, change database schemas or
+raise the Android minimum version. Source/resource cleanup is a separate block.
+The obsolete `-dontwarn org.apache.**` R8 rule, previously justified by Commons
+Codec's optional APIs, is also removed so release builds cannot hide missing
+Apache references behind that broad application-level suppression.
+
+### Validation of this cleanup
+
+- 80 application unit tests passed. The existing `chanlib` arithmetic smoke
+  test also passed, but is not counted as functional regression coverage.
+- 21 CI-helper/contract tests passed.
+- Full Motorola Edge 20 / Android 12 suite: 32 cases, 30 passed, 2 expected
+  opt-in skips, no failures/errors; includes Room migrations, WorkManager,
+  startup/restoration and gallery playback. The temporary stay-awake setting
+  was restored to its original value after the run.
+- Debug APK/test APK, normal debug lint and minified release APK/AAB builds
+  passed. The final release build passed with the broad Apache suppression
+  removed, and its generated R8 configuration no longer contains that rule.
+- SBOM schema/freshness/negative checks passed; generated source has no
+  `GuavaRoom`, `ListenableFuture` or Commons Codec references.
+- Local release artifacts decreased from 59,508,566 to 59,384,414 bytes (APK)
+  and from 36,577,045 to 36,450,099 bytes (AAB). These are local observations,
+  not a startup benchmark or an assertion of byte-identical builds.
+
+The first combined build hit an internal Kotlin FIR exception while lint
+analyzed an unchanged instrumentation test. A separate normal lint invocation
+passed without code changes, disabled detectors or relaxed error handling. The
+cause of that analyzer exception is not established; do not hide it with retries
+if it recurs in CI. The previous remote baseline is green in run 15; this
+dependency-cleanup commit still needs its own Android 10/12/14/16 CI run.
 
 ## Findings from the resolved graph
 
@@ -25,12 +72,8 @@ No vulnerability database was queried in this phase.
 
 ## Candidates for incremental removal or consolidation
 
-- `androidx.room:room-guava`: no direct `ListenableFuture`/Guava Optional usage
-  was found in application source. Confirm generated/indirect usage before removal.
-- `commons-codec:commons-codec`: no direct imports were found in either module.
-  Contrast its dependency paths and compile/test results before removing it.
-- `kapt androidx.annotation:annotation`: inspect whether this annotation artifact
-  provides any processor; preserve the normal annotation dependency as needed.
+- The first three dependency candidates are resolved above. Continue reviewing
+  indirect/generated usage rather than equating absent imports with safe removal.
 - Legacy AndroidX umbrella dependencies: check which APIs and resources still
   require them after the ViewPager and background-work migrations.
 - JUnit 4.12 in `chanlib` versus 4.13.2 in the app: align the library test setup.
@@ -42,12 +85,30 @@ Do not infer that a layout library is unused merely from Java/Kotlin imports:
 remains in `post_filter_view.xml`. Commons Lang `StringUtils` is also used in the
 comment parser and post-option adapter.
 
+## Legacy file review: pending a separate cleanup
+
+A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
+2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
+`CodeSpan`, `DelegatingSocketFactory`, `BetterViewAnimator` and `RequestQueueUtil`
+still have source or layout consumers, and license notices remain necessary.
+
+Candidates with no references found in the source/resource search include
+`AudioSettingsHost`, `MimiTab`, and the old `activity_video_ad`, `activity_youtube`
+and `activity_gallery` layouts. The existing debug lint report contains 490
+`UnusedResources` warnings. These findings require manual confirmation against
+view binding, manifest entries, themes, variants and indirect resource usage;
+they are not an automatic deletion list. Keep migration assets, font assets,
+third-party licenses and CAPTCHA paths until their actual consumers and upgrade
+requirements have been checked. The two old `chanlib` test templates also need
+review; the arithmetic example is not meaningful regression coverage.
+
 ## Sequence for subsequent iterations
 
-1. Add CVE/GHSA scanning of the versioned SBOM to GitHub Actions, including
+1. Complete bounded removal of confirmed unused dependencies and orphaned code/
+   resources in separate commits. Regenerate snapshots and run relevant tests,
+   lint and a minified release build after each dependency group.
+2. Add CVE/GHSA scanning of the cleaned SBOM to GitHub Actions, including
    scheduled execution, SARIF output and reviewed time-limited exceptions.
-2. Remove confirmed unused dependencies in small commits; regenerate snapshots
-   and run relevant tests, lint and a minified release build after each group.
 3. Align selected/declarative versions, then modernize UI/native dependencies
    with the Android 10/12/14/16 matrix and targeted device checks.
 4. Compare APK/AAB size and startup behavior before and after cleanup.

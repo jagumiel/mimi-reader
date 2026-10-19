@@ -2765,42 +2765,6 @@
             "version": "2.8.5"
         },
         {
-            "bom-ref": "pkg:maven/androidx.room/room-guava@2.8.5?type=aar",
-            "description": "Android Room Guava",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
-                }
-            ],
-            "group": "androidx.room",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "f503e780965299bdf8a3d166248060cb7e24fa0c71f8bccb077da3c6f8bdae58"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "room-guava",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.room/room-guava@2.8.5?type=aar",
-            "type": "library",
-            "version": "2.8.5"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.room/room-ktx@2.8.5?type=aar",
             "description": "Android Room Kotlin Extensions",
             "externalReferences": [
@@ -4608,45 +4572,6 @@
             "version": "2.11.0"
         },
         {
-            "bom-ref": "pkg:maven/commons-codec/commons-codec@1.12?type=jar",
-            "description": "The Apache Commons Codec package contains simple encoder and decoders for various formats such as Base64 and Hexadecimal. In addition to these widely used encoders and decoders, the codec package also maintains a collection of phonetic encoding utilities.",
-            "externalReferences": [
-                {
-                    "type": "issue-tracker",
-                    "url": "http://issues.apache.org/jira/browse/CODEC"
-                },
-                {
-                    "type": "vcs",
-                    "url": "https://github.com/apache/commons-codec"
-                }
-            ],
-            "group": "commons-codec",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "23df58fae9c83d1bcd277b99f9429e9d8c134f0600b73e2e86b2385ed793c81e"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "commons-codec",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/commons-codec/commons-codec@1.12?type=jar",
-            "type": "library",
-            "version": "1.12"
-        },
-        {
             "bom-ref": "pkg:maven/io.reactivex.rxjava2/rxandroid@2.1.1?type=aar",
             "description": "RxAndroid",
             "externalReferences": [
@@ -5088,41 +5013,6 @@
             "version": "1.9.0"
         },
         {
-            "bom-ref": "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-guava@1.9.0?type=jar",
-            "description": "Coroutines support libraries for Kotlin",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://github.com/Kotlin/kotlinx.coroutines"
-                }
-            ],
-            "group": "org.jetbrains.kotlinx",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "ca68323328a85a2df3c03429d5e7b124bc784f07fbace958399a5bba4118d7a0"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "kotlinx-coroutines-guava",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-guava@1.9.0?type=jar",
-            "type": "library",
-            "version": "1.9.0"
-        },
-        {
             "bom-ref": "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-reactive@1.9.0?type=jar",
             "description": "Coroutines support libraries for Kotlin",
             "externalReferences": [
@@ -5540,7 +5430,6 @@
                 "pkg:maven/androidx.preference/preference-ktx@1.1.1?type=aar",
                 "pkg:maven/androidx.preference/preference@1.1.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
-                "pkg:maven/androidx.room/room-guava@2.8.5?type=aar",
                 "pkg:maven/androidx.room/room-ktx@2.8.5?type=aar",
                 "pkg:maven/androidx.room/room-runtime@2.8.5?type=pom",
                 "pkg:maven/androidx.room/room-rxjava2@2.8.5?type=aar",
@@ -5564,7 +5453,6 @@
                 "pkg:maven/com.squareup.retrofit2/adapter-rxjava2@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
-                "pkg:maven/commons-codec/commons-codec@1.12?type=jar",
                 "pkg:maven/io.reactivex.rxjava2/rxandroid@2.1.1?type=aar",
                 "pkg:maven/io.reactivex.rxjava2/rxjava@2.2.21?type=jar",
                 "pkg:maven/io.reactivex.rxjava2/rxkotlin@2.4.0?type=jar",
@@ -5765,18 +5653,6 @@
                 "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar"
             ],
             "ref": "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar",
-                "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar",
-                "pkg:maven/androidx.room/room-common@2.8.5?type=pom",
-                "pkg:maven/androidx.room/room-runtime@2.8.5?type=pom",
-                "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-guava@1.9.0?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
-            ],
-            "ref": "pkg:maven/androidx.room/room-guava@2.8.5?type=aar"
         },
         {
             "dependsOn": [
@@ -6639,14 +6515,6 @@
             "dependsOn": [
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-bom@1.9.0?type=pom",
-                "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom"
-            ],
-            "ref": "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-guava@1.9.0?type=jar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-bom@1.9.0?type=pom",
                 "pkg:maven/org.jetbrains/annotations@23.0.0?type=jar"
             ],
             "ref": "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm@1.9.0?type=jar"
@@ -6783,12 +6651,6 @@
 
             ],
             "ref": "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
-        },
-        {
-            "dependsOn": [
-
-            ],
-            "ref": "pkg:maven/commons-codec/commons-codec@1.12?type=jar"
         },
         {
             "dependsOn": [
