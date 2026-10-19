@@ -110,10 +110,14 @@ do not mark the remote CI fixed merely because local checks pass.
 The Motorola Edge 20 (Android 12, WebView 155) passed the gallery playback suite
 with the WebGL renderer during this investigation. A later full-suite attempt
 was interrupted after the phone locked: ActivityScenario could not reach
-`RESUMED` behind its keyguard. That run is **not** recorded as passing; repeat
-the complete device suite with the phone unlocked. Local Windows API 29/31
-emulators did not reach ADB availability either, so no local emulator-matrix
-success is claimed.
+`RESUMED` behind its keyguard. That interrupted run is **not** recorded as passing.
+After the user unlocked the phone on 19 October 2026, the complete suite passed:
+32 cases, 30 passed, 2 expected opt-in skips, no failures or errors. The
+original-provider capability/playback check was then explicitly enabled and also
+passed separately (1 test). This validates its supported-provider path on
+WebView 155; the legacy-provider path still requires the API 29 CI run.
+Local Windows API 29/31 emulators did not reach ADB availability, so no local
+emulator-matrix success is claimed. Remote confirmation remains pending.
 
 Final local checks passed: 80 app unit tests, 18 CI-helper/contract tests, debug
 lint, SBOM freshness/negative tests, minified release APK/AAB generation, and the
