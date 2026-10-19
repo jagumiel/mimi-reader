@@ -1,8 +1,8 @@
 # Dependency inventory and cleanup plan
 
 Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
-19 October after the first bounded dependency cleanup; retained library versions
-are unchanged.
+19 October after the bounded dependency and orphan-file cleanup blocks;
+retained library versions are unchanged.
 
 The canonical release SBOM has **154 top-level components**: 152 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -85,22 +85,74 @@ Do not infer that a layout library is unused merely from Java/Kotlin imports:
 remains in `post_filter_view.xml`. Commons Lang `StringUtils` is also used in the
 comment parser and post-option adapter.
 
-## Legacy file review: pending a separate cleanup
+## Second cleanup: confirmed orphaned source and layouts
+
+Removed five files after checking both modules' source sets, XML resources,
+manifest entries, R8 rules and generated view-binding consumers:
+
+| Removed file | Evidence and preserved functionality |
+| --- | --- |
+| `interfaces/AudioSettingsHost.java` | No implementation or caller. Current video mute state lives in `GalleryAudioState` and is applied by `WebmPage`; its controls do not implement this interface. |
+| `interfaces/MimiTab.java` | No implementation or caller. Current tabs use `TabInterface`, `TabEventListener` and `TabPagerAdapter`; those contracts remain. |
+| `layout/activity_gallery.xml` | No inflation, include, binding consumer or alternate-qualified version. The registered `GalleryActivity2` inflates `ActivityGallery2Binding` from `activity_gallery2.xml`, which remains. |
+| `layout/activity_video_ad.xml` | No activity, include or binding consumer. This was the abandoned advertisement screen, not a current playback control. |
+| `layout/activity_youtube.xml` | No activity, include or binding consumer. `YoutubeLinkSpan` still opens `ACTION_VIEW` links and offers its existing copy-link dialog; neither needs this layout. |
+
+No name-based resource lookup or reflective class lookup was found in either
+module's application/test sources. The three generated binding classes were
+outputs of the old layouts, not proof that the layouts had a consumer. Their
+removal is checked in regenerated build outputs rather than editing generated
+code. Both `free` and `paid` flavors use these shared main sources.
+
+The `gallery_container` ID also exists in `activity_postitem_list.xml`, so that
+layout and its ID are retained. Shared toolbar IDs, themes and strings are not
+removed as a side effect. Dependency declarations, SBOM snapshots, minimum SDK,
+database schemas, user data and third-party license files remain unchanged.
+
+### Validation of the orphan-file cleanup
+
+- 80 application unit tests and 21 CI-helper/contract tests passed; the existing
+  `chanlib` arithmetic smoke test also passed.
+- Debug APKs for both `free` and `paid`, plus the `free` instrumentation APK,
+  compiled. The three removed binding classes and two removed interface classes
+  are absent from regenerated debug outputs for both flavors; the current
+  `ActivityGallery2Binding` remains.
+- A separate normal `lintFreeDebug` run passed with no errors: 1,020 warnings
+  and one hint, down from 1,024 warnings and one hint. `UnusedResources`
+  warnings dropped from 490 to 487. Existing unrelated findings remain pending;
+  no detector, baseline or warning suppression was added.
+- `verifySbom` and `testSbomValidation` passed without regenerating the committed
+  snapshots: 154 top-level components and 74 direct declarations, unchanged.
+- Full Motorola Edge 20 / Android 12 suite passed: 32 cases, 30 passed, two
+  expected opt-in skips, no failures or errors. Existing tests exercise gallery
+  playback/autoplay/SWF, tab navigation, restoration, migrations and background
+  downloads. The original phone stay-awake setting (`0`) was restored afterward.
+- Minified `freeRelease` APK/AAB builds passed, including release vital lint;
+  the obsolete binding classes are also absent from regenerated release sources.
+  Local artifact sizes changed from 59,384,414 to 59,382,590 bytes (APK) and
+  36,450,099 to 36,448,057 bytes (AAB). Such small differences are observations,
+  not evidence of a measurable runtime/startup improvement: release shrinking
+  already removes unused code/resources. This block primarily reduces obsolete
+  source and maintenance overhead.
+
+The Android 10/12/14/16 remote matrix still needs to run on this cleanup commit;
+the earlier green baseline is not validation of these deletions.
+
+### Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
 `CodeSpan`, `DelegatingSocketFactory`, `BetterViewAnimator` and `RequestQueueUtil`
 still have source or layout consumers, and license notices remain necessary.
 
-Candidates with no references found in the source/resource search include
-`AudioSettingsHost`, `MimiTab`, and the old `activity_video_ad`, `activity_youtube`
-and `activity_gallery` layouts. The existing debug lint report contains 490
-`UnusedResources` warnings. These findings require manual confirmation against
-view binding, manifest entries, themes, variants and indirect resource usage;
-they are not an automatic deletion list. Keep migration assets, font assets,
-third-party licenses and CAPTCHA paths until their actual consumers and upgrade
-requirements have been checked. The two old `chanlib` test templates also need
-review; the arithmetic example is not meaningful regression coverage.
+The five confirmed candidates above are removed in this block. Before removal,
+the debug lint report contained 490 `UnusedResources` warnings; that number is
+not a count of safe-to-delete files. Other findings still require manual
+confirmation against view binding, manifest entries, themes, variants and
+indirect resource usage. Keep migration assets, font assets, third-party
+licenses and CAPTCHA paths until their actual consumers and upgrade requirements
+have been checked. The two old `chanlib` test templates also need review; the
+arithmetic example is not meaningful regression coverage.
 
 ## Sequence for subsequent iterations
 
