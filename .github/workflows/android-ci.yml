@@ -39,6 +39,9 @@ jobs:
       - name: Install Android SDK 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Test CI preparation helpers
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
+
       - name: Generate and verify release SBOM
         run: >-
           ./gradlew --no-daemon --stacktrace
@@ -142,8 +145,12 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
-      - name: Install Android SDK 36
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Prepare Android SDK and emulator image
+        run: bash scripts/ci/install_emulator_sdk.sh '${{ matrix.api_level }}'
+
+      - name: Prepare pinned API 29 test WebView
+        if: matrix.api_level == 29
+        run: python3 scripts/ci/android_webview.py download --apk "$RUNNER_TEMP/ci-webview.apk"
 
       - name: Enable KVM acceleration
         run: |
@@ -155,7 +162,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: ${{ matrix.api_level }}
-          target: default
+          target: google_apis
           arch: x86_64
           profile: pixel_2
           cores: 2
@@ -164,7 +171,7 @@ jobs:
           emulator-options: >-
             -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
             -camera-back none -camera-front none -no-snapshot-save
-          script: ./gradlew --no-daemon --stacktrace :mimi-app:connectedFreeDebugAndroidTest
+          script: python3 scripts/ci/android_webview.py test --api '${{ matrix.api_level }}' --apk "$RUNNER_TEMP/ci-webview.apk"
 
       - name: Upload instrumented test results
         if: always()
@@ -174,5 +181,6 @@ jobs:
           path: |
             mimi-app/build/reports/androidTests/connected/
             mimi-app/build/outputs/androidTest-results/connected/
+            build/reports/legacy-webview/
           if-no-files-found: warn
           retention-days: 14

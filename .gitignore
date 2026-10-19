@@ -3,6 +3,7 @@
 .idea/
 .gradle/
 .kotlin/
+__pycache__/
 captures/
 build/
 ant_build/

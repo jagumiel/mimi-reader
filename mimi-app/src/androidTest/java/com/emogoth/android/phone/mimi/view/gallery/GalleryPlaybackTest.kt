@@ -365,6 +365,59 @@ class GalleryPlaybackTest {
 
     @Test
     fun bundledRuffleLoadsAFlashMovieInAndroidWebView() {
+        assertBundledFlashPlayback(expectUnsupported = false)
+    }
+
+    @Test
+    fun originalWebViewHandlesFlashOrExplainsItsRequirement() {
+        // CI explicitly tests the unmodified API 29 provider before updating it.
+        org.junit.Assume.assumeTrue(InstrumentationRegistry.getArguments()
+                .getString("legacyFlashWebView") == "true")
+        assertBundledFlashPlayback(expectUnsupported = null)
+    }
+
+    @Test
+    fun flashStartupErrorsAreReportedWithoutWaitingForTheDeadline() {
+        // Startup-state delivery needs a real WebView, not a visible activity.
+        // Keeping it independent of screen/keyguard state also makes this a tighter test.
+        for ((state, expected) in listOf("error" to FlashLoadFailure.PLAYER_ERROR,
+                "unsupported" to FlashLoadFailure.UNSUPPORTED_WEBVIEW)) {
+            val failed = CountDownLatch(1)
+            val failure = AtomicReference<FlashLoadFailure?>()
+            lateinit var webView: WebView
+            lateinit var client: FlashWebViewClient
+            instrumentation.runOnMainSync {
+                webView = MimiWebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    val loader = object : FlashContentLoader(context) {
+                        override fun shouldInterceptRequest(uri: Uri): android.webkit.WebResourceResponse {
+                            if (uri.toString() != FlashContentLoader.PLAYER_URL) return super.shouldInterceptRequest(uri)
+                            val html = "<html><script>window.mimiRuffleState='$state';window.mimiRuffleError='startup fixture';</script></html>"
+                            return android.webkit.WebResourceResponse("text/html", "UTF-8",
+                                    html.byteInputStream())
+                        }
+                    }
+                    client = FlashWebViewClient(loader,
+                            onPageReady = { throw AssertionError("An error was reported as ready") },
+                            onLoadError = { failure.set(it); failed.countDown() },
+                            onRendererGone = { throw AssertionError("Renderer stopped") })
+                    webViewClient = client
+                }
+                webView.loadUrl(FlashContentLoader.PLAYER_URL)
+            }
+            try {
+                assertTrue("$state was hidden behind a timeout", failed.await(5, TimeUnit.SECONDS))
+                assertEquals(expected, failure.get())
+            } finally {
+                instrumentation.runOnMainSync {
+                    client.cancelPendingLoad()
+                    webView.destroy()
+                }
+            }
+        }
+    }
+
+    private fun assertBundledFlashPlayback(expectUnsupported: Boolean?) {
         val swfFile = File.createTempFile("gallery-ruffle", ".swf", context.cacheDir).apply {
             writeBytes(MINIMAL_SWF)
         }
@@ -373,6 +426,8 @@ class GalleryPlaybackTest {
         val loadError = AtomicReference<String?>()
         val movieReady = AtomicBoolean(false)
         lateinit var webView: WebView
+        lateinit var client: FlashWebViewClient
+        var unsupportedExpected = expectUnsupported == true
 
         try {
             scenario.onActivity { activity ->
@@ -383,22 +438,39 @@ class GalleryPlaybackTest {
                     settings.allowContentAccess = false
                     settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
                     settings.mediaPlaybackRequiresUserGesture = false
-                    webViewClient = FlashWebViewClient(
+                    client = FlashWebViewClient(
                             loader,
                             onPageReady = { movieReady.set(true) },
-                            onLoadError = { loadError.set("page load failed") },
+                            onLoadError = { reason -> loadError.set(reason.name) },
                             onRendererGone = { loadError.set("WebView renderer stopped") }
                     )
+                    webViewClient = client
                 }
+                val provider = androidx.webkit.WebViewCompat.getCurrentWebViewPackage(activity)
+                android.util.Log.i("FlashPlaybackTest", "WebView provider: ${provider?.packageName} ${provider?.versionName}")
                 activity.addContentView(webView, FrameLayout.LayoutParams(320, 240))
+            }
+            if (expectUnsupported == null) {
+                unsupportedExpected = !evaluateBoolean(scenario, webView,
+                        "(function(){try{return new Function('return ({value:1})?.value ?? 0')() === 1 && typeof WebAssembly === 'object';}catch(e){return false;}})()")
+            }
+            scenario.onActivity {
                 webView.loadUrl(FlashContentLoader.PLAYER_URL)
             }
 
             waitUntil(RUFFLE_TIMEOUT_MS) {
-                loadError.get() == null && movieReady.get() &&
-                        evaluateBoolean(scenario, webView, "Boolean(window.mimiRuffleLoaded)")
+                loadError.get() != null || movieReady.get()
             }
-            assertNull(loadError.get())
+            val diagnostics = evaluateString(scenario, webView,
+                    "JSON.stringify({state:window.mimiRuffleState,error:window.mimiRuffleError,userAgent:navigator.userAgent})")
+            if (unsupportedExpected) {
+                assertEquals(diagnostics, FlashLoadFailure.UNSUPPORTED_WEBVIEW.name, loadError.get())
+                assertFalse(movieReady.get())
+                assertTrue(diagnostics.contains("Update Android System WebView"))
+                return
+            }
+            assertNull("Flash playback failed: $diagnostics", loadError.get())
+            assertTrue(evaluateBoolean(scenario, webView, "Boolean(window.mimiRuffleLoaded)"))
             assertTrue(evaluateBoolean(scenario, webView,
                     "document.getElementById('ruffle-player').ruffle().metadata.width === 320 && " +
                             "document.getElementById('ruffle-player').ruffle().metadata.height === 240"))
@@ -423,6 +495,7 @@ class GalleryPlaybackTest {
             }
         } finally {
             scenario.onActivity {
+                client.cancelPendingLoad()
                 (webView.parent as? ViewGroup)?.removeView(webView)
                 webView.destroy()
             }
@@ -503,6 +576,14 @@ class GalleryPlaybackTest {
             webView: WebView,
             expression: String
     ): Boolean {
+        return evaluateString(scenario, webView, expression) == "true"
+    }
+
+    private fun evaluateString(
+            scenario: ActivityScenario<TabsActivity>,
+            webView: WebView,
+            expression: String
+    ): String {
         val result = AtomicReference<String?>()
         val evaluated = CountDownLatch(1)
         scenario.onActivity {
@@ -511,7 +592,9 @@ class GalleryPlaybackTest {
                 evaluated.countDown()
             }
         }
-        return evaluated.await(JS_EVALUATION_TIMEOUT_MS, TimeUnit.MILLISECONDS) && result.get() == "true"
+        assertTrue("JavaScript evaluation timed out: $expression",
+                evaluated.await(JS_EVALUATION_TIMEOUT_MS, TimeUnit.MILLISECONDS))
+        return result.get().orEmpty()
     }
 
     private fun writeFixture(prefix: String, suffix: String, base64: String): File {
@@ -527,7 +610,8 @@ class GalleryPlaybackTest {
         const val TRANSITION_TIMEOUT_MS = 5_000L
         const val SURFACE_TIMEOUT_MS = 5_000L
         const val PLAYBACK_TIMEOUT_MS = 8_000L
-        const val RUFFLE_TIMEOUT_MS = 20_000L
+        // Let the player's 45s deadline report a failure first. Actual errors fail immediately.
+        const val RUFFLE_TIMEOUT_MS = 60_000L
         const val JS_EVALUATION_TIMEOUT_MS = 2_000L
         // Original test fixture: 320x240, two frames at 2 fps, alternating red/blue backgrounds.
         // A real timeline exercises metadata and frame loading, unlike an empty SWF header.

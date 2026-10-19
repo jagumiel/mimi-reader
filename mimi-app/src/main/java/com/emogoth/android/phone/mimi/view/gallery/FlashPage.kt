@@ -29,6 +29,7 @@ import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
+import org.json.JSONObject
 
 @SuppressLint("ViewConstructor", "SetJavaScriptEnabled")
 class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(context, viewModel) {
@@ -153,9 +154,9 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
                     notifyContentReady()
                     syncPlaybackState()
                 },
-                onLoadError = {
+                onLoadError = { reason ->
                     loaded = false
-                    showLoadError(allowRetry = true)
+                    showLoadError(allowRetry = true, unsupportedWebView = reason == FlashLoadFailure.UNSUPPORTED_WEBVIEW)
                 },
                 onRendererGone = {
                     released = true
@@ -180,10 +181,15 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
         )
     }
 
-    private fun showLoadError(allowRetry: Boolean = false, unavailable: Boolean = false) {
+    private fun showLoadError(allowRetry: Boolean = false, unavailable: Boolean = false,
+                              unsupportedWebView: Boolean = false) {
         Log.w(LOG_TAG, "Unable to load Flash content")
         if (isAttachedToWindow) {
-            errorText.setText(if (unavailable) R.string.flash_file_unavailable else R.string.could_not_load_flash)
+            errorText.setText(when {
+                unsupportedWebView -> R.string.flash_update_webview
+                unavailable -> R.string.flash_file_unavailable
+                else -> R.string.could_not_load_flash
+            })
             view.visibility = View.INVISIBLE
             retryButton.visibility = if (allowRetry) View.VISIBLE else View.GONE
             retryButton.setOnClickListener {
@@ -225,10 +231,12 @@ class FlashPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(con
     }
 }
 
+internal enum class FlashLoadFailure { PLAYER_ERROR, UNSUPPORTED_WEBVIEW, TIMEOUT }
+
 internal class FlashWebViewClient(
         private val contentLoader: FlashContentLoader,
         private val onPageReady: () -> Unit,
-        private val onLoadError: () -> Unit,
+        private val onLoadError: (FlashLoadFailure) -> Unit,
         private val onRendererGone: () -> Unit
 ) : WebViewClient() {
     private var navigation = 0
@@ -259,13 +267,21 @@ internal class FlashWebViewClient(
     // Poll only the trusted shell, without exposing an Android JavaScript interface to movies.
     private fun awaitMovie(view: WebView, currentNavigation: Int, attempt: Int) {
         if (currentNavigation != navigation || view.url != FlashContentLoader.PLAYER_URL) return
-        view.evaluateJavascript("window.mimiRuffleState || 'loading'") { state ->
+        view.evaluateJavascript("JSON.stringify({state:window.mimiRuffleState || 'loading',error:window.mimiRuffleError || ''})") { result ->
             if (currentNavigation != navigation) return@evaluateJavascript
-            when (state) {
-                "\"ready\"" -> onPageReady()
-                "\"error\"" -> onLoadError()
+            val status = try {
+                // evaluateJavascript JSON-encodes the JavaScript string once more.
+                JSONObject(org.json.JSONTokener(result).nextValue() as String)
+            } catch (_: Exception) { JSONObject() }
+            when (status.optString("state")) {
+                "ready" -> onPageReady()
+                "error", "unsupported" -> {
+                    Log.w(GalleryPage.LOG_TAG, "Flash runtime failed: ${status.optString("error")}")
+                    onLoadError(if (status.optString("state") == "unsupported")
+                        FlashLoadFailure.UNSUPPORTED_WEBVIEW else FlashLoadFailure.PLAYER_ERROR)
+                }
                 else -> if (attempt >= 450) {
-                    onLoadError()
+                    onLoadError(FlashLoadFailure.TIMEOUT)
                 } else {
                     view.postDelayed({ awaitMovie(view, currentNavigation, attempt + 1) }, 100L)
                 }
@@ -276,7 +292,7 @@ internal class FlashWebViewClient(
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: android.webkit.WebResourceError) {
         if (request.isForMainFrame) {
             cancelPendingLoad()
-            onLoadError()
+            onLoadError(FlashLoadFailure.PLAYER_ERROR)
         }
     }
 
@@ -287,7 +303,7 @@ internal class FlashWebViewClient(
     }
 }
 
-internal class FlashContentLoader(context: Context) {
+internal open class FlashContentLoader(context: Context) {
     companion object {
         const val PLAYER_URL = "https://appassets.androidplatform.net/ruffle/player.html"
         private const val HOST = "appassets.androidplatform.net"
@@ -313,7 +329,7 @@ internal class FlashContentLoader(context: Context) {
             .addPathHandler("/movie/") { path -> serveMovie(path) }
             .build()
 
-    fun shouldInterceptRequest(uri: Uri): WebResourceResponse {
+    open fun shouldInterceptRequest(uri: Uri): WebResourceResponse {
         if (uri.scheme != "https" || uri.host != HOST || uri.port != -1 || uri.userInfo != null) {
             return response(403, "Forbidden")
         }

@@ -1,0 +1,121 @@
+# Android CI and Flash playback
+
+The workflow builds debug/release artifacts, validates the release SBOM, and
+runs instrumentation on Android 10, 12, 14 and 16 (API 29/31/34/36). A passing
+build job alone is not a passing workflow: every instrumentation job must pass.
+
+## Failures investigated on 19 October 2026
+
+Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),
+[12](https://github.com/jagumiel/mimi-reader/actions/runs/39158910576) and
+[13](https://github.com/jagumiel/mimi-reader/actions/runs/39160285233) all passed
+build, lint and unit tests; run 13 also passed SBOM verification. All three
+failed the mandatory bundled-Ruffle playback test. Downloaded run-13 logcat
+reports identified these distinct causes:
+
+- API 29's original AOSP WebView could not parse Ruffle's optional chaining:
+  `Uncaught SyntaxError: Unexpected token .`.
+- API 31 and 36 initialized WASM but panicked in wgpu shader compilation:
+  `Vertex shader active uniforms exceed GL_MAX_VERTEX_UNIFORM_VECTORS (256)`.
+- API 34 failed before tests: SDK Manager could not prepare its system-image
+  ZIP (`Error on ZipFile unknown archive`).
+
+The test previously waited 20 seconds even after a player error. That generic
+assertion obscured the actual JavaScript/graphics failure.
+
+## Application changes
+
+The trusted Flash shell prefers Ruffle's legacy `webgl` renderer, avoiding the
+wgpu shader path that panics on the emulators' SwiftShader limits. Ruffle can
+still fall back to Canvas. The upstream runtime and its inventoried hashes have
+not been modified. The legacy renderer has fewer advanced rendering features
+than wgpu; complex bitmap effects/blend modes and ActionScript compatibility
+still need real-content testing. See the
+[versioned renderer configuration](https://github.com/ruffle-rs/ruffle/blob/v0.7.1/web/packages/core/src/public/config/load-options.ts).
+
+The shell checks JavaScript syntax and WebAssembly support, catches startup
+errors/rejected promises and publishes a bounded diagnostic. A deficient
+WebView produces an explicit update message, rather than an indefinitely blank
+gallery. This does not increase `minSdk` or require upgrading Android 10/12.
+Users should update their normal Android System WebView through their device's
+trusted distribution channel, not install the historical CI provider below.
+
+Instrumentation fails immediately when the player reports an error, including
+the state/message/user agent in the assertion. The outer 60-second deadline
+allows the player's 45-second startup deadline to report first; it is not a
+retry and does not mask graphics failures. Synthetic startup-error tests verify
+that errors are delivered within five seconds.
+
+## Emulator preparation
+
+All matrix entries use rootable/debuggable `google_apis` x86_64 images. SDK image
+installation has three bounded attempts; cleanup is restricted to the exact
+matrix image package. Test failures are **not** retried or ignored. The emulator
+action reuses the prepared image. Its supported options are documented
+[upstream](https://github.com/ReactiveCircus/android-emulator-runner/tree/v2.38.0).
+
+For API 29 only, `scripts/ci/android_webview.py`:
+
+1. Downloads and verifies the pinned AOSP APK before running installation commands.
+2. Checks an emulator serial, `ro.kernel.qemu=1`, API 29, a debuggable image and
+   absence of a conflicting `com.android.webview` installation. It refuses a
+   physical device and never removes a system app or modifies a system image.
+3. Tests the original provider: successful playback if its capability probe
+   succeeds, otherwise the explicit unsupported-WebView result. This report is
+   preserved separately from the subsequent suite.
+4. Installs/selects the test provider and verifies its exact active version.
+5. Runs the complete suite with SWF playback **mandatory**, without skip flags.
+
+The extra original-provider test is opt-in; the separate live `/f/` smoke test
+also remains opt-in to avoid depending on CDN availability. Neither replaces
+the mandatory offline SWF playback fixture on any matrix entry.
+
+### CI-only provider provenance
+
+- Source: [AOSP chromium-webview](https://android.googlesource.com/platform/external/chromium-webview/+/27ac2bdb9a1a4e55dc65bb6cdc752dbfdea3b9f4/128.0.6613.88/x86_64/webview.apk).
+- Revision: `27ac2bdb9a1a4e55dc65bb6cdc752dbfdea3b9f4`.
+- Version: `128.0.6613.88`; package: `com.android.webview`; minimum API: 26.
+- APK SHA-256: `deb1987501d40c4c326697be8fdd7733abdf2e0ab7fb6e028205b0ff786876e5`.
+- Scope: historical compatibility-test baseline inside a disposable emulator,
+  **not** a current secure browser recommendation or an application dependency.
+  It is never bundled in the APK, committed as a binary, or installed on the phone.
+
+The helper retries interrupted downloads up to three times, but hash mismatches
+are hard failures. Gradle is scoped to the verified emulator via `ANDROID_SERIAL`.
+The emulator action receives one complete Python command: its script parser runs
+each input line in a separate shell, so multiline shell conditionals are not used.
+
+Google APIs userdebug images allow this additional provider; see Chromium's
+[provider requirements](https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/webview-providers.md).
+Changing the pinned APK requires deliberate provenance/hash review and a full
+playback run. Newer matrix entries keep their image's own WebView.
+
+## Local checks and remaining verification
+
+```sh
+python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
+bash -n scripts/ci/install_emulator_sdk.sh
+./gradlew verifySbom testSbomValidation \
+  :mimi-app:testFreeDebugUnitTest :mimi-app:lintFreeDebug \
+  :mimi-app:assembleFreeDebug :mimi-app:assembleFreeRelease :mimi-app:bundleFreeRelease
+./gradlew :mimi-app:connectedFreeDebugAndroidTest
+```
+
+The helper tests cover bounded SDK retries, final failure propagation, invalid
+API arguments, APK hashes/base64/cache handling, device safety and provider
+selection before the full suite. They do not substitute for a real emulator run.
+After pushing this change, check **all four** matrix jobs and their artifacts;
+do not mark the remote CI fixed merely because local checks pass.
+
+The Motorola Edge 20 (Android 12, WebView 155) passed the gallery playback suite
+with the WebGL renderer during this investigation. A later full-suite attempt
+was interrupted after the phone locked: ActivityScenario could not reach
+`RESUMED` behind its keyguard. That run is **not** recorded as passing; repeat
+the complete device suite with the phone unlocked. Local Windows API 29/31
+emulators did not reach ADB availability either, so no local emulator-matrix
+success is claimed.
+
+Final local checks passed: 80 app unit tests, 18 CI-helper/contract tests, debug
+lint, SBOM freshness/negative tests, minified release APK/AAB generation, and the
+isolated instrumented startup-error test (both error states, without needing an
+unlocked display). The temporary phone stay-awake setting was restored.

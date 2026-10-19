@@ -129,6 +129,9 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - [x] Retirar Stetho y el registro de cabeceras HTTP, y actualizar la política incluida en la aplicación para describir los datos locales, permisos y conexiones reales.
   - [x] Generar en CI APK y AAB release minificados, su checksum SHA-256 y el `mapping.txt`, además de la APK de depuración.
 - [x] Preparar una matriz mínima de pruebas: Android 10, 12, 14 y 16.
+  - [x] Investigar los fallos de las ejecuciones 11–13: WebView antiguo en API 29, fallo de shaders de Ruffle/wgpu en API 31/36 y descarga incompleta de la imagen API 34. Preferir WebGL compatible, informar de WebView incompatible y errores de arranque, fijar/verificar un proveedor de pruebas solo para el emulador API 29 y reintentar únicamente la preparación del SDK. Detalles y procedencia en `docs/CI.md`.
+  - [ ] Confirmar que la nueva ejecución remota supera los cuatro trabajos instrumentados tras publicar la corrección; la validación local y del Motorola no sustituye esta comprobación.
+  - [ ] Repetir la suite completa del Motorola con el teléfono desbloqueado: la reproducción WebGL y los errores de arranque pasan, pero el intento completo del 19 de octubre quedó interrumpido por el bloqueo de pantalla. Se han validado por separado 80 pruebas unitarias, 18 pruebas auxiliares de CI, lint, SBOM y APK/AAB release.
   - [x] Configurar en CI la ejecución paralela de las 27 pruebas instrumentadas sobre API 29, 31, 34 y 36 mediante emuladores acelerados.
   - [x] Conservar durante 14 días informes HTML, resultados JUnit, información del dispositivo y logcat de cada API.
   - [x] Validar la suite completa en el Motorola Edge 20 físico con Android 12/API 31: 27 pruebas superadas el 17 de octubre de 2026. El 18 de octubre se amplió la prueba técnica de Ruffle a una película de dos fotogramas y se verificaron además tres SWF reales de `/f/` mediante una prueba optativa con red.

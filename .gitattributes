@@ -2,3 +2,4 @@
 /mimi-app/src/main/assets/ruffle/* -text
 # Keep versioned generated snapshots identical on Windows and Linux.
 /sbom/*.json text eol=lf
+/scripts/ci/*.sh text eol=lf
