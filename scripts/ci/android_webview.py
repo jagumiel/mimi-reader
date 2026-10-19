@@ -114,11 +114,14 @@ def run_tests(apk, serial, api=29):
     if "Success" not in installed:
         raise RuntimeError("CI WebView installation failed")
     selected = adb(serial, "shell", "cmd", "webviewupdate", "set-webview-implementation", PACKAGE)
-    if f"Success. Current WebView package is {PACKAGE}" not in selected:
-        raise RuntimeError(f"The pinned WebView was not selected: {selected}")
+    # Android 10 prints only "Success"; newer releases can use a longer message.
+    # adb() already rejects nonzero exits. Verify actual state, not wording or an
+    # eligible-provider listing elsewhere in the service dump.
     provider = adb(serial, "shell", "dumpsys", "webviewupdate")
-    if f"({PACKAGE}, {VERSION})" not in provider:
-        raise RuntimeError("The active WebView does not match the pinned test version")
+    active = (rf"^[ \t]*Current WebView package \(name, version\):[ \t]*"
+              rf"\({re.escape(PACKAGE)},[ \t]*{re.escape(VERSION)}\)[ \t]*\r?$")
+    if not re.search(active, provider, re.MULTILINE):
+        raise RuntimeError(f"The active WebView does not match the pinned test version (selection response: {selected!r})")
     gradle(serial=serial)
 
 

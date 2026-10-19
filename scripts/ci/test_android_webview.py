@@ -97,8 +97,9 @@ class WebViewPreparationTest(unittest.TestCase):
     def test_wrong_provider_is_not_treated_as_playback_success(self):
         self.apk.write_bytes(self.content)
         with patch.object(helper, "validate_emulator"), patch.object(helper, "gradle") as gradle, \
-                patch("shutil.copytree"), patch.object(helper, "adb", side_effect=["Success", "Failed"]):
-            with self.assertRaisesRegex(RuntimeError, "not selected"):
+                patch("shutil.copytree"), patch.object(helper, "adb", side_effect=[
+                    "Success", "Failed", "Current WebView package (name, version): (com.google.android.webview, 74.0.0.0)"]):
+            with self.assertRaisesRegex(RuntimeError, "does not match"):
                 helper.run_tests(self.apk, "emulator-5554")
         self.assertEqual(1, gradle.call_count)
 
@@ -113,6 +114,41 @@ class WebViewPreparationTest(unittest.TestCase):
         self.assertIn("originalWebViewHandlesFlashOrExplainsItsRequirement", gradle.call_args_list[0].args[0])
         self.assertEqual((), gradle.call_args_list[1].args)
         self.assertEqual({"serial": "emulator-5554"}, gradle.call_args_list[1].kwargs)
+
+    def test_android_10_short_success_response_allows_verified_playback(self):
+        # Actual API 29 output in workflow run 14: the command prints only Success.
+        self.apk.write_bytes(self.content)
+        responses = ["Performing Streamed Install\nSuccess", "Success",
+                     f"Current WebView Update Service state\n  Current WebView package (name, version): ({helper.PACKAGE}, {helper.VERSION})\n"]
+        with patch.object(helper, "validate_emulator"), patch.object(helper, "gradle") as gradle, \
+                patch("shutil.copytree"), patch.object(helper, "adb", side_effect=responses):
+            helper.run_tests(self.apk, "emulator-5554")
+        self.assertEqual(2, gradle.call_count)
+        self.assertEqual((), gradle.call_args_list[1].args)
+
+    def test_success_text_does_not_bypass_active_provider_verification(self):
+        self.apk.write_bytes(self.content)
+        for current in (f"Current WebView package (name, version): ({helper.PACKAGE}, 127.0.0.0)",
+                        "Current WebView package (name, version): (com.google.android.webview, 128.0.6613.88)",
+                        "Current WebView package is null"):
+            with self.subTest(current=current), patch.object(helper, "validate_emulator"), \
+                    patch.object(helper, "gradle") as gradle, patch("shutil.copytree"), \
+                    patch.object(helper, "adb", side_effect=["Success", "Success", current]):
+                with self.assertRaisesRegex(RuntimeError, "does not match"):
+                    helper.run_tests(self.apk, "emulator-5554")
+                self.assertEqual(1, gradle.call_count)
+
+    def test_eligible_provider_listing_is_not_active_provider_confirmation(self):
+        self.apk.write_bytes(self.content)
+        # The expected tuple elsewhere in the dump must not override its current-provider line.
+        current = ("Current WebView package (name, version): (com.google.android.webview, 74.0.0.0)\n"
+                   f"  Eligible provider: ({helper.PACKAGE}, {helper.VERSION})")
+        responses = ["Success", f"Success. Current WebView package is {helper.PACKAGE}", current]
+        with patch.object(helper, "validate_emulator"), patch.object(helper, "gradle") as gradle, \
+                patch("shutil.copytree"), patch.object(helper, "adb", side_effect=responses):
+            with self.assertRaisesRegex(RuntimeError, "does not match"):
+                helper.run_tests(self.apk, "emulator-5554")
+        self.assertEqual(1, gradle.call_count)
 
     def test_gradle_is_scoped_to_the_verified_emulator(self):
         with patch.object(helper.subprocess, "run") as run:

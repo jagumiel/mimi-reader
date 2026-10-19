@@ -23,6 +23,24 @@ reports identified these distinct causes:
 The test previously waited 20 seconds even after a player error. That generic
 assertion obscured the actual JavaScript/graphics failure.
 
+### Run 14: Android 10 selection-response regression
+
+[Run 14](https://github.com/jagumiel/mimi-reader/actions/runs/39314808778)
+passed build/SBOM checks and the Android 12, 14 and 16 suites. On Android 10,
+the original-provider test passed and APK installation succeeded, but the helper
+rejected the provider-selection command's plain `Success` response before
+querying its active state. The upgraded-provider playback suite never started.
+This was a CI-helper error, not a reported application-test failure.
+
+Android 10's [shell implementation](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-10.0.0_r1/services/core/java/com/android/server/webkit/WebViewUpdateServiceShellCommand.java)
+returns this short success message. The helper now preserves nonzero-exit
+failures and checks the exact **current-provider** package/version line in
+`dumpsys webviewupdate`, independently of success-message wording. An eligible
+provider elsewhere in the dump is not sufficient. The 21 helper/contract tests
+include both response formats and reject wrong/missing active providers or
+versions. A new remote run is still required to validate API 29 playback after
+provider installation.
+
 ## Application changes
 
 The trusted Flash shell prefers Ruffle's legacy `webgl` renderer, avoiding the
