@@ -17,20 +17,11 @@
 package com.mimireader.chanlib.util;
 
 
-import android.graphics.Color;
-
 public class ChanUtil {
-
-    public static String getVariableOrEmptyString(String var) {
-        return var == null ? "" : var;
-    }
 
     // From: https://gist.github.com/odedhb/79d9ea471c10c040245e
     public static int calculateColorBase(String name) {
-        String opacity = "#88"; //opacity between 00-ff
-        String hexColor = String.format(
-                opacity + "%06X", (0xffffff & name.hashCode()));
-
-        return Color.parseColor(hexColor);
+        // Same ARGB as #88RRGGBB, without formatting a string or calling Android APIs.
+        return 0x88000000 | (name.hashCode() & 0x00ffffff);
     }
 }

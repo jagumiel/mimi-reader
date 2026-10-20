@@ -1,8 +1,9 @@
 # Dependency inventory and cleanup plan
 
 Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
-20 October after the bounded dependency/orphan-file cleanups and single-app
-variant consolidation; retained library versions are unchanged.
+20 October after the bounded cleanups and single-app consolidation. The fourth
+block below aligns RxJava declarations with existing resolution and updates
+only the library's test-only JUnit version; shipped library versions are unchanged.
 
 The canonical release SBOM has **154 top-level components**: 152 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -53,15 +54,16 @@ The first combined build hit an internal Kotlin FIR exception while lint
 analyzed an unchanged instrumentation test. A separate normal lint invocation
 passed without code changes, disabled detectors or relaxed error handling. The
 cause of that analyzer exception is not established; do not hide it with retries
-if it recurs in CI. The previous remote baseline is green in run 15; this
-dependency-cleanup commit still needs its own Android 10/12/14/16 CI run.
+if it recurs in CI. Run 15 was the initial remote baseline; the later
+`eeb2e31` run confirmed by the user covers these changes cumulatively, as noted
+under the third block. New cleanup changes still require their own matrix run.
 
 ## Findings from the resolved graph
 
 | Area | Observed state | Follow-up and verification |
 | --- | --- | --- |
 | AppCompat | Declared 1.2.0, but Gradle selects **1.3.0-alpha02**, including appcompat-resources. | Trace the incoming dependency and align a deliberate supported version. Check themes, menus, dialogs, startup, system insets and R8. |
-| RxJava | Declared 2.2.19, selected **2.2.21**; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Align declarations with resolution before considering broader replacement. Check cancellation, network errors and background work. |
+| RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
 | PDF | MimiReader AndroidPdfViewer 3.2.0-beta.2 pulls pdfium-android 1.9.0 and native binaries. | Review maintenance and native compatibility. Exercise opening, scrolling, rotation and release builds on all supported Android test targets. |
 | UI libraries | Material 1.2.1, Glide 4.11.0, Preference 1.1.1, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.0. | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
@@ -76,9 +78,11 @@ No vulnerability database was queried in this phase.
   indirect/generated usage rather than equating absent imports with safe removal.
 - Legacy AndroidX umbrella dependencies: check which APIs and resources still
   require them after the ViewPager and background-work migrations.
-- JUnit 4.12 in `chanlib` versus 4.13.2 in the app: align the library test setup.
-- Empty `chanlib/libs` file-tree and unused version variables: remove obsolete
-  build declarations after checking that no local binary workflow depends on them.
+- JUnit alignment, the empty local file-tree/repositories and obsolete commented
+  build declarations are addressed in the fourth block below.
+- Keep the Serialization BOM: absence of application imports does not establish
+  that a dependency constraint is unused. Lifecycle saved-state consumes its
+  aligned core artifacts transitively; re-evaluate only with graph/migration tests.
 
 Do not infer that a layout library is unused merely from Java/Kotlin imports:
 `PercentRelativeLayout` remains in `filter_list_item.xml`, and AndroidX GridLayout
@@ -136,8 +140,8 @@ database schemas, user data and third-party license files remain unchanged.
   already removes unused code/resources. This block primarily reduces obsolete
   source and maintenance overhead.
 
-The Android 10/12/14/16 remote matrix still needs to run on this cleanup commit;
-the earlier green baseline is not validation of these deletions.
+The later `eeb2e31` matrix run confirmed by the user covers these deletions
+cumulatively. That is not validation of subsequent cleanup changes.
 
 ## Third cleanup: one free application, standard build types
 
@@ -188,10 +192,60 @@ version, SDK level, signing setup or database schema changes in this block.
   AAB changes from 36,448,057 to 36,448,009 bytes. This is not a performance
   benchmark or a claim of byte-identical artifacts.
 
-The historical `.donate` package had a different application ID. Its data is
-not automatically imported into the retained application by removing a build
-flavor; see [the release guide](RELEASING.md). The new commit still requires
-its own Android 10/12/14/16 remote matrix run.
+The user confirmed the full GitHub Actions run for `eeb2e31` passed, including
+the unflavored Android 10/12/14/16 matrix and artifact uploads. This is the
+remote baseline for the next cleanup, not validation of subsequent changes.
+
+## Fourth cleanup: build declarations and testable legacy utilities
+
+The user confirmed `eeb2e31` passed GitHub Actions and requested continued
+dependency cleanup/refactoring before vulnerability scanning. Obsolete
+duplicate-edition migration notes are removed; no edition-specific migration
+implementation remains in Java/Kotlin sources and no installed package or
+application data is removed.
+
+- Remove the two empty `flatDir` repositories and the empty `chanlib/libs`
+  `fileTree` dependency. None of the root/app/library `libs` directories exists;
+  the only tracked JAR is the Gradle wrapper. `chanlib` inherits the central
+  repositories instead of redundantly declaring Google/Maven Central again.
+- Remove the unused LeakCanary version and commented-out LeakCanary, local-JAR
+  and superseded PDF declarations. Keep the actual PDF dependency and licenses.
+- Share RxJava **2.2.21** across modules, matching the previously selected
+  artifact, and JUnit **4.13.2**, replacing `chanlib`'s test-only 4.12 declaration.
+- Retain Kotlin Serialization BOM **1.8.1** and document its indirect consumer.
+  `dependencyInsight --configuration releaseRuntimeClasspath --dependency
+  kotlinx-serialization --single-path` shows Lifecycle saved-state requests core
+  1.7.3, with the BOM selecting 1.8.1. Removing it is not a version-neutral
+  cleanup even though there are no direct application Serialization imports.
+- Replace the arithmetic example with eight real `ChanUtil` unit tests and
+  remove the `ApplicationTestCase` template, which contained no test methods.
+  CI now executes `:chanlib:testDebugUnitTest` explicitly as well as app tests.
+- Refactor `calculateColorBase` from string formatting/Android color parsing to
+  equivalent ARGB bit packing, and remove its unused null-to-empty helper. The
+  thread adapter remains its real consumer. Unit coverage includes negative/
+  overflowing hashes, fixed alpha, collisions, supplementary Unicode and null
+  failure semantics; an instrumented test compares 136 deterministic inputs
+  with the legacy Android parser on every matrix API.
+
+### Validation of this block
+
+- 80 app unit tests, eight actual library unit tests and 22 CI-helper/contract
+  tests passed. Debug APK/test APK and the application variant-ID contract passed.
+- The runtime SBOM snapshot is byte-for-byte unchanged: 154 components, 152
+  Maven components and 74 direct declarations. The dependency inventory changes
+  only the two RxJava requests, the library JUnit request and its test resolution
+  from 4.12 to 4.13.2; no release, processor or build-tool graph version changes.
+- Full Motorola Edge 20 / Android 12 suite: 33 cases, 31 passed, two expected
+  opt-in skips, no failures/errors, including the new color-compatibility test.
+  The temporary phone stay-awake setting was restored to its original value (`0`).
+- Normal debug lint passed with no errors and the unchanged 1,020 warnings,
+  one hint and 487 `UnusedResources` findings. SBOM schema/freshness and negative
+  tests passed; no lint baseline or detector suppression was added.
+- Minified release APK/AAB and release vital lint passed. Packaged metadata
+  retains the original release ID, version 230 / 7.0.1, `minSdk 23` and target
+  API 36. Local APK size remains 59,382,590 bytes; AAB changes from 36,448,009
+  to 36,447,955 bytes. These are artifact observations, not startup/performance
+  measurements. The new block still needs its own remote matrix run.
 
 ## Remaining legacy-file review
 
@@ -206,19 +260,35 @@ not a count of safe-to-delete files. Other findings still require manual
 confirmation against view binding, manifest entries, themes, variants and
 indirect resource usage. Keep migration assets, font assets, third-party
 licenses and CAPTCHA paths until their actual consumers and upgrade requirements
-have been checked. The two old `chanlib` test templates also need review; the
-arithmetic example is not meaningful regression coverage.
+have been checked. The two `chanlib` test templates have now been replaced or
+removed with meaningful unit/device coverage, as described above.
+
+The remaining `openMarketLink` method is not an orphan: the More Info rating
+preference still calls it. Its legacy Amazon/Play Store routes need a separate
+settings/link review given the app's withdrawal from Play Store; do not delete
+only the method and leave a live caller behind. This block does not change that UI.
 
 ## Sequence for subsequent iterations
 
-1. Complete bounded removal of confirmed unused dependencies and orphaned code/
-   resources in separate commits. Regenerate snapshots and run relevant tests,
-   lint and a minified release build after each dependency group.
-2. Add CVE/GHSA scanning of the cleaned SBOM to GitHub Actions, including
-   scheduled execution, SARIF output and reviewed time-limited exceptions.
-3. Align selected/declarative versions, then modernize UI/native dependencies
-   with the Android 10/12/14/16 matrix and targeted device checks.
-4. Compare APK/AAB size and startup behavior before and after cleanup.
+1. Commit the validated fourth cleanup block, its dependency inventory and test
+   coverage before starting another implementation block.
+2. Restore user-solvable CAPTCHA and message posting as the next development
+   task, ahead of the AndroidX group. Reading and participating are both core
+   application functionality. Keep CAPTCHA resolution and submission under the
+   user's control; use simulated posting in CI, and agree content/destination
+   and obtain confirmation before a real public test post. See phase 5 of
+   [the roadmap](../roadmap-2026.md) for scope and acceptance criteria.
+3. Resume dependency modernization and responsibility-focused refactoring:
+   trace and replace the unintended AppCompat/Fragment alpha selections as a
+   bounded AndroidX UI group, with themes, dialogs, restoration/navigation,
+   insets, R8 and the Android 10/12/14/16 matrix. Keep cleanup commits bounded,
+   regenerate affected snapshots and run the relevant tests/lint/release builds.
+4. Review PDF/native compatibility and remaining legacy adapters/resources;
+   compare APK/AAB size and startup behavior with appropriate measurements.
+5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
+   cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
+   time-limited exceptions. Do not treat the scanner as the automatic next task
+   while these cleanup blocks remain outstanding.
 
 The 8.0 changelog still requires agreement with the project owner; the main
 README remains the final documentation task.

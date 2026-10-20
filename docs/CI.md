@@ -118,6 +118,10 @@ Since 20 October 2026 the app and library have no product flavors. CI uses only
 `apk/release`, `bundle/release` and `mapping/release`. The WebView wrapper runs
 `connectedDebugAndroidTest`; its provider-safety checks and emulator matrix are
 unchanged. CI helper coverage is now 22 tests, including these task/output paths.
+The next cleanup also makes `:chanlib:testDebugUnitTest` mandatory in the build
+job: its eight actual utility tests replace the old arithmetic example. A device
+color-compatibility test compares the refactored utility with Android's legacy
+parser across 136 deterministic names on every instrumented matrix target.
 
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
@@ -125,6 +129,7 @@ bash -n scripts/ci/install_emulator_sdk.sh
 ./gradlew verifySbom testSbomValidation \
   :mimi-app:verifyApplicationVariants \
   :mimi-app:testDebugUnitTest :mimi-app:lintDebug \
+  :chanlib:testDebugUnitTest \
   :mimi-app:assembleDebug :mimi-app:assembleRelease :mimi-app:bundleRelease
 ./gradlew :mimi-app:connectedDebugAndroidTest
 ```

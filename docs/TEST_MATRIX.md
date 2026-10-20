@@ -11,6 +11,12 @@ Mimi Reader keeps `minSdk 23`, but the supported release baseline is exercised o
 
 The suite covers startup routing, tab and activity restoration, back navigation, Room and preference migrations, cache clearing, gallery playback and autoplay, MP4 decoding, and persistent WorkManager downloads.
 
+On 20 October 2026, the cleanup adds a device check comparing `ChanUtil` colors
+with the old Android color parser across 136 deterministic inputs. The Motorola
+Edge 20 / Android 12 suite has 33 cases: 31 passed and two expected opt-in skips.
+Eight real `chanlib` utility unit tests replace its old arithmetic example and
+are now explicitly run in CI alongside the app's 80 unit tests.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

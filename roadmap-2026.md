@@ -6,6 +6,8 @@
 
 Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo útiles. La aplicación mantiene `minSdk 23` y se valida expresamente en Android 10 y Android 12, aunque compile y publique contra Android 16 (`compileSdk` y `targetSdk` 36).
 
+La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el usuario pueda resolver y publicar mensajes forma parte de la funcionalidad esencial, no de una mejora de baja prioridad.
+
 ## Estado actual
 
 ### Completado
@@ -31,6 +33,13 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - Prueba final del 5 de octubre de 2026: cancelación sin temporales residuales y recuperación de 151 archivos con cero diferencias de tamaño.
 
 ## Siguientes fases
+
+### Orden de trabajo inmediato
+
+1. Registrar en un commit el cuarto bloque de limpieza y refactorización ya validado.
+2. Recuperar la publicación de mensajes con CAPTCHA visible y resoluble manualmente por el usuario; alcance y criterios en la fase 5. Es la siguiente tarea de desarrollo.
+3. Retomar AppCompat/Fragment y los demás bloques de dependencias y refactorización.
+4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 
 ### 1. Red y compatibilidad con la API
 
@@ -143,23 +152,32 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
     - [ ] Retirar o sustituir los candidatos confirmados en cambios incrementales con sus pruebas.
       - [x] Primer bloque: retirar `commons-codec:1.12`, `room-guava:2.8.5` y el falso procesador `kapt androidx.annotation`; conservar las anotaciones normales y las integraciones Rx utilizadas. El SBOM pasa de 157 a 154 componentes al desaparecer también `kotlinx-coroutines-guava`; no cambian las versiones de los componentes conservados. Inventario actualizado de 77 a 74 declaraciones.
         - [x] Retirar además la supresión amplia de advertencias Apache en R8. Validar 80 pruebas unitarias de aplicación, 21 auxiliares de CI, lint, SBOM, APK/AAB release y la suite del Motorola (30 superadas, 2 optativas omitidas). Registrar tamaños antes/después y el fallo interno inicial de lint en `docs/DEPENDENCIES.md`.
-        - [ ] Confirmar la matriz remota de Android 10/12/14/16 con el commit de esta limpieza, no solo con la versión anterior.
+        - [x] Cobertura acumulada confirmada por el usuario en la matriz remota de Android 10/12/14/16 de `eeb2e31`, que ya incluye esta limpieza.
       - [x] Segundo bloque: retirar `AudioSettingsHost`, `MimiTab` y los layouts huérfanos `activity_gallery`, `activity_video_ad` y `activity_youtube`, tras comprobar referencias en código, XML, manifiesto, reglas R8, view binding y variantes. Conservar `activity_gallery2`, los contratos actuales de pestañas/audio, los enlaces externos de YouTube y el ID `gallery_container` compartido con otra pantalla. No borrar archivos solo por su antigüedad; auditoría en `docs/DEPENDENCIES.md`.
         - [x] Compilar `freeDebug`, su APK de pruebas y `paidDebug`; verificar las 80 pruebas unitarias de aplicación, las 21 auxiliares de CI y el SBOM sin cambios de componentes ni snapshots. Confirmar que los tres bindings huérfanos ya no se generan en ninguna de las dos variantes.
         - [x] Validar lint sin errores (avisos `UnusedResources` de 490 a 487), APK/AAB release minificados y la suite completa del Motorola con Android 12: 30 pruebas superadas y dos optativas omitidas, sin fallos. Restaurar el ajuste temporal de pantalla encendida y documentar los tamaños locales sin atribuir mejoras de rendimiento no medidas.
-        - [ ] Confirmar la matriz remota de Android 10/12/14/16 con el commit de esta limpieza de recursos.
+        - [x] Cobertura acumulada confirmada por el usuario en la matriz remota de Android 10/12/14/16 de `eeb2e31`, que ya incluye estas retiradas de recursos.
       - [x] Tercer bloque: consolidar la única aplicación gratuita, retirando `free`/`paid` de ambos módulos y la variante `amazon` de `chanlib`. Mantener solo `debug`/`release`, los identificadores y la firma actuales; adaptar tareas, CI, artefactos, diagnósticos e inventario/SBOM sin modificar versiones de dependencias. Añadir `verifyApplicationVariants` a `check` y CI para proteger los identificadores y evitar variantes comerciales accidentales.
         - [x] Validar 80 pruebas unitarias, 22 auxiliares de CI, lint sin errores, SBOM y APK/AAB release minificados. Confirmar que los 154 componentes y sus grafos/versiones/huellas no cambian tras renombrar variantes/configuraciones; renombrar el snapshot a `mimi-reader-release.cdx.json`.
-        - [x] Actualizar la instalación existente con `adb install -r`, comprobar las nueve huellas de bases de datos/preferencias sin cambios y el arranque correcto. Suite del Motorola con Android 12: 30 pruebas superadas, dos optativas omitidas y cero fallos; ajuste temporal de pantalla restaurado. El antiguo paquete `.donate` no se migra automáticamente ni se desinstala.
-        - [ ] Confirmar en GitHub Actions la matriz remota de Android 10/12/14/16 y la subida de artefactos con las rutas sin flavors de este commit.
+        - [x] Actualizar la instalación existente con `adb install -r`, comprobar las nueve huellas de bases de datos/preferencias sin cambios y el arranque correcto. Suite del Motorola con Android 12: 30 pruebas superadas, dos optativas omitidas y cero fallos; ajuste temporal de pantalla restaurado.
+        - [x] Confirmada por el usuario la ejecución de GitHub Actions de `eeb2e31`: matriz remota de Android 10/12/14/16 y subida de artefactos con las rutas sin flavors.
+      - [x] Cuarto bloque: retirar repositorios locales y declaraciones vacías/comentadas, compartir las versiones de RxJava y JUnit y sustituir las plantillas de pruebas de `chanlib` por cobertura real. Refactorizar el cálculo de colores sin cambiar su resultado y retirar referencias documentales a la antigua edición de donación, sin tocar instalaciones ni datos.
+        - [x] Confirmar el uso indirecto de Kotlin Serialization por Lifecycle saved-state y conservar el BOM 1.8.1: retirarlo podría cambiar la versión seleccionada, aunque no haya imports directos en la app.
+        - [x] Validar 80 pruebas unitarias de app, ocho de biblioteca y 22 auxiliares de CI; compilar APK/APK de pruebas y comprobar el SBOM de runtime sin cambios. Añadir la suite de biblioteca a CI y una prueba instrumentada de equivalencia de colores con 136 entradas.
+        - [x] Suite completa del Motorola con Android 12: 31 pruebas superadas y dos optativas omitidas, sin fallos; restaurar el ajuste de pantalla encendida. Lint sin errores, sin nuevas supresiones y con los avisos anteriores.
+        - [x] Validar APK/AAB release minificados y vital lint, conservando identificador, versión, `minSdk 23` y objetivo API 36. Registrar tamaños locales sin atribuir mejoras de rendimiento no medidas.
+        - [ ] Confirmar la matriz remota de Android 10/12/14/16 con los cambios de este bloque.
+      - [ ] Grupo AndroidX posterior a recuperar CAPTCHA/publicación: rastrear y sustituir las selecciones alpha heredadas de AppCompat/Fragment, revisando también Preference y los adaptadores legacy que las introducen. Validar temas, diálogos, navegación/restauración, insets y R8 antes de ampliar el grupo.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
     - [x] Cubrir el grafo de `release` (antes `freeRelease`) antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
   - [ ] Añadir a GitHub Actions una validación del SBOM y un análisis de vulnerabilidades conocidas (CVE/GHSA), publicar los resultados en SARIF y bloquear inicialmente solo vulnerabilidades `high` o `critical` no justificadas.
+    - Recuperar primero CAPTCHA/publicación y continuar después con los bloques acordados de limpieza de dependencias y refactorización; el escaneo queda aplazado, no es la siguiente tarea automática.
     - [x] Validar el formato y la frescura del SBOM en CI; el análisis CVE/GHSA y SARIF sigue pendiente.
     - [ ] Ejecutar el análisis en cada `pull_request`, al actualizar el SBOM y de forma programada para detectar vulnerabilidades publicadas después del último cambio de código.
     - [ ] Identificar Ruffle y cualquier componente manual mediante versión y Package URL; documentar excepciones temporales con caducidad para evitar que los falsos positivos se conviertan en exclusiones permanentes.
   - [ ] Separar las clases con demasiadas responsabilidades y eliminar adaptadores, recursos y rutas heredadas que hayan quedado sin uso tras la modernización.
+    - [ ] Revisar la acción de valorar la app y sus rutas antiguas de Play Store/Amazon en Acerca de; no son código huérfano, pero Mimi ya no se distribuye en Play Store. Tratarlo como una revisión funcional de enlaces y preferencias, con sus pruebas.
   - [ ] Añadir pruebas unitarias o instrumentadas para cada sustitución y ejecutar la matriz completa de Android 10, 12, 14 y 16 para detectar regresiones.
   - [ ] Comparar tamaño de artefactos, tiempos de arranque y comportamiento de R8 antes y después de la limpieza.
 - [ ] Antes de preparar el release, definir conjuntamente el alcance y el formato del changelog; no iniciar esta tarea sin consultar primero al responsable del proyecto.
@@ -167,10 +185,17 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
   - El changelog debe reconstruir y resumir todos los cambios desde **7.0.1**, punto de partida del fork.
 - [ ] Como última tarea, actualizar el `README.md` con una descripción actual de la aplicación, los cambios incorporados durante la modernización, las instrucciones de compilación e instalación y la aclaración de que Mimi ya no está disponible en Google Play.
 
-### 5. Publicación de contenido (prioridad baja)
+### 5. Publicación de contenido (próxima tarea prioritaria)
 
-- Investigar el CAPTCHA vigente y su flujo compatible con WebView o navegador.
-- Recuperar la publicación solo después de estabilizar lectura, multimedia y descargas.
+- [ ] Revisar el flujo de publicación y CAPTCHA vigente del sitio y el código heredado de la app, sin asumir que la integración antigua sigue siendo válida.
+- [ ] Mostrar un desafío completo, legible e interactivo que pueda resolver manualmente el usuario, con WebView o una integración de navegador compatible según lo que admita el sitio.
+- [ ] Integrar la respuesta o token del CAPTCHA con el formulario y el envío explícito del usuario. Permitir responder en hilos y crear hilos donde la board lo admita, conservando los adjuntos ya admitidos por la app.
+- [ ] Permitir renovar el desafío cuando falle o caduque, cancelar y reintentar sin perder el borrador ni provocar envíos duplicados.
+- [ ] Mostrar con claridad errores de CAPTCHA, validación, red, límites de publicación o restricciones del sitio. No registrar respuestas, tokens ni cookies de sesión en logs.
+- [ ] Cubrir formulario, transmisión de la respuesta/token, caducidad, cancelación y reintento con pruebas simuladas e instrumentadas; validar interacción, teclado, rotación y regreso a la app en Android 10 y 12, además de la matriz CI habitual.
+- [ ] Realizar una prueba de publicación real solo después de acordar con el usuario el contenido y el destino y recibir su confirmación. Las pruebas automatizadas de CI no publicarán mensajes reales.
+
+Resolver el CAPTCHA y decidir publicar son acciones del usuario. Esta fase tiene prioridad sobre AppCompat/Fragment y el escaneo; el resto de la modernización se retomará después.
 
 ## Criterios de compatibilidad
 

@@ -58,7 +58,7 @@
         {
             "configuration": "api",
             "project": ":chanlib",
-            "requested": "io.reactivex.rxjava2:rxjava:2.2.19"
+            "requested": "io.reactivex.rxjava2:rxjava:2.2.21"
         },
         {
             "configuration": "api",
@@ -318,7 +318,7 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "io.reactivex.rxjava2:rxjava:2.2.19"
+            "requested": "io.reactivex.rxjava2:rxjava:2.2.21"
         },
         {
             "configuration": "implementation",
@@ -363,7 +363,7 @@
         {
             "configuration": "testImplementation",
             "project": ":chanlib",
-            "requested": "junit:junit:4.12"
+            "requested": "junit:junit:4.13.2"
         },
         {
             "configuration": "testImplementation",
@@ -466,7 +466,7 @@
             },
             {
                 "direct": true,
-                "id": "junit:junit:4.12"
+                "id": "junit:junit:4.13.2"
             },
             {
                 "direct": true,

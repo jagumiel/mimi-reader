@@ -216,6 +216,7 @@ class WorkflowContractTest(unittest.TestCase):
         for task in ("verifyApplicationVariants", "testDebugUnitTest", "lintDebug",
                      "assembleDebug", "assembleRelease", "bundleRelease"):
             self.assertIn(f":mimi-app:{task}", workflow)
+        self.assertIn(":chanlib:testDebugUnitTest", workflow)
         for path in ("apk/debug/mimi-app-debug.apk", "apk/release/*.apk",
                      "bundle/release/*.aab", "mapping/release/mapping.txt"):
             self.assertIn(f"mimi-app/build/outputs/{path}", workflow)

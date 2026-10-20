@@ -13,8 +13,6 @@ against the actual AGP variants and also runs through `check` and Android CI.
 
 Removing a flavor does not require uninstalling the existing free application.
 Use an in-place update with the same certificate; do not clear application data.
-The historical `.donate` package was a different application ID and is not
-automatically migrated by this change. No installed donation app is uninstalled.
 
 ## Versioning
 

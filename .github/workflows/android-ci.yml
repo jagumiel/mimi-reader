@@ -52,6 +52,7 @@ jobs:
           ./gradlew --no-daemon --stacktrace
           :mimi-app:verifyApplicationVariants
           :mimi-app:testDebugUnitTest
+          :chanlib:testDebugUnitTest
           :mimi-app:lintDebug
           :mimi-app:assembleDebug
 

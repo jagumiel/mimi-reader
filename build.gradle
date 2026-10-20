@@ -20,7 +20,8 @@ buildscript {
     ext.room_version = "2.8.5"
     ext.lifecycle_version = "2.11.0"
     ext.kotlinx_serialization_version = "1.8.1"
-    ext.canary_version = "2.4"
+    ext.rxjava_version = '2.2.21'
+    ext.junit_version = '4.13.2'
     ext.gson_version = "2.14.0"
     ext.jsoup_version = "1.23.2"
     ext.desugar_jdk_libs_version = "2.1.5"
@@ -30,10 +31,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-
-        flatDir {
-            dirs 'libs'
-        }
     }
 
     dependencies {
@@ -52,10 +49,6 @@ allprojects {
         mavenCentral()
         maven { url 'https://jitpack.io' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-
-        flatDir {
-            dirs 'libs'
-        }
     }
 }
 

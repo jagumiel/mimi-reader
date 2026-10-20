@@ -17,11 +17,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 android {
     namespace 'com.mimireader.chanlib'
     compileSdkVersion 36
@@ -56,8 +51,7 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$junit_version"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs_nio:$desugar_jdk_libs_version"
 
     api "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -66,7 +60,7 @@ dependencies {
     api "com.google.code.gson:gson:$gson_version"
 
     api "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-    api 'io.reactivex.rxjava2:rxjava:2.2.19'
+    api "io.reactivex.rxjava2:rxjava:$rxjava_version"
     api 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     api "org.jsoup:jsoup:$jsoup_version"
