@@ -43,6 +43,14 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.lifecycle.ViewModelProvider;
+import android.webkit.CookieManager;
+import android.webkit.WebSettings;
+import android.widget.TextView;
+import androidx.preference.PreferenceManager;
+import com.emogoth.android.phone.mimi.fourchan.PostingProtocol;
+import com.emogoth.android.phone.mimi.viewmodel.PostSubmissionViewModel;
+import io.reactivex.Single;
 
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.activity.MimiActivity;
@@ -54,8 +62,6 @@ import com.emogoth.android.phone.mimi.db.HistoryTableConnection;
 import com.emogoth.android.phone.mimi.db.PostOptionTableConnection;
 import com.emogoth.android.phone.mimi.db.UserPostTableConnection;
 import com.emogoth.android.phone.mimi.dialog.CaptchaDialog;
-import com.emogoth.android.phone.mimi.fourchan.FourChanCommentParser;
-import com.emogoth.android.phone.mimi.fourchan.FourChanHtmlParser;
 import com.emogoth.android.phone.mimi.fourchan.FourChanConnector;
 import com.emogoth.android.phone.mimi.util.Extras;
 import com.emogoth.android.phone.mimi.util.HttpClientFactory;
@@ -64,9 +70,7 @@ import com.emogoth.android.phone.mimi.util.ResourceUtils;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.view.IconTextView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-;
 import com.mimireader.chanlib.ChanConnector;
-import com.mimireader.chanlib.models.ChanBoard;
 import com.mimireader.chanlib.models.ChanPost;
 
 
@@ -76,25 +80,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 
 
 public class PostFragment extends BottomSheetDialogFragment {
     private static final String LOG_TAG = PostFragment.class.getSimpleName();
 
     private static final String EXTRA_NAME = "name";
-    private static final String EXTRA_COMMENT = "comment";
     private static final String EXTRA_SUBJECT = "subject";
     private static final String EXTRA_EMAIL = "email";
     private static final String EXTRA_FILE = "file";
@@ -105,11 +102,8 @@ public class PostFragment extends BottomSheetDialogFragment {
     private long threadId;
     private int threadSize;
     private String boardName;
-    private String postUrl;
     private String boardTitle;
 
-    private ViewGroup shrinkFormContainer;
-    //    private ViewGroup headerContainer;
     private AppCompatEditText commentField;
     private AppCompatTextView nameText;
 
@@ -118,17 +112,16 @@ public class PostFragment extends BottomSheetDialogFragment {
     private AppCompatEditText subjectInput;
 
     private ViewSwitcher replyFormViewSwitcher;
-    private ImageView editUserInfoButton;
     private AppCompatTextView doneEditingButton;
 
     private String name = "";
     private String comment;
     private String email = "";
     private String subject = "";
-    private boolean isEditMode = false;
 
-    public String captchaChallenge = null;
-    public String captchaVerification;
+    private PostingProtocol.Answer captchaAnswer;
+    private PostSubmissionViewModel submission;
+    private TextView postError;
     private ImageView attachedImage;
     private PostListener postListener;
     private boolean isNewPost = false;
@@ -146,8 +139,6 @@ public class PostFragment extends BottomSheetDialogFragment {
     private PostOptionAdapter adapter;
 
     private Disposable fetchPostOptionsSubscription;
-    private Disposable fetchPostSubscription;
-    private Disposable boardInfoSubscription;
     private Disposable addPostSubscription;
 
     private String selectedFlag = null;
@@ -155,6 +146,20 @@ public class PostFragment extends BottomSheetDialogFragment {
 
     private String imagePath;
     private Uri imageUri;
+
+    @Override
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        getChildFragmentManager().setFragmentResultListener(CaptchaDialog.RESULT, this, (key, result) -> {
+            getChildFragmentManager().clearFragmentResult(CaptchaDialog.RESULT);
+            if (submission == null || submission.isSending()) return;
+            try {
+                captchaAnswer = new PostingProtocol.Answer(boardName, isNewPost ? 0 : threadId,
+                        result.getString("challenge"), result.getString("response"), result.getLong("expiresAt"));
+                startPostCall();
+            } catch (Exception error) { showPostError(getString(R.string.captcha_not_ready)); }
+        });
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -188,6 +193,7 @@ public class PostFragment extends BottomSheetDialogFragment {
             final Map<String, String> flagMap = ResourceUtils.getHashMapResource(getActivity(), R.xml.flags);
             final List<String> flagKeys = new ArrayList<>(flagMap.keySet());
 
+            final String restoredFlag = selectedFlag;
             selectedFlag = "0";
             flagSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -204,12 +210,16 @@ public class PostFragment extends BottomSheetDialogFragment {
 
             ArrayAdapter<String> flagAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, flagKeys);
             flagSelector.setAdapter(flagAdapter);
+            if (restoredFlag != null) for (int i = 0; i < flagKeys.size(); i++) {
+                if (restoredFlag.equals(flagMap.get(flagKeys.get(i)))) { flagSelector.setSelection(i); break; }
+            }
         }
 
         spoilerSelection = v.findViewById(R.id.spoiler_selection);
         if ("a".equals(boardName) || "lit".equals(boardName)) {
             spoilerSelection.setVisibility(View.VISIBLE);
             spoilerSelection.setOnCheckedChangeListener((compoundButton, checked) -> spoilerValue = checked ? "on" : null);
+            spoilerSelection.setChecked("on".equals(spoilerValue));
         }
 
         return v;
@@ -294,8 +304,8 @@ public class PostFragment extends BottomSheetDialogFragment {
 
         clearImage = view.findViewById(R.id.clear_image);
         clearImage.setOnClickListener(v -> {
-            clearAttachedImage();
             cleanUpTempImage();
+            clearAttachedImage();
         });
 
         attachedImageContainer = view.findViewById(R.id.image_container);
@@ -303,6 +313,29 @@ public class PostFragment extends BottomSheetDialogFragment {
 
         attachImageButton = view.findViewById(R.id.attach_image_button);
         attachImageButton.setOnClickListener(v -> pickImage());
+        if (!TextUtils.isEmpty(imagePath) && new File(imagePath).isFile()) {
+            attachedImage.setImageURI(Uri.fromFile(new File(imagePath)));
+            attachedImageContainer.setVisibility(View.VISIBLE);
+            attachImageButton.setVisibility(View.GONE);
+        }
+        postError = view.findViewById(R.id.post_error);
+        submission = new ViewModelProvider(this).get(PostSubmissionViewModel.class);
+        if (savedInstanceState != null && savedInstanceState.getBoolean("post_sending")
+                && !submission.isSending() && submission.getState().getValue().receipt == null) {
+            showPostError(getString(R.string.post_interrupted));
+        }
+        submission.getState().observe(getViewLifecycleOwner(), state -> {
+            setSending(state.sending);
+            if (state.receipt != null) {
+                submission.consume();
+                completePost(state.receipt);
+            } else if (state.error != null) {
+                submission.consume();
+                captchaAnswer = null;
+                showPostError(getString(R.string.post_attempt_failed, state.error.getLocalizedMessage()));
+                if (postListener != null) postListener.onError(state.error);
+            }
+        });
 
     }
 
@@ -340,108 +373,43 @@ public class PostFragment extends BottomSheetDialogFragment {
         captchaRequired = true;
     }
 
-    private void processResponse(Response<ResponseBody> response) {
-        String html = null;
-
-        try {
-            if (response == null) {
-                html = MimiApplication.getInstance().getString(R.string.empty_response_error);
-                if (postListener != null) {
-                    postListener.onError(new Exception(html));
-                }
-                return;
-            } else if (response.isSuccessful()) {
-                html = response.body().string();
-            } else {
-                html = response.errorBody().string();
-            }
-        } catch (Exception e) {
-            if (postListener != null) {
-                postListener.onError(e);
-            }
-            Log.e(LOG_TAG, "Error processing response", e);
-
-            return;
+    private void completePost(PostingProtocol.Receipt receipt) {
+        String postId = Long.toString(receipt.post);
+        if (isNewPost) {
+            threadId = receipt.thread;
+            ChanPost firstPost = new ChanPost();
+            firstPost.setName(TextUtils.isEmpty(name) ? "Anonymous" : name);
+            firstPost.setCom(comment);
+            firstPost.setComment(comment);
+            firstPost.setSub(subject);
+            firstPost.setSubject(subject);
+            firstPost.setNo(receipt.post);
+            HistoryTableConnection.putHistory(boardName, threadId, firstPost, 1)
+                    .compose(DatabaseUtils.applySingleSchedulers())
+                    .subscribe(ignored -> {}, error -> Log.w(LOG_TAG, "Could not save posted thread locally"));
         }
-
-        final String errorMsg = FourChanHtmlParser.parsePostError(html);
-        if (errorMsg != null) {
-            Log.i(LOG_TAG, errorMsg);
-
-            if (postListener != null) {
-                postListener.onError(new Exception(errorMsg));
-            }
-        } else {
-            String postId = null;
-            int index = html.indexOf("no:");
-            if (index >= 0) {
-                postId = html.substring(index + 3, html.lastIndexOf(" "));
-            } else {
-                index = html.indexOf("thread:");
-                if (index >= 0) {
-                    postId = html.substring(index + 3, html.lastIndexOf(" "));
-                }
-            }
-
-            if (postId != null && isNewPost) {
-                final String fileName = MimiUtil.removeExtention(imagePath);
-                final String fileExt = imagePath.substring(imagePath.lastIndexOf("."));
-                final String name = TextUtils.isEmpty(getName()) ? "Anonymous" : getName();
-                final ChanPost firstPost = new ChanPost();
-                final FourChanCommentParser.Builder parserBuilder = new FourChanCommentParser.Builder();
-
-                parserBuilder.setContext(getActivity())
-                        .setComment(getComment())
-                        .setQuoteColor(MimiUtil.getInstance().getQuoteColor())
-                        .setReplyColor(MimiUtil.getInstance().getReplyColor())
-                        .setHighlightColor(MimiUtil.getInstance().getHighlightColor())
-                        .setLinkColor(MimiUtil.getInstance().getLinkColor());
-
-                firstPost.setName(name);
-                firstPost.setTim(Calendar.getInstance(Locale.getDefault()).getTime().toString());
-                firstPost.setCom(getComment());
-                firstPost.setComment(parserBuilder.build().parse());
-                firstPost.setEmail(getEmail());
-                firstPost.setSub(getSubject());
-                firstPost.setSubject(getSubject());
-                firstPost.setNo(Integer.parseInt(postId));
-                firstPost.setFilename(fileName);
-                firstPost.setExt(fileExt);
-
-                HistoryTableConnection.putHistory(boardName, threadId, firstPost, 1)
-                        .compose(DatabaseUtils.applySingleSchedulers())
-                        .doOnSuccess(aBoolean -> Log.e(LOG_TAG, "Post returned with success=" + aBoolean))
-                        .doOnError(throwable -> {
-                            Log.e(LOG_TAG, "Error posting", throwable);
-                        })
-                        .subscribe();
-            }
-
-            BoardTableConnection.incrementPostCount(boardName).subscribe();
-
-            String option = getName();
-            if (!TextUtils.isEmpty(option)) {
-                PostOptionTableConnection.putPostOption(option)
-                        .compose(DatabaseUtils.applySingleSchedulers())
-                        .subscribe();
-            }
-
-            savePost(postId, true);
-
-            if (postListener != null) {
-                postListener.onSuccess(postId);
-            }
-            cleanUpTempImage();
-            clearForm();
-        }
+        BoardTableConnection.incrementPostCount(boardName)
+                .subscribe(ignored -> {}, error -> Log.w(LOG_TAG, "Could not update local post count"));
+        if (!TextUtils.isEmpty(name)) PostOptionTableConnection.putPostOption(name)
+                .compose(DatabaseUtils.applySingleSchedulers())
+                .subscribe(ignored -> {}, error -> Log.w(LOG_TAG, "Could not store name suggestion"));
+        savePost(postId);
+        cleanUpTempImage();
+        clearForm();
+        if (postListener != null) postListener.onSuccess(postId);
+        dismissAllowingStateLoss();
     }
 
     public void cleanUpTempImage() {
+        deleteTemporaryAttachment(imagePath);
+    }
+
+    private void deleteTemporaryAttachment(String path) {
         try {
-            if (!TextUtils.isEmpty(imagePath)) {
-                File imageFile = new File(imagePath);
-                if (imageFile.exists()) {
-                    Log.d(LOG_TAG, "Deleting temporary image file [" + imagePath + "]");
+            if (!TextUtils.isEmpty(path)) {
+                File imageFile = new File(path);
+                File uploadRoot = new File(requireContext().getCacheDir(), "upload");
+                if (imageFile.getCanonicalPath().startsWith(uploadRoot.getCanonicalPath() + File.separator) && imageFile.exists()) {
                     imageFile.delete();
                 }
             }
@@ -450,21 +418,13 @@ public class PostFragment extends BottomSheetDialogFragment {
         }
     }
 
-    private void savePost(final String postId, final boolean watch) {
+    private void savePost(final String postId) {
         if (postId == null) {
             Exception e = new Exception("Post ID is null");
             Log.e(LOG_TAG, "Cannot convert null post ID to an integer", e);
             return;
         }
-        final int id = Integer.parseInt(postId);
-//        RxUtil.safeUnsubscribe(fetchPostSubscription);
-//        fetchPostSubscription = HistoryTableConnection.fetchPost(boardName, threadId)
-//                .compose(DatabaseUtils.applySchedulers())
-//                .subscribe(history -> {
-//                    if (history.threadId == -1) {
-//                        ThreadRegistry.getInstance().add(boardName, threadId, id, threadSize + 1, watch);
-//                    }
-//                });
+        final long id = Long.parseLong(postId);
 
         RxUtil.safeUnsubscribe(addPostSubscription);
         addPostSubscription = UserPostTableConnection.addPost(boardName, threadId, id)
@@ -475,95 +435,61 @@ public class PostFragment extends BottomSheetDialogFragment {
                     } else {
                         Log.e(LOG_TAG, "Error Adding post to database: board=" + boardName + ", thread=" + threadId + ", post=" + postId);
                     }
-                });
+                }, error -> Log.w(LOG_TAG, "Could not record posted ID locally"));
     }
 
-    private Consumer<Response<ResponseBody>> onPostComplete() {
-        return this::processResponse;
-    }
-
-    private Consumer<Throwable> onPostFail() {
-        return throwable -> {
-            if (postListener != null) {
-                postListener.onError(throwable);
-            }
-        };
-    }
-
-    public void post() {
-        final ChanConnector chanConnector = new FourChanConnector.Builder()
+    private void post() {
+        Map<String, Object> params = new HashMap<>();
+        if (!TextUtils.isEmpty(name)) params.put("name", name);
+        if (!TextUtils.isEmpty(email)) params.put("email", email);
+        if (!TextUtils.isEmpty(subject)) params.put("sub", subject);
+        params.put("com", comment == null ? "" : comment);
+        android.content.SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String password = prefs.getString("posting_delete_password", null);
+        if (password == null) {
+            password = java.util.UUID.randomUUID().toString();
+            prefs.edit().putString("posting_delete_password", password).apply();
+        }
+        params.put("pwd", password);
+        params.put("mode", "regist");
+        if (selectedFlag != null) params.put("flag", selectedFlag);
+        if (spoilerValue != null) params.put("spoiler", spoilerValue);
+        if (!isNewPost) params.put("resto", Long.toString(threadId));
+        if (captchaRequired) PostingProtocol.addCaptcha(params, captchaAnswer, boardName, isNewPost ? 0 : threadId, System.currentTimeMillis());
+        captchaAnswer = null; // One explicit submission only; never reuse after an uncertain result.
+        if (!TextUtils.isEmpty(imagePath)) params.put("upfile", new File(imagePath));
+        PostingProtocol.board(boardName);
+        ChanConnector connector = new FourChanConnector.Builder()
                 .setEndpoint(FourChanConnector.getDefaultEndpoint())
                 .setPostEndpoint(FourChanConnector.getDefaultPostEndpoint())
-                .setClient(HttpClientFactory.getInstance().getClient())
+                .setClient(HttpClientFactory.getInstance().getPostingClient(WebSettings.getDefaultUserAgent(requireContext()),
+                        CookieManager.getInstance().getCookie(PostingProtocol.SYSTEM_ORIGIN),
+                        PostingProtocol.browserUrl(boardName, isNewPost ? 0 : threadId)))
                 .build();
+        submission.submit(Single.defer(() -> connector.post(boardName, params)).map(PostingProtocol::parseResponse));
+    }
 
-        final File imageLocation;
-        if (TextUtils.isEmpty(imagePath)) {
-            imageLocation = null;
-        } else {
-            imageLocation = new File(imagePath);
+    private void setSending(boolean sending) {
+        setCancelable(!sending);
+        if (getView() != null) setEnabledRecursively(getView(), !sending);
+    }
+
+    private void setEnabledRecursively(View view, boolean enabled) {
+        view.setEnabled(enabled);
+        if (view instanceof ViewGroup) for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+            setEnabledRecursively(((ViewGroup) view).getChildAt(i), enabled);
         }
+    }
 
-        RxUtil.safeUnsubscribe(boardInfoSubscription);
-        boardInfoSubscription = BoardTableConnection.fetchBoard(boardName)
-                .observeOn(Schedulers.io())
-                .onErrorReturn(throwable -> {
-                    Log.e(LOG_TAG, "Error fetching board info for " + boardName, throwable);
-                    return new ChanBoard();
-                })
-//                .flatMap((Function<ChanBoard, SingleSource<File>>) chanBoard -> {
-//                    return Single.just(copyDocumentFileLocally(imageUri));
-//                })
-                .map(chanBoard -> {
-                    final Map<String, Object> params = new HashMap<>();
-                    if (!TextUtils.isEmpty(name)) {
-                        params.put("name", name);
-                    }
-
-                    if (!TextUtils.isEmpty(email)) {
-                        params.put("email", email);
-                    }
-
-                    if (!TextUtils.isEmpty(subject)) {
-                        params.put("sub", subject);
-                    }
-
-                    params.put("com", comment);
-                    params.put("pwd", "password");
-                    params.put("mode", "regist");
-
-                    if (selectedFlag != null) {
-                        params.put("flag", selectedFlag);
-                    }
-
-                    if (spoilerValue != null) {
-                        params.put("spoiler", spoilerValue);
-                    }
-
-                    if (!isNewPost) {
-                        params.put("resto", String.valueOf(threadId));
-                    }
-
-                    if (captchaRequired) {
-                        params.put("g-recaptcha-response", captchaChallenge);
-                    }
-
-                    if (imageLocation != null) {
-                        params.put("upfile", imageLocation);
-                    }
-                    return params;
-                })
-                .flatMap(params -> chanConnector.post(boardName, params))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onPostComplete(), onPostFail());
+    private void showPostError(String message) {
+        if (postError != null) { postError.setText(message); postError.setVisibility(View.VISIBLE); }
     }
 
     private void saveFormData() {
-        comment = commentField.getText().toString();
-        subject = subjectInput.getText().toString();
-        email = optionsInput.getText().toString();
-        name = nameInput.getText().toString();
+        if (commentField != null) comment = commentField.getText().toString();
+        if (subjectInput != null) subject = subjectInput.getText().toString();
+        if (optionsInput != null) email = optionsInput.getText().toString();
+        if (nameInput != null) name = nameInput.getText().toString();
     }
 
     private void clearForm() {
@@ -611,6 +537,7 @@ public class PostFragment extends BottomSheetDialogFragment {
 
     @Override
     public void onPause() {
+        saveFormData();
         super.onPause();
 
         RxUtil.safeUnsubscribe(fetchPostOptionsSubscription);
@@ -618,6 +545,10 @@ public class PostFragment extends BottomSheetDialogFragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        saveFormData();
+        outState.putBoolean("post_sending", submission != null && submission.isSending());
+        outState.putString("post_flag", selectedFlag);
+        outState.putString("post_spoiler", spoilerValue);
         outState.putLong(Extras.EXTRAS_THREAD_ID, threadId);
         outState.putString(Extras.EXTRAS_BOARD_NAME, boardName);
         outState.putString(Extras.EXTRAS_BOARD_TITLE, boardTitle);
@@ -649,12 +580,15 @@ public class PostFragment extends BottomSheetDialogFragment {
         state.putString(EXTRA_NAME, name);
         state.putString(EXTRA_FILE, imagePath);
 
+        state.putString("post_flag", selectedFlag);
+        state.putString("post_spoiler", spoilerValue);
         state.putBoolean(Extras.EXTRAS_POST_NEW, isNewPost);
 
         return state;
     }
 
     private void extractExtras(final Bundle bundle) {
+        if (bundle == null) return;
         if (bundle.containsKey(Extras.EXTRAS_THREAD_ID)) {
             threadId = bundle.getLong(Extras.EXTRAS_THREAD_ID);
         } else {
@@ -662,10 +596,6 @@ public class PostFragment extends BottomSheetDialogFragment {
         }
         if (bundle.containsKey(Extras.EXTRAS_BOARD_NAME)) {
             boardName = bundle.getString(Extras.EXTRAS_BOARD_NAME);
-            if (getActivity() != null) {
-                final String url = getResources().getString(R.string.sys_link);
-                postUrl = "https://" + url + "/" + boardName + "/post";
-            }
         }
 
         boardTitle = bundle.getString(Extras.EXTRAS_BOARD_TITLE, null);
@@ -686,20 +616,27 @@ public class PostFragment extends BottomSheetDialogFragment {
         subject = bundle.getString(EXTRA_SUBJECT, null);
         email = bundle.getString(EXTRA_EMAIL, null);
         name = bundle.getString(EXTRA_NAME, null);
-        isNewPost = bundle.getBoolean(Extras.EXTRAS_POST_NEW, false);
+        isNewPost = bundle.getBoolean(Extras.EXTRAS_POST_NEW, !bundle.containsKey(Extras.EXTRAS_THREAD_ID) || threadId <= 0);
+        selectedFlag = bundle.getString("post_flag");
+        spoilerValue = bundle.getString("post_spoiler");
         imagePath = bundle.getString(EXTRA_FILE, null);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_IMAGE && data != null) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE && resultCode == android.app.Activity.RESULT_OK && data != null) {
             imageUri = data.getData();
 
+            final String previousImage = imagePath;
             try {
                 copyDocumentFileLocally(imageUri);
             } catch (Exception e) {
-                e.printStackTrace();
+                imagePath = previousImage;
+                showPostError(getString(R.string.post_attempt_failed, "Could not read attachment"));
+                return;
             }
+            if (previousImage != null && !previousImage.equals(imagePath)) deleteTemporaryAttachment(previousImage);
 
             if (attachedImage != null) {
                 attachedImage.setImageURI(imageUri);
@@ -729,7 +666,10 @@ public class PostFragment extends BottomSheetDialogFragment {
                 throw new IOException("Could not create attachment cache directory");
             }
 
-            localFile = new File(uploadDir, fileName);
+            if (fileName.isEmpty() || ".".equals(fileName) || "..".equals(fileName)) throw new IOException("Invalid attachment name");
+            File selectionDir = new File(uploadDir, java.util.UUID.randomUUID().toString());
+            if (!selectionDir.mkdir()) throw new IOException("Could not create attachment directory");
+            localFile = new File(selectionDir, fileName);
             try (InputStream input = context.getContentResolver().openInputStream(f.getUri());
                  OutputStream output = new FileOutputStream(localFile, false)) {
                 if (input == null) {
@@ -742,24 +682,16 @@ public class PostFragment extends BottomSheetDialogFragment {
                     output.write(buffer, 0, count);
                 }
                 output.flush();
+            } catch (Exception error) {
+                localFile.delete();
+                selectionDir.delete();
+                throw error;
             }
 
             imagePath = localFile.getAbsolutePath();
         }
 
         return localFile;
-    }
-
-    private void enableEditMode(final boolean enabled) {
-        if (isEditMode != enabled) {
-//            if (enabled) {
-//                headerContainer.setVisibility(View.GONE);
-//            } else {
-//                headerContainer.setVisibility(View.VISIBLE);
-//            }
-
-            isEditMode = enabled;
-        }
     }
 
     public String getName() {
@@ -822,40 +754,31 @@ public class PostFragment extends BottomSheetDialogFragment {
     }
 
     private void sendPost() {
-//        setEmail(optionsInput.getText().toString());
-//        setName(nameInput.getText().toString());
-//        setSubject(subjectInput.getText().toString());
-//        setComment(commentField.getText().toString());
-
+        if (submission == null || submission.isSending()) return;
         saveFormData();
-
-        if (captchaRequired) {
-            final CaptchaDialog dialog = new CaptchaDialog();
-            dialog.setOnRecaptchaResponseCallback(response -> {
-                if (getActivity() != null) {
-                    dialog.dismiss();
-                }
-                captchaChallenge = response;
-                startPostCall();
-            });
-
-            dialog.show(getActivity().getSupportFragmentManager(), CAPTCHA_DIALOG_TAG);
-        } else {
-            startPostCall();
+        if (TextUtils.isEmpty(comment) && TextUtils.isEmpty(imagePath)) {
+            showPostError(getString(R.string.post_empty)); return;
         }
+        if (captchaRequired) {
+            if (getChildFragmentManager().findFragmentByTag(CAPTCHA_DIALOG_TAG) != null) return;
+            try {
+                CaptchaDialog.newInstance(boardName, isNewPost ? 0 : threadId)
+                        .show(getChildFragmentManager(), CAPTCHA_DIALOG_TAG);
+            } catch (Exception error) { showPostError(getString(R.string.captcha_not_ready)); }
+        } else startPostCall();
     }
 
     private void startPostCall() {
-        if (getActivity() == null) {
-            return;
+        if (!isAdded() || submission == null || submission.isSending()) return;
+        try {
+            saveFormData();
+            if (postError != null) postError.setVisibility(View.GONE);
+            post();
+            if (postListener != null) postListener.onStartPost();
+        } catch (Exception error) {
+            captchaAnswer = null;
+            showPostError(getString(R.string.post_attempt_failed, error.getLocalizedMessage()));
         }
-        dismiss();
-
-        if (postListener != null) {
-            postListener.onStartPost();
-        }
-
-        post();
     }
 
     @Override

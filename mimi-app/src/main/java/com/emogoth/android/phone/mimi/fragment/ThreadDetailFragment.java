@@ -827,19 +827,14 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
                             if (!watched) {
                                 toggleWatch();
                             }
-                        });
+                        }, error -> Log.w(LOG_TAG, "Could not load posting history"));
 
                 showPostProgress();
-                onBackPressed();
             }
 
             @Override
             public void onSuccess(final String postId) {
                 try {
-                    if (threadWatcherSubscription == null || threadWatcherSubscription.isDisposed()) {
-                        return;
-                    }
-
                     Log.i(LOG_TAG, "Post ID: " + postId);
 
                     if (getActivity() == null) {
@@ -865,7 +860,6 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
             @Override
             public void onError(Throwable error) {
                 if (getActivity() != null) {
-                    error.printStackTrace();
                     final String html;
                     if (error instanceof ChanPostException) {
                         html = ((ChanPostException) error).getHtml();

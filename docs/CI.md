@@ -123,6 +123,15 @@ job: its eight actual utility tests replace the old arithmetic example. A device
 color-compatibility test compares the refactored utility with Android's legacy
 parser across 136 deterministic names on every instrumented matrix target.
 
+The posting block adds 14 protocol unit tests (94 app tests in total) and five
+mandatory offline device tests in `PostingFlowTest`. They exercise a local
+TCaptcha fixture through the production document/resource interceptor, visible
+dialog size, explicit confirmation/reload, draft and attachment restoration,
+in-flight rotation/duplicate protection, and host-scoped cookies/headers. No CI
+test posts public messages or solves real CAPTCHA challenges. A third opt-in
+test, `livePostingCaptcha=true`, is a human-only widget preview with no posting
+API attached; it stays skipped in the normal matrix. See [POSTING.md](POSTING.md).
+
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
 bash -n scripts/ci/install_emulator_sdk.sh

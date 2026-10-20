@@ -2,4 +2,5 @@
 <resources>
     <item type="id" name="gallery2_pager" />
     <item type="id" name="gallery2_grid" />
+    <item name="captch_webview" type="id" />
 </resources>

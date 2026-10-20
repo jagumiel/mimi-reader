@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://s.4cdn.org https://hcaptcha.com https://*.hcaptcha.com https://challenges.cloudflare.com https://mcl.io https://*.mcl.io https://spur.us https://*.spur.us; frame-src https://sys.4chan.org https://hcaptcha.com https://*.hcaptcha.com https://challenges.cloudflare.com https://mcl.io https://*.mcl.io https://spur.us https://*.spur.us; connect-src https://hcaptcha.com https://*.hcaptcha.com https://challenges.cloudflare.com https://mcl.io https://*.mcl.io https://spur.us https://*.spur.us; img-src data: https://s.4cdn.org https://hcaptcha.com https://*.hcaptcha.com https://mcl.io https://*.mcl.io https://spur.us https://*.spur.us; style-src 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com; font-src https://hcaptcha.com https://*.hcaptcha.com; base-uri 'none'; form-action 'none'">
+<style>body{margin:8px;font-family:sans-serif;color:#555}#t-root{margin:12px auto}iframe{max-width:100%}#notice{font-size:14px;white-space:pre-line}dialog{box-sizing:border-box;max-width:calc(100vw - 16px)}dialog img{max-width:100%;height:auto}dialog input{max-width:100%}.t-ext-active{outline:4px solid #00c3ff;outline-offset:-4px}</style>
+</head><body><div id="notice" role="status">Loading the site's interactive CAPTCHA…</div><div id="t-root"></div>
+<script>
+(function(){
+  'use strict';
+  var expiresAt=0, requiresResponse=true, extended=false, failed=false;
+  var notice=document.getElementById('notice');
+  document.body.style.background=__DARK__?'#181818':'#fff';
+  document.body.style.color=__DARK__?'#ddd':'#333';
+  window.mimiCaptchaSnapshot=function(){
+    var t=window.TCaptcha;
+    if(failed)return {state:'error'};
+    if(!t||!t.challengeIdNode||!t.challengeIdNode.value)return {state:expiresAt?'expired':'pending'};
+    if(Date.now()>=expiresAt)return {state:'expired'};
+    var response=t.respNode.value;
+    var done=!requiresResponse||(response.length>0&&(extended||t.isDone()));
+    return {state:done?'ready':'pending',challenge:t.challengeIdNode.value,response:response,expiresAt:expiresAt};
+  };
+  var script=document.createElement('script');
+  script.src='https://s.4cdn.org/js/tcaptcha.min.7.js';
+  script.onerror=function(){failed=true;notice.textContent='The CAPTCHA could not load. Reload or open the posting page in your browser.';};
+  script.onload=function(){
+    try {
+      var t=window.TCaptcha, original=t.buildFromJson;
+      t.buildFromJson=function(data){
+        expiresAt=0;
+        requiresResponse=!!(data.extTask||(data.tasks&&data.tasks.length));
+        extended=!!data.extTask;
+        if(data.challenge&&Number(data.ttl)>0)expiresAt=Date.now()+Math.min(Number(data.ttl)*1000,900000)-3000;
+        return original.call(t,data);
+      };
+      t.init(document.getElementById('t-root'),__BOARD__,__THREAD__,1,__DARK__);
+      t.setErrorCb(function(message){notice.textContent=message?String(message).replace(/<[^>]*>/g,''):'Solve the CAPTCHA manually, then confirm in the app.';});
+      t.onReloadClick();
+      notice.textContent='Solve the CAPTCHA manually, then confirm in the app. If verification cannot load, use your browser.';
+    } catch(error){failed=true;notice.textContent='This WebView could not start the CAPTCHA. Update Android System WebView or use your browser.';}
+  };
+  document.head.appendChild(script);
+})();
+</script></body></html>

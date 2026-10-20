@@ -161,14 +161,8 @@ public class FourChanConnector extends ChanConnector {
     @NonNull
     @Override
     public Single<Response<ResponseBody>> post(@NonNull String boardName, @NonNull Map<String, ?> params) {
-        final Map<String, RequestBody> parts = getPartsFromMap(params);
-
-        return postApi.post(boardName, parts)
-                .observeOn(Schedulers.io())
-                .onErrorReturn(throwable -> {
-                    Log.e(LOG_TAG, "Error posting comment", throwable);
-                    return badResponse(throwable);
-                });
+        PostingProtocol.board(boardName);
+        return postApi.post(boardName, PostingProtocol.parts(params)).observeOn(Schedulers.io());
 
     }
 

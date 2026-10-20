@@ -172,7 +172,7 @@ public class HttpClientFactory {
                 userAgent = archiveUserAgent;
             }
 
-            newRequestBuilder.removeHeader("User-Agent").addHeader("User-Agent", userAgent);
+            newRequestBuilder.header("User-Agent", userAgent);
 
             return chain.proceed(newRequestBuilder.build());
         };
@@ -201,6 +201,44 @@ public class HttpClientFactory {
 
     public synchronized OkHttpClient getDownloadClient() {
         return getClient(ClientType.DOWNLOAD);
+    }
+
+    /** CAPTCHA cookies apply only to the exact posting host, with no automatic redirects. */
+    public OkHttpClient getPostingClient(String userAgent, String webCookies, String referer) {
+        OkHttpClient base = getClient();
+        okhttp3.CookieJar jar = base.cookieJar();
+        java.util.List<okhttp3.Cookie> browserCookies = new java.util.ArrayList<>();
+        if (webCookies != null) for (String pair : webCookies.split(";")) {
+            int equal = pair.indexOf('=');
+            if (equal <= 0) continue;
+            String name = pair.substring(0, equal).trim();
+            // Pass authentication belongs to the native login flow. Never restore a
+            // stale browser login or override the app's current Pass session.
+            if (name.startsWith("pass_")) continue;
+            try {
+                browserCookies.add(new okhttp3.Cookie.Builder().name(name)
+                        .value(pair.substring(equal + 1).trim()).hostOnlyDomain("sys.4chan.org").path("/").secure().build());
+            } catch (IllegalArgumentException ignored) { }
+        }
+        return base.newBuilder().followRedirects(false).followSslRedirects(false)
+                .cookieJar(new okhttp3.CookieJar() {
+                    @Override public void saveFromResponse(okhttp3.HttpUrl url, java.util.List<okhttp3.Cookie> cookies) { jar.saveFromResponse(url, cookies); }
+                    @Override public java.util.List<okhttp3.Cookie> loadForRequest(okhttp3.HttpUrl url) {
+                        java.util.Map<String, okhttp3.Cookie> cookies = new java.util.LinkedHashMap<>();
+                        for (okhttp3.Cookie cookie : jar.loadForRequest(url)) cookies.put(cookie.name(), cookie);
+                        if (url.isHttps() && "sys.4chan.org".equals(url.host())) {
+                            for (okhttp3.Cookie cookie : browserCookies) cookies.put(cookie.name(), cookie);
+                        }
+                        return new java.util.ArrayList<>(cookies.values());
+                    }
+                }).addInterceptor(chain -> {
+                    Request request = chain.request();
+                    if (!request.url().isHttps() || request.url().port() != 443 || !"sys.4chan.org".equals(request.url().host())
+                            || !request.url().encodedPath().matches("/[a-z0-9]{1,16}/post")) throw new IOException("Invalid posting destination");
+                    return chain.proceed(request.newBuilder().header("User-Agent", userAgent)
+                            .header("Origin", "https://boards.4chan.org").header("Referer", referer).build());
+                }).addNetworkInterceptor(chain -> chain.proceed(chain.request().newBuilder()
+                        .header("User-Agent", userAgent).build())).build();
     }
 
     public synchronized OkHttpClient getClient(ClientType type) {

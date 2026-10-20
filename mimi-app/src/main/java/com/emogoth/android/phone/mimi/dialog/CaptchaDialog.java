@@ -16,72 +16,74 @@
 
 package com.emogoth.android.phone.mimi.dialog;
 
-
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import com.emogoth.android.phone.mimi.R;
-import com.emogoth.android.phone.mimi.interfaces.OnCaptchaViewReadyCallback;
-import com.emogoth.android.phone.mimi.interfaces.OnRecaptchaResponseCallback;
+import com.emogoth.android.phone.mimi.fourchan.PostingProtocol;
 import com.emogoth.android.phone.mimi.view.CaptchaWebView;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class CaptchaDialog extends DialogFragment {
-    private static final String LOG_TAG = CaptchaDialog.class.getSimpleName();
-
-    private OnRecaptchaResponseCallback onRecaptcharesponseCallback;
+    public static final String RESULT = "mimi_captcha_answer";
     private CaptchaWebView webView;
-    private TextView captchaLoading;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        final View v = inflater.inflate(R.layout.dialog_captcha, container, false);
-
-        captchaLoading = (TextView) v.findViewById(R.id.loading_captcha);
-        webView = (CaptchaWebView) v.findViewById(R.id.captch_webview);
-
-        return v;
+    private TextView status;
+    public static CaptchaDialog newInstance(String board, long thread) {
+        CaptchaDialog dialog = new CaptchaDialog(); Bundle args = new Bundle();
+        args.putString("board", PostingProtocol.board(board)); args.putLong("thread", Math.max(0, thread));
+        dialog.setArguments(args); return dialog;
     }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+    @NonNull @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LinearLayout content = new LinearLayout(requireContext()); content.setOrientation(LinearLayout.VERTICAL);
+        // AlertDialog measures its custom panel with wrap-content. A zero-height
+        // weighted WebView otherwise remains invisible even in a tall window.
+        content.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * 0.55));
+        int padding = (int) (12 * getResources().getDisplayMetrics().density);
+        content.setPadding(padding, padding, padding, padding);
+        status = new TextView(requireContext()); status.setText(R.string.captcha_instructions); content.addView(status);
+        webView = createCaptchaWebView(); webView.setId(R.id.captch_webview);
+        content.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        Button browser = new Button(requireContext()); browser.setText(R.string.captcha_open_browser);
+        browser.setOnClickListener(view -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PostingProtocol.browserUrl(board(), thread())))); }
+            catch (android.content.ActivityNotFoundException error) { status.setText(R.string.error_opening_url); }
+        }); content.addView(browser);
+        webView.loadCaptchaPage(board(), thread());
+        return new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.captcha_title).setView(content)
+                .setPositiveButton(R.string.captcha_confirm_send, null).setNeutralButton(R.string.captcha_reload, null)
+                .setNegativeButton(android.R.string.cancel, null).create();
+    }
+    @Override public void onStart() {
+        super.onStart(); AlertDialog dialog = (AlertDialog) requireDialog();
+        dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, (int) (getResources().getDisplayMetrics().heightPixels * 0.85));
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> { status.setText(R.string.captcha_instructions); webView.loadCaptchaPage(board(), thread()); });
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> webView.readAnswer(raw -> {
+            if (!isAdded() || getParentFragmentManager().isStateSaved()) return;
+            try {
+                PostingProtocol.Answer answer = PostingProtocol.answerFromWebView(raw, board(), thread(), System.currentTimeMillis());
+                Bundle result = new Bundle(); result.putString("challenge", answer.challenge); result.putString("response", answer.response); result.putLong("expiresAt", answer.expiresAt);
+                getParentFragmentManager().setFragmentResult(RESULT, result); dismiss();
+            } catch (Exception error) { status.setText(R.string.captcha_not_ready); }
+        }));
+    }
+    private String board() { return requireArguments().getString("board"); }
+    protected CaptchaWebView createCaptchaWebView() { return new CaptchaWebView(requireContext()); }
+    private long thread() { return requireArguments().getLong("thread"); }
+    @Override public void onDestroyView() {
         if (webView != null) {
-            webView.loadCaptchaPage();
-            webView.setBackgroundColor(0x00000000);
-            webView.setOnRecaptchaResponseCallback(new OnRecaptchaResponseCallback() {
-                @Override
-                public void onResponse(String response) {
-                    if (onRecaptcharesponseCallback != null) {
-                        onRecaptcharesponseCallback.onResponse(response);
-                    }
-                }
-            });
-
-            webView.setOnCaptchaViewReadyCallback(new OnCaptchaViewReadyCallback() {
-                @Override
-                public void onCaptchaViewReady() {
-                    if (captchaLoading.getVisibility() == View.VISIBLE) {
-                        captchaLoading.setVisibility(View.GONE);
-                    }
-                }
-            });
+            webView.stopLoading();
+            if (webView.getParent() instanceof ViewGroup) ((ViewGroup) webView.getParent()).removeView(webView);
+            webView.destroy(); webView = null;
         }
-    }
-
-    public void setOnRecaptchaResponseCallback(final OnRecaptchaResponseCallback callback) {
-        this.onRecaptcharesponseCallback = callback;
+        super.onDestroyView();
     }
 }

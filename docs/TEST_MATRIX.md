@@ -17,6 +17,23 @@ Edge 20 / Android 12 suite has 33 cases: 31 passed and two expected opt-in skips
 Eight real `chanlib` utility unit tests replace its old arithmetic example and
 are now explicitly run in CI alongside the app's 80 unit tests.
 
+The posting block adds 14 app protocol unit tests (94 app + 8 library) and five
+mandatory offline instrumented checks: local-widget confirmation/reload/expiry,
+visible dialog sizing, draft/attachment restoration and cancellation, rotation
+of a single pending attempt, and posting cookie/header boundaries. The full
+suite now has 39 cases including three opt-in skips. Public posting is never
+part of CI; the extra live preview requires a human and has no posting API
+attached. Fixture success does not establish real site acceptance. See
+[posting contracts and acceptance limits](POSTING.md).
+
+On 20 October the complete updated suite ran through ADB on the physical Motorola
+Edge 20 / Android 12 / WebView 155: `OK (39 tests)`, 36 mandatory checks passed and
+three opt-in checks skipped by their assumptions. The real human-only CAPTCHA
+preview was recorded separately as `OK (1 test)` before the full suite. No
+message was posted. The temporary stay-awake setting was restored to
+its original value, 0. Remote Android 10/12/14/16 results for this posting commit
+still require confirmation after pushing it.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

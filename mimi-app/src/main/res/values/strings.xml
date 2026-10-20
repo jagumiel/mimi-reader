@@ -262,13 +262,11 @@
     <string name="name">Name</string>
     <string name="options">Options</string>
     <string name="subject">Subject</string>
-    <string name="captcha">captcha</string>
     <string name="send">Send</string>
     <string name="sending">Sending...</string>
     <string name="cancel">Cancel</string>
     <string name="success">Success!</string>
     <string name="just_now">Just now</string>
-    <string name="error_fetching_captcha_image">Error fetching captcha image</string>
 
     <!-- User Info Form -->
     <string name="clear_info">Clear</string>
@@ -441,7 +439,6 @@
         <item quantity="other">%d replies to you</item>
     </plurals>
 
-    <string name="loading_captcha">Loading captcha...</string>
     <string name="copy_file">Copy File</string>
     <string name="file_name_is_taken">File name is taken</string>
     <string name="overwrite">Overwrite</string>
@@ -552,7 +549,6 @@
     <string name="find">Find</string>
     <string name="found_number">found %d</string>
     <string name="error_opening_search_link">Error opening search link</string>
-    <string name="captcha_answer_hint">captcha text</string>
     <string name="spoiler">Spoiler</string>
     <string name="view">View</string>
     <string name="mark_as_read">Mark as Read</string>
@@ -681,4 +677,13 @@
     <string name="clearing_history">Clearing history...</string>
     <string name="error_while_clearing_history">Error while clearing history</string>
     <string name="tap_to_open_bookmarks">Tap to open bookmarks</string>
+    <string name="captcha_title">Posting verification</string>
+    <string name="captcha_instructions">Solve the site’s CAPTCHA manually, then confirm to send. Your draft stays in the app if you cancel.</string>
+    <string name="captcha_confirm_send">Confirm and send</string>
+    <string name="captcha_reload">Reload</string>
+    <string name="captcha_open_browser">Open posting page in browser</string>
+    <string name="captcha_not_ready">The CAPTCHA is incomplete or expired. Complete the verification or reload it.</string>
+    <string name="post_attempt_failed">%1$s\nYour draft is preserved. If delivery is uncertain, check the thread before retrying.</string>
+    <string name="post_interrupted">The previous submission was interrupted. Check the thread before retrying; your draft is preserved.</string>
+    <string name="post_empty">Write a comment or attach a file before sending.</string>
 </resources>

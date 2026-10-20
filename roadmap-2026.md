@@ -36,8 +36,8 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 
 ### Orden de trabajo inmediato
 
-1. Registrar en un commit el cuarto bloque de limpieza y refactorización ya validado.
-2. Recuperar la publicación de mensajes con CAPTCHA visible y resoluble manualmente por el usuario; alcance y criterios en la fase 5. Es la siguiente tarea de desarrollo.
+1. Cuarto bloque de limpieza registrado en `faaf5a7`; confirmar su matriz remota junto al siguiente bloque.
+2. Completar la validación de publicación y CAPTCHA: integración implementada, pruebas locales y resolución humana real comprobada en Android 12. Quedan Android 10, la matriz remota y una publicación real con contenido/destino acordados y autorización explícita; alcance en la fase 5 y `docs/POSTING.md`.
 3. Retomar AppCompat/Fragment y los demás bloques de dependencias y refactorización.
 4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 
@@ -185,14 +185,23 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
   - El changelog debe reconstruir y resumir todos los cambios desde **7.0.1**, punto de partida del fork.
 - [ ] Como última tarea, actualizar el `README.md` con una descripción actual de la aplicación, los cambios incorporados durante la modernización, las instrucciones de compilación e instalación y la aclaración de que Mimi ya no está disponible en Google Play.
 
-### 5. Publicación de contenido (próxima tarea prioritaria)
+### 5. Publicación de contenido (implementación y validación prioritaria)
 
-- [ ] Revisar el flujo de publicación y CAPTCHA vigente del sitio y el código heredado de la app, sin asumir que la integración antigua sigue siendo válida.
+- [x] Revisar el flujo de publicación y CAPTCHA vigente del sitio y el código heredado de la app, sin asumir que la integración antigua sigue siendo válida.
+  - El formulario actual usa TCaptcha (`t-challenge`/`t-response`), no la integración Google antigua. Contratos, fuentes oficiales y límites de WebView documentados en `docs/POSTING.md`.
 - [ ] Mostrar un desafío completo, legible e interactivo que pueda resolver manualmente el usuario, con WebView o una integración de navegador compatible según lo que admita el sitio.
-- [ ] Integrar la respuesta o token del CAPTCHA con el formulario y el envío explícito del usuario. Permitir responder en hilos y crear hilos donde la board lo admita, conservando los adjuntos ya admitidos por la app.
-- [ ] Permitir renovar el desafío cuando falle o caduque, cancelar y reintentar sin perder el borrador ni provocar envíos duplicados.
-- [ ] Mostrar con claridad errores de CAPTCHA, validación, red, límites de publicación o restricciones del sitio. No registrar respuestas, tokens ni cookies de sesión en logs.
+  - [x] Implementar un diálogo dedicado sin puente JavaScript nativo, con recursos restringidos, recarga y acceso alternativo a la página en navegador. Corregir la altura cero del WebView detectada al revisar la pantalla física y protegerla con una aserción de tamaño visible.
+  - [x] Confirmar carga y resolución humana del desafío real en el Motorola Edge 20 / Android 12 / WebView 155: vista de prueba superada el 20 de octubre (`OK, 1 test`) tras permitir Spur/Monocle. El sitio aplica sus propios tiempos de espera y el recibo de la respuesta en la app no equivale a validación de una publicación por el servidor.
+  - [ ] Repetir la aceptación manual en Android 10 y validar teclado/regreso desde navegador. La aceptación por los proveedores depende de WebView, dispositivo y red; el navegador externo no transfiere automáticamente su sesión al formulario nativo.
+- [x] Integrar la respuesta o token del CAPTCHA con el formulario y el envío explícito del usuario. Permitir responder en hilos y crear hilos donde la board lo admita, conservando los adjuntos ya admitidos por la app.
+  - Cobertura local de multipart, respuesta vacía válida, adjunto ausente y recibo oficial de éxito con IDs largos. La publicación real sigue pendiente de autorización y validación.
+- [x] Permitir renovar el desafío cuando falle o caduque, cancelar y reintentar sin perder el borrador ni provocar envíos duplicados.
+  - Retener un único intento durante rotación, no reintentar automáticamente y advertir de entrega incierta tras muerte del proceso. El formulario se cierra solo con recibo confirmado; los fallos conservan texto y adjunto.
+- [x] Mostrar con claridad errores de CAPTCHA, validación, red, límites de publicación o restricciones del sitio. No registrar respuestas, tokens ni cookies de sesión en logs.
+  - No aceptar HTTP 200 genérico, redirecciones ni páginas de bloqueo como éxito; preservar la sesión nativa Pass frente a cookies antiguas del navegador y limitar cookies de verificación al host de publicación.
 - [ ] Cubrir formulario, transmisión de la respuesta/token, caducidad, cancelación y reintento con pruebas simuladas e instrumentadas; validar interacción, teclado, rotación y regreso a la app en Android 10 y 12, además de la matriz CI habitual.
+  - [x] Añadir 14 pruebas unitarias de protocolo y cinco pruebas instrumentadas locales del nuevo flujo; vista real opcional sin API de publicación conectada, excluida de CI normal.
+  - [ ] Completar la matriz de interacción manual Android 10/12 y confirmar la matriz remota de este commit. En Android 12 ya se ha resuelto manualmente un desafío real sin publicar.
 - [ ] Realizar una prueba de publicación real solo después de acordar con el usuario el contenido y el destino y recibir su confirmación. Las pruebas automatizadas de CI no publicarán mensajes reales.
 
 Resolver el CAPTCHA y decidir publicar son acciones del usuario. Esta fase tiene prioridad sobre AppCompat/Fragment y el escaneo; el resto de la modernización se retomará después.

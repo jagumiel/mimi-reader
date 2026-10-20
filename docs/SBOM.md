@@ -91,6 +91,10 @@ overrides and archive the JSON alongside its APK/AAB and R8 mapping:
 ./gradlew generateSbom -PmimiVersionName=VERSION -PmimiVersionCode=CODE
 ```
 
-Known-vulnerability scanning, SARIF reporting and expiring exceptions are the next
-phase. Schema/freshness checks do **not** constitute a CVE scan. See
+Known-vulnerability scanning, SARIF reporting and expiring exceptions remain
+deferred until posting recovery and the agreed dependency cleanup. Schema/freshness
+checks do **not** constitute a CVE scan. The posting CAPTCHA loads external provider
+scripts at runtime; these are not bundled assets or Gradle components, so this
+integration does not change the packaged-component snapshot. See
+[the posting boundaries](POSTING.md),
 [the dependency audit](DEPENDENCIES.md) and [the roadmap](../roadmap-2026.md).

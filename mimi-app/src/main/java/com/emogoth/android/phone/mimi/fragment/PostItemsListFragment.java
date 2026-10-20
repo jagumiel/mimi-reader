@@ -1108,9 +1108,6 @@ public class PostItemsListFragment extends MimiFragmentBase implements
             @Override
             public void onStartPost() {
                 showPostProgress();
-                if (postFragment != null) {
-                    postFragment.dismiss();
-                }
             }
 
             @Override
@@ -1119,6 +1116,8 @@ public class PostItemsListFragment extends MimiFragmentBase implements
                     Log.i(LOG_TAG, "Post ID: " + postId);
                     showPostStatus(getString(R.string.success));
                     postFragment = null;
+                    postState = null;
+                    createNewPostFragment = true;
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Error creating a new post", e);
                 }
@@ -1127,7 +1126,6 @@ public class PostItemsListFragment extends MimiFragmentBase implements
 
             @Override
             public void onError(Throwable error) {
-                error.printStackTrace();
                 showPostStatus(error.getLocalizedMessage());
             }
 

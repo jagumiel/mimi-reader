@@ -23,16 +23,18 @@
 </head>
 <body>
 <h1>Mimi Reader privacy policy</h1>
-<p>Last updated: October 17, 2026.</p>
+<p>Last updated: October 20, 2026.</p>
 
 <p>Mimi Reader is an unofficial, open-source client for browsing 4chan. The app does not include advertising, analytics, or crash-reporting services, and the Mimi Reader project does not operate a server that receives your browsing activity.</p>
 
 <h2>Network connections</h2>
 <p>The app connects directly to 4chan and, when you open content hosted elsewhere, to archive and media hosts selected by that content. Those services receive normal connection information such as your IP address, user agent, request time, and the content requested. Their own terms and privacy policies apply.</p>
 <p>If you use posting or login features, the text, files, credentials, pass cookies, and CAPTCHA data that you provide are sent to the applicable third-party service. Mimi Reader does not receive a separate copy.</p>
+<p>When you open the posting CAPTCHA, a dedicated WebView loads the site's current verification widget and may contact hCaptcha, Cloudflare, or Spur Monocle (spur.us/mcl.io). JavaScript, browser storage, and verification cookies (including third-party cookies in that WebView) are used so you can complete the challenge manually. The site's anti-abuse providers may assess device/session information and whether a connection uses a VPN or proxy. Those providers' own privacy policies apply. Opening the external posting page uses your selected browser and its separate session.</p>
 
 <h2>Data stored on your device</h2>
 <p>Mimi Reader stores preferences, browsing history, favourite boards, watched or hidden threads, filters, cookies, and cached images or videos locally on your device. Files are saved outside the app only after you choose a file or folder through Android's system picker.</p>
+<p>Posting drafts and temporary attachment copies are kept locally while you edit or retry. The app keeps a random local deletion password for posts and a record of confirmed post IDs. CAPTCHA answers are used for a single explicit submission, not written to logs or saved with drafts; verification-provider cookies and browser tickets can persist in WebView storage until app data is cleared.</p>
 <p>You can clear downloaded cache files from the app settings. You can remove all remaining local data using Android's app-info screen or by uninstalling the app.</p>
 
 <h2>Permissions</h2>

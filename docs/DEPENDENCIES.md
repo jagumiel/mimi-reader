@@ -270,14 +270,17 @@ only the method and leave a live caller behind. This block does not change that 
 
 ## Sequence for subsequent iterations
 
-1. Commit the validated fourth cleanup block, its dependency inventory and test
-   coverage before starting another implementation block.
-2. Restore user-solvable CAPTCHA and message posting as the next development
-   task, ahead of the AndroidX group. Reading and participating are both core
+1. The validated fourth cleanup block is committed as `faaf5a7`; its remote
+   matrix still needs confirmation together with the posting block.
+2. Complete manual validation of the implemented user-solvable CAPTCHA and native
+   posting flow, ahead of the AndroidX group. Reading and participating are both core
    application functionality. Keep CAPTCHA resolution and submission under the
    user's control; use simulated posting in CI, and agree content/destination
    and obtain confirmation before a real public test post. See phase 5 of
    [the roadmap](../roadmap-2026.md) for scope and acceptance criteria.
+   [Posting contracts and validation limits](POSTING.md) describe the replacement
+   of the obsolete reCAPTCHA bridge/assets. It adds no Gradle dependencies and does
+   not alter the packaged SBOM graph; live provider scripts are loaded remotely.
 3. Resume dependency modernization and responsibility-focused refactoring:
    trace and replace the unintended AppCompat/Fragment alpha selections as a
    bounded AndroidX UI group, with themes, dialogs, restoration/navigation,

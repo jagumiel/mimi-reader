@@ -26,6 +26,14 @@
     android:layout_gravity="bottom"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/post_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:accessibilityLiveRegion="polite"
+        android:visibility="gone" />
+
     <ViewSwitcher
         android:id="@+id/reply_form_switcher"
         android:layout_width="match_parent"
