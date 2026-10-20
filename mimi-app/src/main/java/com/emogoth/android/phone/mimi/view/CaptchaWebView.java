@@ -90,11 +90,20 @@ public class CaptchaWebView extends MimiWebView {
         loadUrl(DOCUMENT_URL);
     }
     public void readAnswer(ValueCallback<String> callback) {
+        evaluateBounded("JSON.stringify(window.mimiCaptchaSnapshot ? window.mimiCaptchaSnapshot() : null)", callback);
+    }
+
+    /** Read readiness only; do not copy challenge/answer data until explicit send. */
+    public void readStatus(ValueCallback<String> callback) {
+        evaluateBounded("window.mimiCaptchaSnapshot ? window.mimiCaptchaSnapshot().state : 'pending'", callback);
+    }
+
+    private void evaluateBounded(String script, ValueCallback<String> callback) {
         java.util.concurrent.atomic.AtomicBoolean delivered = new java.util.concurrent.atomic.AtomicBoolean();
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
             if (delivered.compareAndSet(false, true)) callback.onReceiveValue("null");
         }, 3000);
-        evaluateJavascript("JSON.stringify(window.mimiCaptchaSnapshot ? window.mimiCaptchaSnapshot() : null)", result -> {
+        evaluateJavascript(script, result -> {
             if (delivered.compareAndSet(false, true)) callback.onReceiveValue(result);
         });
     }

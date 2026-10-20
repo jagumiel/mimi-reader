@@ -37,7 +37,7 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 ### Orden de trabajo inmediato
 
 1. Cuarto bloque de limpieza registrado en `faaf5a7`; confirmar su matriz remota junto al siguiente bloque.
-2. Completar la validación de publicación y CAPTCHA: integración implementada, pruebas locales y resolución humana real comprobada en Android 12. Quedan Android 10, la matriz remota y una publicación real con contenido/destino acordados y autorización explícita; alcance en la fase 5 y `docs/POSTING.md`.
+2. Completar la validación de publicación y CAPTCHA: integración, resolución humana y una respuesta pública autorizada comprobadas en Android 12. Quedan Android 10, la matriz remota y casos de adjuntos/hilos nuevos con autorización específica; alcance en la fase 5 y `docs/POSTING.md`.
 3. Retomar AppCompat/Fragment y los demás bloques de dependencias y refactorización.
 4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 
@@ -200,9 +200,12 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 - [x] Mostrar con claridad errores de CAPTCHA, validación, red, límites de publicación o restricciones del sitio. No registrar respuestas, tokens ni cookies de sesión en logs.
   - No aceptar HTTP 200 genérico, redirecciones ni páginas de bloqueo como éxito; preservar la sesión nativa Pass frente a cookies antiguas del navegador y limitar cookies de verificación al host de publicación.
 - [ ] Cubrir formulario, transmisión de la respuesta/token, caducidad, cancelación y reintento con pruebas simuladas e instrumentadas; validar interacción, teclado, rotación y regreso a la app en Android 10 y 12, además de la matriz CI habitual.
-  - [x] Añadir 14 pruebas unitarias de protocolo y cinco pruebas instrumentadas locales del nuevo flujo; vista real opcional sin API de publicación conectada, excluida de CI normal.
+  - [x] Añadir 14 pruebas unitarias de protocolo y seis pruebas instrumentadas locales del nuevo flujo; vista real opcional sin API de publicación conectada, excluida de CI normal. La sexta cubre el formulario completo hasta HTTP simulado y recuperación tras rechazo.
+  - [x] Aclarar el último paso: “Done” termina el CAPTCHA, no publica; “Get Captcha” solicita otro. Habilitar el botón nativo “Send message” solo con verificación lista, sin envíos ni recargas automáticos.
+    - Validación posterior con el Motorola desbloqueado: suite completa de 40 casos, 37 superados y tres optativos omitidos, sin fallos; seis casos locales de publicación y 94 pruebas unitarias de app correctos. Ajuste de pantalla encendida restaurado a 0. El intento previo interrumpido por el bloqueo no se cuenta como correcto.
   - [ ] Completar la matriz de interacción manual Android 10/12 y confirmar la matriz remota de este commit. En Android 12 ya se ha resuelto manualmente un desafío real sin publicar.
-- [ ] Realizar una prueba de publicación real solo después de acordar con el usuario el contenido y el destino y recibir su confirmación. Las pruebas automatizadas de CI no publicarán mensajes reales.
+- [x] Realizar una prueba de publicación real solo después de acordar con el usuario el contenido y el destino y recibir su confirmación. Las pruebas automatizadas de CI no publicarán mensajes reales.
+  - El 20 de octubre, el usuario autorizó el hilo `/g/110111399`, preparó el mensaje y resolvió el desafío. Una sola confirmación publicó `110119159`, comprobado por recibo y por lectura independiente del JSON público. No se hicieron más publicaciones de prueba. Cobertura: respuesta de texto en Android 12; no implica validar adjuntos ni creación de hilos.
 
 Resolver el CAPTCHA y decidir publicar son acciones del usuario. Esta fase tiene prioridad sobre AppCompat/Fragment y el escaneo; el resto de la modernización se retomará después.
 

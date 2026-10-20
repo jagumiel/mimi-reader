@@ -678,8 +678,9 @@
     <string name="error_while_clearing_history">Error while clearing history</string>
     <string name="tap_to_open_bookmarks">Tap to open bookmarks</string>
     <string name="captcha_title">Posting verification</string>
-    <string name="captcha_instructions">Solve the site’s CAPTCHA manually, then confirm to send. Your draft stays in the app if you cancel.</string>
-    <string name="captcha_confirm_send">Confirm and send</string>
+    <string name="captcha_instructions">Solve the CAPTCHA until it says “Done”, then tap “Send message” below. “Get Captcha” requests another challenge; it does not send your message.</string>
+    <string name="captcha_send_message">Send message</string>
+    <string name="captcha_ready_to_send">CAPTCHA completed. Tap “Send message” below to publish your draft.</string>
     <string name="captcha_reload">Reload</string>
     <string name="captcha_open_browser">Open posting page in browser</string>
     <string name="captcha_not_ready">The CAPTCHA is incomplete or expired. Complete the verification or reload it.</string>

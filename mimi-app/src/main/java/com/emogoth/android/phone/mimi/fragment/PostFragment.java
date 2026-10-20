@@ -462,11 +462,19 @@ public class PostFragment extends BottomSheetDialogFragment {
         ChanConnector connector = new FourChanConnector.Builder()
                 .setEndpoint(FourChanConnector.getDefaultEndpoint())
                 .setPostEndpoint(FourChanConnector.getDefaultPostEndpoint())
-                .setClient(HttpClientFactory.getInstance().getPostingClient(WebSettings.getDefaultUserAgent(requireContext()),
-                        CookieManager.getInstance().getCookie(PostingProtocol.SYSTEM_ORIGIN),
-                        PostingProtocol.browserUrl(boardName, isNewPost ? 0 : threadId)))
+                .setClient(createPostingClient())
                 .build();
         submission.submit(Single.defer(() -> connector.post(boardName, params)).map(PostingProtocol::parseResponse));
+    }
+
+    protected okhttp3.OkHttpClient createPostingClient() {
+        return HttpClientFactory.getInstance().getPostingClient(WebSettings.getDefaultUserAgent(requireContext()),
+                CookieManager.getInstance().getCookie(PostingProtocol.SYSTEM_ORIGIN),
+                PostingProtocol.browserUrl(boardName, isNewPost ? 0 : threadId));
+    }
+
+    protected CaptchaDialog createCaptchaDialog(String board, long thread) {
+        return CaptchaDialog.newInstance(board, thread);
     }
 
     private void setSending(boolean sending) {
@@ -762,7 +770,7 @@ public class PostFragment extends BottomSheetDialogFragment {
         if (captchaRequired) {
             if (getChildFragmentManager().findFragmentByTag(CAPTCHA_DIALOG_TAG) != null) return;
             try {
-                CaptchaDialog.newInstance(boardName, isNewPost ? 0 : threadId)
+                createCaptchaDialog(boardName, isNewPost ? 0 : threadId)
                         .show(getChildFragmentManager(), CAPTCHA_DIALOG_TAG);
             } catch (Exception error) { showPostError(getString(R.string.captcha_not_ready)); }
         } else startPostCall();

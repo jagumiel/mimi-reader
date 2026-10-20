@@ -145,3 +145,41 @@ unchanged dependency snapshots. `minSdk 23`, target API 36 and application IDs
 remain unchanged. The updated debug APK was installed over the existing phone
 installation without clearing user data; the original stay-awake value was
 restored after testing.
+
+### Authorized public reply and confirmation UX
+
+Later on 20 October the owner explicitly authorized posting in `/g/110111399`
+and prepared a reply in the actual thread composer. After the owner completed the
+CAPTCHA manually, one native confirmation produced one POST and the official
+receipt for post `110119159`. A separate read of the public thread JSON confirmed
+that post existed. No further public test messages were sent. This establishes
+one real text-only reply on Android 12, not attachment/new-thread coverage or
+universal provider/device acceptance.
+
+The original reported loop did not reproduce when using native confirmation:
+the widget's **Done** completes verification, while **Get Captcha** requests
+another challenge instead of sending the draft. To distinguish those actions,
+the native button now says **Send message**, remains disabled until verification
+is ready, and displays an explicit completion instruction. Readiness polling
+returns only state, stops while the dialog is inactive, and never sends messages
+or requests a replacement challenge. A new challenge invalidates pending reads.
+The full proof is read only on the user's explicit send action.
+
+An additional offline instrumented test now drives the real `PostFragment` Send
+action through the local widget into Retrofit multipart submission. Its client
+intercepts before the network, verifies the draft/CAPTCHA fields, returns a
+simulated server rejection, and checks one attempt, retained draft, re-enabled
+form and no unsolicited replacement dialog. The initial assertion incorrectly
+assumed multipart parts had no intermediate headers; it was corrected to accept
+valid part headers, not by weakening the request/field checks. Production factories
+use the normal client/widget; only the test subclass substitutes these boundaries.
+
+The updated source compiles and its 94 app unit tests and debug lint pass. An
+attempt to run the 40-case device suite was stopped after the phone locked:
+ActivityScenario could not reach RESUMED behind the keyguard. That interrupted
+run is not a passing regression run. After the owner unlocked the phone, the
+complete suite passed: 40 cases, 37 passed, three expected opt-in skips, zero
+failures/errors. This includes all six offline posting-flow tests, the readiness
+button behavior and the corrected multipart assertions. The same run passed all
+94 app unit tests. The stay-awake setting was restored to its original value, 0.
+No more public replies were sent during this regression run.

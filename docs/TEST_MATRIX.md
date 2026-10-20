@@ -34,6 +34,15 @@ message was posted. The temporary stay-awake setting was restored to
 its original value, 0. Remote Android 10/12/14/16 results for this posting commit
 still require confirmation after pushing it.
 
+Later on the same day, confirmation-UX coverage and an actual-composer-to-mocked-
+HTTP test expanded the suite to 40 cases. After an interrupted attempt behind
+the phone keyguard, the owner unlocked it and the complete Gradle device suite
+passed: 37 passed, three expected opt-in skips, zero failures/errors. All six
+offline posting-flow cases passed, alongside 94 app unit tests. The original
+stay-awake setting (0) was restored. An earlier, separately authorized text reply
+was confirmed publicly as post `110119159`; this regression run made no public
+submissions. See [POSTING.md](POSTING.md) for the precise scope.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

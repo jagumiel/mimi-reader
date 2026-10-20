@@ -124,7 +124,11 @@ color-compatibility test compares the refactored utility with Android's legacy
 parser across 136 deterministic names on every instrumented matrix target.
 
 The posting block adds 14 protocol unit tests (94 app tests in total) and five
-mandatory offline device tests in `PostingFlowTest`. They exercise a local
+mandatory offline device tests in `PostingFlowTest`. A subsequent sixth test drives
+the actual composer through CAPTCHA confirmation into a mocked HTTP submission
+and verifies rejection recovery; the matrix now has 40 cases with three opt-in
+skips. It also checks that readiness enables an explicit Send message action,
+without posting or requesting another challenge automatically. They exercise a local
 TCaptcha fixture through the production document/resource interceptor, visible
 dialog size, explicit confirmation/reload, draft and attachment restoration,
 in-flight rotation/duplicate protection, and host-scoped cookies/headers. No CI

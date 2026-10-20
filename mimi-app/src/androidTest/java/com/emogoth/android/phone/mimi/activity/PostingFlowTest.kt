@@ -53,6 +53,25 @@ class PostingFlowTest {
         override fun createCaptchaWebView(): CaptchaWebView = fixtureWebView(requireContext())
     }
 
+    class FixturePostFragment : PostFragment() {
+        val requests = AtomicInteger()
+        val body = AtomicReference<String>()
+
+        override fun createCaptchaDialog(board: String, thread: Long): CaptchaDialog = FixtureCaptchaDialog().apply {
+            arguments = Bundle().apply { putString("board", board); putLong("thread", thread) }
+        }
+
+        override fun createPostingClient(): okhttp3.OkHttpClient = okhttp3.OkHttpClient.Builder().addInterceptor { chain ->
+            // Stop before the network. This fake CAPTCHA must never reach the site.
+            requests.incrementAndGet()
+            val buffer = okio.Buffer()
+            chain.request().body!!.writeTo(buffer)
+            body.set(buffer.readUtf8())
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("Fixture")
+                .body("<span id='errmsg'>Local simulated rejection</span>".toResponseBody("text/html".toMediaType())).build()
+        }.build()
+    }
+
     class FixtureCaptchaWebView(context: android.content.Context) : CaptchaWebView(context) {
         var loaded = CountDownLatch(1)
         override fun loadCaptchaPage(board: String, thread: Long) {
@@ -105,6 +124,17 @@ class PostingFlowTest {
         fail("Local CAPTCHA fixture did not load")
     }
 
+    private fun confirmReady(scenario: ActivityScenario<TabsActivity>, dialog: CaptchaDialog) {
+        val deadline = SystemClock.uptimeMillis() + 5000
+        var enabled = false
+        while (!enabled && SystemClock.uptimeMillis() < deadline) {
+            scenario.onActivity { enabled = (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled }
+            SystemClock.sleep(25)
+        }
+        assertTrue("Completed verification must enable the explicit Send message button", enabled)
+        scenario.onActivity { (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick() }
+    }
+
     @Test fun manualAnswerAndExpiryAreReadFromTheWidgetWithoutAnAndroidBridge() {
         val scenario = host()
         lateinit var view: CaptchaWebView
@@ -146,7 +176,10 @@ class PostingFlowTest {
             }
             ready(scenario, view)
             scenario.onActivity { assertTrue("The CAPTCHA must be visible, not just loaded", view.height >= (160 * view.resources.displayMetrics.density).toInt()) }
-            scenario.onActivity { (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick() }
+            scenario.onActivity {
+                assertFalse((dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled)
+                (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            }
             SystemClock.sleep(200)
             scenario.onActivity { assertTrue(dialog.isAdded); assertEquals(0, results.get()) }
             js(scenario, view, "TCaptcha.respNode.value='fixture-user-answer';TCaptcha.done=true")
@@ -156,7 +189,7 @@ class PostingFlowTest {
                 PostingProtocol.answerFromWebView(js(scenario, view, "JSON.stringify(window.mimiCaptchaSnapshot())"), "g", 42, System.currentTimeMillis())
             }
             js(scenario, view, "TCaptcha.respNode.value='fixture-user-answer';TCaptcha.done=true")
-            scenario.onActivity { (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick() }
+            confirmReady(scenario, dialog)
             val deadline = SystemClock.uptimeMillis() + 2000
             while (results.get() == 0 && SystemClock.uptimeMillis() < deadline) SystemClock.sleep(25)
             assertEquals(1, results.get()) // Only a result listener; there is no production submission here.
@@ -218,6 +251,47 @@ class PostingFlowTest {
             assertEquals(1, calls.get())
             assertNotNull(original.state.value?.error)
             scenario.onActivity { assertFalse(original.isSending) }
+        } finally { scenario.close() }
+    }
+
+    @Test fun confirmingCaptchaSubmitsTheActualDraftOnceAndKeepsARejectedDraft() {
+        val scenario = host()
+        lateinit var fragment: FixturePostFragment
+        lateinit var dialog: FixtureCaptchaDialog
+        lateinit var view: CaptchaWebView
+        try {
+            scenario.onActivity { activity ->
+                fragment = FixturePostFragment().apply { arguments = Bundle().apply {
+                    putString(Extras.EXTRAS_BOARD_NAME, "g"); putLong(Extras.EXTRAS_THREAD_ID, 42)
+                    putString(Extras.EXTRAS_POST_COMMENT, "offline posting fixture")
+                } }
+                fragment.showNow(activity.supportFragmentManager, "posting-pipeline-fixture")
+                fragment.requireView().findViewById<View>(R.id.submit_button).performClick()
+                fragment.childFragmentManager.executePendingTransactions()
+                dialog = fragment.childFragmentManager.findFragmentByTag("captcha_dialog") as FixtureCaptchaDialog
+                view = dialog.requireDialog().findViewById(R.id.captch_webview)
+            }
+            ready(scenario, view)
+            js(scenario, view, "TCaptcha.respNode.value='fixture-user-answer';TCaptcha.done=true")
+            confirmReady(scenario, dialog)
+            val deadline = SystemClock.uptimeMillis() + 5000
+            var rejected = false
+            while (!rejected && SystemClock.uptimeMillis() < deadline) {
+                scenario.onActivity {
+                    rejected = fragment.requireView().findViewById<android.widget.TextView>(R.id.post_error).text.contains("Local simulated rejection")
+                }
+                SystemClock.sleep(25)
+            }
+            assertTrue("The CAPTCHA confirmation must reach the posting API", rejected)
+            assertEquals(1, fragment.requests.get())
+            assertTrue(Regex("name=\"t-response\"\\r\\n(?:[^\\r\\n]+\\r\\n)*\\r\\nfixture-user-answer\\r\\n").containsMatchIn(fragment.body.get()))
+            assertTrue(Regex("name=\"com\"\\r\\n(?:[^\\r\\n]+\\r\\n)*\\r\\noffline posting fixture\\r\\n").containsMatchIn(fragment.body.get()))
+            scenario.onActivity {
+                assertTrue(fragment.isAdded)
+                assertEquals("offline posting fixture", fragment.requireView().findViewById<EditText>(R.id.comment_input).text.toString())
+                assertTrue(fragment.requireView().findViewById<View>(R.id.submit_button).isEnabled)
+                assertNull(fragment.childFragmentManager.findFragmentByTag("captcha_dialog"))
+            }
         } finally { scenario.close() }
     }
 
