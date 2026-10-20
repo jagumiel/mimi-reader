@@ -1,8 +1,8 @@
 # Dependency inventory and cleanup plan
 
 Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
-19 October after the bounded dependency and orphan-file cleanup blocks;
-retained library versions are unchanged.
+20 October after the bounded dependency/orphan-file cleanups and single-app
+variant consolidation; retained library versions are unchanged.
 
 The canonical release SBOM has **154 top-level components**: 152 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -102,7 +102,8 @@ No name-based resource lookup or reflective class lookup was found in either
 module's application/test sources. The three generated binding classes were
 outputs of the old layouts, not proof that the layouts had a consumer. Their
 removal is checked in regenerated build outputs rather than editing generated
-code. Both `free` and `paid` flavors use these shared main sources.
+code. At the time of that cleanup, both `free` and `paid` flavors used these
+shared main sources; the subsequent block below removes the duplicate flavors.
 
 The `gallery_container` ID also exists in `activity_postitem_list.xml`, so that
 layout and its ID are retained. Shared toolbar IDs, themes and strings are not
@@ -138,7 +139,61 @@ database schemas, user data and third-party license files remain unchanged.
 The Android 10/12/14/16 remote matrix still needs to run on this cleanup commit;
 the earlier green baseline is not validation of these deletions.
 
-### Remaining legacy-file review
+## Third cleanup: one free application, standard build types
+
+The application no longer has separate free/paid editions. Remove all product
+flavors in `mimi-app` and `chanlib`, including the library-only `amazon` flavor;
+there are no flavor-specific source directories to merge. Both modules now use
+standard `debug` and `release` variants. No dependency declaration, selected
+version, SDK level, signing setup or database schema changes in this block.
+
+- Release remains `com.emogoth.android.phone.mimi`; debug remains
+  `com.emogoth.android.phone.mimi.beta`. This preserves the previous free app's
+  update identity, preference keys and provider authority.
+- `verifyApplicationVariants`, wired into `check` and CI, checks the actual AGP
+  variant/application-ID map against exactly these two entries. It uses the
+  [AGP Android Components API](https://developer.android.com/reference/tools/gradle-api/8.13/com/android/build/api/variant/AndroidComponentsExtension)
+  with lazy application-ID providers rather than a deprecated variant API.
+- Feedback diagnostics report `BUILD_TYPE` instead of the removed `FLAVOR`.
+- CI, its WebView test wrapper, checksums and uploaded artifacts use unflavored
+  task/output names. Release/test guides follow those names. Only the obsolete
+  build command in the main README changes; its full rewrite remains deferred.
+- Rename the tracked release SBOM to `sbom/mimi-reader-release.cdx.json` and
+  regenerate both snapshots with the standard configuration names. Comparison
+  against the previous commit confirms all 154 component records (including
+  versions, hashes and licenses), dependency edges, 74 declarations and every
+  resolved inventory graph are unchanged after the variant/configuration rename.
+
+### Validation of variant consolidation
+
+- The actual variant/ID contract and debug/test APK builds passed. All 80 app
+  unit tests and the existing `chanlib` arithmetic smoke test passed.
+- 22 CI-helper/contract tests passed, including the exact unflavored Gradle
+  instrumentation command and workflow task/artifact paths.
+- `adb install -r` successfully updated the previous free-debug installation
+  on the Motorola Edge 20 / Android 12. All nine existing database/preference
+  file SHA-256 values were identical immediately before and after installation;
+  launcher startup then reached `TabsActivity` successfully. No app data was
+  cleared and no application was uninstalled.
+- Full Motorola suite passed through `connectedDebugAndroidTest`: 32 cases,
+  30 passed, two expected opt-in skips, no failures/errors. The temporary
+  stay-awake setting was restored to its original value (`0`).
+- Normal `lintDebug` and SBOM freshness/schema/negative checks passed. Lint has
+  no errors and retains the previous 1,020 warnings, one hint and 487
+  `UnusedResources` findings; no baseline or suppression was introduced.
+- Minified `assembleRelease` and `bundleRelease` passed, including release
+  vital lint. Packaged APK metadata confirms the original release ID, version
+  code/name (230 / 7.0.1), `minSdk 23` and `targetSdk 36`. APK/AAB and R8 mapping
+  exist at the new paths used by CI. Local APK size remains 59,382,590 bytes;
+  AAB changes from 36,448,057 to 36,448,009 bytes. This is not a performance
+  benchmark or a claim of byte-identical artifacts.
+
+The historical `.donate` package had a different application ID. Its data is
+not automatically imported into the retained application by removing a build
+flavor; see [the release guide](RELEASING.md). The new commit still requires
+its own Android 10/12/14/16 remote matrix run.
+
+## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,

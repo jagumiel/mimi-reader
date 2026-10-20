@@ -90,7 +90,7 @@ def validate_emulator(serial, api=29):
 
 def gradle(*args, serial):
     subprocess.run(["./gradlew", "--no-daemon", "--stacktrace",
-                    ":mimi-app:connectedFreeDebugAndroidTest", *args], check=True,
+                    ":mimi-app:connectedDebugAndroidTest", *args], check=True,
                    env=dict(os.environ, ANDROID_SERIAL=serial))
 
 

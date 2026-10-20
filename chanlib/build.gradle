@@ -33,21 +33,6 @@ android {
         versionName "1.0"
     }
 
-    flavorDimensions "default"
-    productFlavors{
-        free {
-            dimension "default"
-        }
-
-        paid {
-            dimension "default"
-        }
-
-        amazon {
-            dimension "default"
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false

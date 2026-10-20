@@ -155,6 +155,8 @@ class WebViewPreparationTest(unittest.TestCase):
             helper.gradle(serial="emulator-5556")
         self.assertEqual("emulator-5556", run.call_args.kwargs["env"]["ANDROID_SERIAL"])
         self.assertTrue(run.call_args.kwargs["check"])
+        self.assertEqual(["./gradlew", "--no-daemon", "--stacktrace",
+                          ":mimi-app:connectedDebugAndroidTest"], run.call_args.args[0])
 
     def test_newer_apis_keep_their_provider_and_run_mandatory_playback(self):
         for api in (31, 34, 36):
@@ -209,6 +211,16 @@ class SdkPreparationTest(unittest.TestCase):
 
 
 class WorkflowContractTest(unittest.TestCase):
+    def test_workflow_builds_and_uploads_the_single_application(self):
+        workflow = (Path(__file__).resolve().parents[2] / ".github/workflows/android-ci.yml").read_text()
+        for task in ("verifyApplicationVariants", "testDebugUnitTest", "lintDebug",
+                     "assembleDebug", "assembleRelease", "bundleRelease"):
+            self.assertIn(f":mimi-app:{task}", workflow)
+        for path in ("apk/debug/mimi-app-debug.apk", "apk/release/*.apk",
+                     "bundle/release/*.aab", "mapping/release/mapping.txt"):
+            self.assertIn(f"mimi-app/build/outputs/{path}", workflow)
+        self.assertNotRegex(workflow, r"(?i)(?:free|paid)(?:debug|release)|outputs/apk/(?:free|paid)/")
+
     def test_emulator_action_receives_one_complete_shell_command(self):
         workflow = (Path(__file__).resolve().parents[2] / ".github/workflows/android-ci.yml").read_text()
         runner = workflow.split("uses: reactivecircus/android-emulator-runner@v2.38.0", 1)[1]

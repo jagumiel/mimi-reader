@@ -1,13 +1,14 @@
 # Software bill of materials
 
-The repository tracks a CycloneDX 1.6 JSON SBOM for **freeRelease** and a separate
+The repository tracks a CycloneDX 1.6 JSON SBOM for **release** and a separate
 dependency inventory. They describe the selected Gradle dependency graph before
 R8 shrinking, not a claim that every class in every artifact survives in the APK.
-The paid variant and Android's platform-provided libraries are outside this SBOM.
+There is a single free application with standard debug/release build types;
+Android's platform-provided libraries are outside this SBOM.
 
 ## Files and coverage
 
-- `sbom/mimi-reader-free-release.cdx.json`: release runtime dependencies, the local
+- `sbom/mimi-reader-release.cdx.json`: release runtime dependencies, the local
   `chanlib` module, the desugaring runtime, and bundled Ruffle files. It includes
   Package URLs, dependency edges, reported licenses, and SHA-256 artifact hashes
   where an artifact exists. BOM/platform nodes can have no binary hash.
@@ -31,6 +32,12 @@ or the Rust/npm build dependencies of the upstream Ruffle WebAssembly release.
 Further upstream SBOMs or binary analysis would be needed for that additional coverage.
 
 ## Generate and verify
+
+On 20 October 2026, the legacy product flavors were removed. The previous
+`mimi-reader-free-release.cdx.json` snapshot is now named
+`mimi-reader-release.cdx.json`; the application Package URL qualifier and
+inventory configuration names now use `release`/`debug` without the old flavor.
+This is a build-variant/metadata change, not a dependency version update.
 
 Use JDK 17 and the Android SDK required by the project. On Windows replace
 `./gradlew` with `.\gradlew.bat`.

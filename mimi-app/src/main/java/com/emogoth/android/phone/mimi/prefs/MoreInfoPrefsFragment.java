@@ -154,7 +154,7 @@ public class MoreInfoPrefsFragment extends PreferenceFragmentCompat {
             sb.append("Mimi ")
                     .append(BuildConfig.VERSION_NAME).append(" (")
                     .append(BuildConfig.VERSION_CODE).append('-')
-                    .append(BuildConfig.FLAVOR).append(")\n");
+                    .append(BuildConfig.BUILD_TYPE).append(")\n");
             sb.append("Device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
             sb.append("Android: ").append(Build.VERSION.CODENAME).append(" (SDK ").append(Build.VERSION.SDK_INT).append(")\n");
         }

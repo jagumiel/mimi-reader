@@ -47,24 +47,25 @@ jobs:
           ./gradlew --no-daemon --stacktrace
           verifySbom testSbomValidation
 
-      - name: Build and verify freeDebug
+      - name: Build and verify debug
         run: >-
           ./gradlew --no-daemon --stacktrace
-          :mimi-app:testFreeDebugUnitTest
-          :mimi-app:lintFreeDebug
-          :mimi-app:assembleFreeDebug
+          :mimi-app:verifyApplicationVariants
+          :mimi-app:testDebugUnitTest
+          :mimi-app:lintDebug
+          :mimi-app:assembleDebug
 
       - name: Build minified release artifacts
         run: >-
           ./gradlew --no-daemon --stacktrace
-          :mimi-app:assembleFreeRelease
-          :mimi-app:bundleFreeRelease
+          :mimi-app:assembleRelease
+          :mimi-app:bundleRelease
 
       - name: Generate release checksums
         run: >-
           sha256sum
-          mimi-app/build/outputs/apk/free/release/*.apk
-          mimi-app/build/outputs/bundle/freeRelease/*.aab
+          mimi-app/build/outputs/apk/release/*.apk
+          mimi-app/build/outputs/bundle/release/*.aab
           > mimi-app/build/outputs/release-checksums.txt
 
       - name: Upload verification reports
@@ -78,11 +79,11 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload freeDebug APK
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: mimi-reader-free-debug-${{ github.sha }}
-          path: mimi-app/build/outputs/apk/free/debug/mimi-app-free-debug.apk
+          name: mimi-reader-debug-${{ github.sha }}
+          path: mimi-app/build/outputs/apk/debug/mimi-app-debug.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -97,14 +98,14 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload unsigned freeRelease artifacts
+      - name: Upload unsigned release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mimi-reader-free-release-unsigned-${{ github.sha }}
+          name: mimi-reader-release-unsigned-${{ github.sha }}
           path: |
-            mimi-app/build/outputs/apk/free/release/*.apk
-            mimi-app/build/outputs/bundle/freeRelease/*.aab
-            mimi-app/build/outputs/mapping/freeRelease/mapping.txt
+            mimi-app/build/outputs/apk/release/*.apk
+            mimi-app/build/outputs/bundle/release/*.aab
+            mimi-app/build/outputs/mapping/release/mapping.txt
             mimi-app/build/outputs/release-checksums.txt
           if-no-files-found: error
           retention-days: 14

@@ -17,14 +17,14 @@ Connect exactly one authorized device or emulator and run:
 
 ```powershell
 adb devices -l
-.\gradlew.bat :mimi-app:connectedFreeDebugAndroidTest
+.\gradlew.bat :mimi-app:connectedDebugAndroidTest
 ```
 
 When more than one device is connected, set `ANDROID_SERIAL` to avoid accidentally running the suite on every device:
 
 ```powershell
 $env:ANDROID_SERIAL = "emulator-5554"
-.\gradlew.bat :mimi-app:connectedFreeDebugAndroidTest
+.\gradlew.bat :mimi-app:connectedDebugAndroidTest
 Remove-Item Env:\ANDROID_SERIAL
 ```
 

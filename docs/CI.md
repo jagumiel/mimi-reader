@@ -112,13 +112,21 @@ playback run. Newer matrix entries keep their image's own WebView.
 
 ## Local checks and remaining verification
 
+Since 20 October 2026 the app and library have no product flavors. CI uses only
+`debug`/`release`, checks the actual application variant IDs with
+`verifyApplicationVariants`, and uploads artifacts from `apk/debug`,
+`apk/release`, `bundle/release` and `mapping/release`. The WebView wrapper runs
+`connectedDebugAndroidTest`; its provider-safety checks and emulator matrix are
+unchanged. CI helper coverage is now 22 tests, including these task/output paths.
+
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
 bash -n scripts/ci/install_emulator_sdk.sh
 ./gradlew verifySbom testSbomValidation \
-  :mimi-app:testFreeDebugUnitTest :mimi-app:lintFreeDebug \
-  :mimi-app:assembleFreeDebug :mimi-app:assembleFreeRelease :mimi-app:bundleFreeRelease
-./gradlew :mimi-app:connectedFreeDebugAndroidTest
+  :mimi-app:verifyApplicationVariants \
+  :mimi-app:testDebugUnitTest :mimi-app:lintDebug \
+  :mimi-app:assembleDebug :mimi-app:assembleRelease :mimi-app:bundleRelease
+./gradlew :mimi-app:connectedDebugAndroidTest
 ```
 
 The helper tests cover bounded SDK retries, final failure propagation, invalid

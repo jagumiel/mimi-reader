@@ -17,7 +17,7 @@ buildscript {
 // Debug/test/build tooling is inventoried separately, not attributed to the shipped app.
 allprojects {
     tasks.named('cyclonedxDirectBom') {
-        includeConfigs = ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring']
+        includeConfigs = ['releaseRuntimeClasspath', 'coreLibraryDesugaring']
         includeBomSerialNumber = false
         includeBuildSystem = false
         // Plugin 3.5.1 defaults to CycloneDX 1.6; validation also requires 1.6.
@@ -32,7 +32,7 @@ allprojects {
 def app = project(':mimi-app')
 def outputDirectory = layout.buildDirectory.dir('reports/sbom')
 def manifestFile = file('sbom/manual-components.json')
-def snapshots = ['mimi-reader-free-release.cdx.json', 'dependency-inventory.json']
+def snapshots = ['mimi-reader-release.cdx.json', 'dependency-inventory.json']
 def sha256 = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
 def readJson = { File input -> new JsonSlurper().parse(input, 'UTF-8') }
 def deepCopy = { value -> new JsonSlurper().parseText(JsonOutput.toJson(value)) }
@@ -80,7 +80,7 @@ def verifyManualFiles = { Map manifest ->
 def normalizeBom = { Map input, Map manifest ->
     def bom = deepCopy(input)
     def version = providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
-    def appRef = "pkg:generic/mimi-reader@$version?variant=freeRelease".toString()
+    def appRef = "pkg:generic/mimi-reader@$version?variant=release".toString()
     def replacements = [(bom.metadata.component['bom-ref']): appRef]
     bom.components.findAll { it.purl?.contains('project_path=') }.each { component ->
         if (component.name != 'chanlib') fail("Unexpected local project in release SBOM: ${component.name}")
@@ -99,7 +99,7 @@ def normalizeBom = { Map input, Map manifest ->
             type: 'application', name: 'mimi-reader', version: version,
             'bom-ref': appRef, purl: appRef,
             licenses: [[license: [id: 'Apache-2.0']]],
-            properties: [[name: 'mimi:variant', value: 'freeRelease'],
+            properties: [[name: 'mimi:variant', value: 'release'],
                          [name: 'mimi:versionCode', value: providers.gradleProperty('mimiVersionCode').getOrElse('230')],
                          [name: 'mimi:coverage', value: 'resolved-runtime-and-desugaring-before-R8']]
     ]
@@ -159,7 +159,7 @@ def validateBom = { Map bom ->
     all.findAll { it.type != 'file' }.each {
         if (!it.version || !it.purl) fail("Missing version or Package URL: ${it.name}")
     }
-    def selected = ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring'].collectMany { name ->
+    def selected = ['releaseRuntimeClasspath', 'coreLibraryDesugaring'].collectMany { name ->
         app.configurations.getByName(name).incoming.resolutionResult.allComponents.collect { it.id }
                 .findAll { it instanceof ModuleComponentIdentifier }
                 .collect { "$it.group:$it.module:$it.version".toString() }
@@ -212,14 +212,14 @@ def buildInventory = {
         }
     }
     def graphs = [:]
-    ['freeReleaseRuntimeClasspath', 'coreLibraryDesugaring', 'freeDebugUnitTestRuntimeClasspath',
-     'freeDebugAndroidTestRuntimeClasspath', 'kaptFreeRelease'].each { name ->
+    ['releaseRuntimeClasspath', 'coreLibraryDesugaring', 'debugUnitTestRuntimeClasspath',
+     'debugAndroidTestRuntimeClasspath', 'kaptRelease'].each { name ->
         graphs[name] = inventoryGraph(app.configurations.getByName(name))
     }
     graphs['rootBuildscriptClasspath'] = inventoryGraph(rootProject.buildscript.configurations.classpath)
     graphs['chanlibUnitTestRuntimeClasspath'] = inventoryGraph(
-            project(':chanlib').configurations.getByName('freeDebugUnitTestRuntimeClasspath'))
-    [formatVersion: 1, variant: 'freeRelease', declarations: declarations,
+            project(':chanlib').configurations.getByName('debugUnitTestRuntimeClasspath'))
+    [formatVersion: 1, variant: 'release', declarations: declarations,
      resolvedConfigurations: graphs,
      buildTools: [gradle: gradle.gradleVersion, cyclonedxGradlePlugin: '3.5.1', cyclonedxValidator: '13.2.0'],
      buildDependencies: rootProject.buildscript.configurations.classpath.dependencies.collect {

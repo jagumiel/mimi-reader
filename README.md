@@ -15,4 +15,4 @@ The current open source release is 7.0.1. It is based off of the 7.0.1 release o
 ### How do I get set up? ###
 
 1. Clone
-1. run `gradlew assembleFreeDebug`
+1. run `gradlew assembleDebug`

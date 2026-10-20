@@ -2,12 +2,26 @@
 
 Mimi Reader can produce a minified unsigned release without access to signing secrets. A local `keystore.properties` file enables signing for both APK and App Bundle outputs. The keystore and its properties are ignored by Git and must never be committed.
 
+## Single free application
+
+There are no separate free/paid products. Both modules use only standard
+`debug` and `release` variants; the old `free`, `paid` and library-only `amazon`
+flavors have been removed. Release keeps `com.emogoth.android.phone.mimi` and
+debug keeps `com.emogoth.android.phone.mimi.beta`, with the same signing setup.
+`./gradlew :mimi-app:verifyApplicationVariants` checks both application IDs
+against the actual AGP variants and also runs through `check` and Android CI.
+
+Removing a flavor does not require uninstalling the existing free application.
+Use an in-place update with the same certificate; do not clear application data.
+The historical `.donate` package was a different application ID and is not
+automatically migrated by this change. No installed donation app is uninstalled.
+
 ## Versioning
 
 The source defaults are `versionCode 230` and `versionName 7.0.1`. Override both values for a release without editing the build file:
 
 ```powershell
-.\gradlew.bat :mimi-app:assembleFreeRelease :mimi-app:bundleFreeRelease -PmimiVersionCode=231 -PmimiVersionName=7.0.2
+.\gradlew.bat :mimi-app:assembleRelease :mimi-app:bundleRelease -PmimiVersionCode=231 -PmimiVersionName=7.0.2
 ```
 
 `mimiVersionCode` must be a positive integer and must increase for every published update. `mimiVersionName` is the user-facing release number.
@@ -16,9 +30,9 @@ The source defaults are `versionCode 230` and `versionName 7.0.1`. Override both
 
 When `keystore.properties` is absent, the release tasks generate minified, resource-shrunk artifacts suitable for CI verification or later signing:
 
-- `mimi-app/build/outputs/apk/free/release/`
-- `mimi-app/build/outputs/bundle/freeRelease/`
-- `mimi-app/build/outputs/mapping/freeRelease/mapping.txt`
+- `mimi-app/build/outputs/apk/release/`
+- `mimi-app/build/outputs/bundle/release/`
+- `mimi-app/build/outputs/mapping/release/mapping.txt`
 
 GitHub Actions builds these artifacts on every run, includes their SHA-256 checksums, and retains them for 14 days. CI artifacts are unsigned and must not be distributed as an installable release.
 
@@ -32,7 +46,7 @@ GitHub Actions builds these artifacts on every run, includes their SHA-256 check
 The build fails early if the properties file exists but any required signing value is empty. Verify a signed APK with the Android SDK tool before distribution:
 
 ```powershell
-& "$env:LOCALAPPDATA\Android\Sdk\build-tools\36.0.0\apksigner.bat" verify --verbose --print-certs mimi-app\build\outputs\apk\free\release\mimi-app-free-release.apk
+& "$env:LOCALAPPDATA\Android\Sdk\build-tools\36.0.0\apksigner.bat" verify --verbose --print-certs mimi-app\build\outputs\apk\release\mimi-app-release.apk
 ```
 
 Install the signed APK as an update on a device that already contains the previous release. Android will reject it if the signing certificate differs, which protects existing installations from an unintended key change.

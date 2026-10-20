@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 19 de octubre de 2026.
+Última revisión: 20 de octubre de 2026.
 
 ## Objetivo
 
@@ -148,8 +148,12 @@ Actualizar Mimi Reader sin abandonar los dispositivos antiguos que siguen siendo
         - [x] Compilar `freeDebug`, su APK de pruebas y `paidDebug`; verificar las 80 pruebas unitarias de aplicación, las 21 auxiliares de CI y el SBOM sin cambios de componentes ni snapshots. Confirmar que los tres bindings huérfanos ya no se generan en ninguna de las dos variantes.
         - [x] Validar lint sin errores (avisos `UnusedResources` de 490 a 487), APK/AAB release minificados y la suite completa del Motorola con Android 12: 30 pruebas superadas y dos optativas omitidas, sin fallos. Restaurar el ajuste temporal de pantalla encendida y documentar los tamaños locales sin atribuir mejoras de rendimiento no medidas.
         - [ ] Confirmar la matriz remota de Android 10/12/14/16 con el commit de esta limpieza de recursos.
+      - [x] Tercer bloque: consolidar la única aplicación gratuita, retirando `free`/`paid` de ambos módulos y la variante `amazon` de `chanlib`. Mantener solo `debug`/`release`, los identificadores y la firma actuales; adaptar tareas, CI, artefactos, diagnósticos e inventario/SBOM sin modificar versiones de dependencias. Añadir `verifyApplicationVariants` a `check` y CI para proteger los identificadores y evitar variantes comerciales accidentales.
+        - [x] Validar 80 pruebas unitarias, 22 auxiliares de CI, lint sin errores, SBOM y APK/AAB release minificados. Confirmar que los 154 componentes y sus grafos/versiones/huellas no cambian tras renombrar variantes/configuraciones; renombrar el snapshot a `mimi-reader-release.cdx.json`.
+        - [x] Actualizar la instalación existente con `adb install -r`, comprobar las nueve huellas de bases de datos/preferencias sin cambios y el arranque correcto. Suite del Motorola con Android 12: 30 pruebas superadas, dos optativas omitidas y cero fallos; ajuste temporal de pantalla restaurado. El antiguo paquete `.donate` no se migra automáticamente ni se desinstala.
+        - [ ] Confirmar en GitHub Actions la matriz remota de Android 10/12/14/16 y la subida de artefactos con las rutas sin flavors de este commit.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
-    - [x] Cubrir el grafo de `freeRelease` antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
+    - [x] Cubrir el grafo de `release` (antes `freeRelease`) antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
   - [ ] Añadir a GitHub Actions una validación del SBOM y un análisis de vulnerabilidades conocidas (CVE/GHSA), publicar los resultados en SARIF y bloquear inicialmente solo vulnerabilidades `high` o `critical` no justificadas.
     - [x] Validar el formato y la frescura del SBOM en CI; el análisis CVE/GHSA y SARIF sigue pendiente.

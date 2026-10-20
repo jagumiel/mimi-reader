@@ -487,7 +487,7 @@
                 "id": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
             }
         ],
-        "freeDebugAndroidTestRuntimeClasspath": [
+        "debugAndroidTestRuntimeClasspath": [
             {
                 "direct": false,
                 "id": "androidx.room:room-migration-jvm:2.8.5"
@@ -665,7 +665,7 @@
                 "id": "org.jspecify:jspecify:1.0.0"
             }
         ],
-        "freeDebugUnitTestRuntimeClasspath": [
+        "debugUnitTestRuntimeClasspath": [
             {
                 "direct": false,
                 "id": "androidx.activity:activity:1.13.0"
@@ -1307,7 +1307,157 @@
                 "id": "project::chanlib"
             }
         ],
-        "freeReleaseRuntimeClasspath": [
+        "kaptRelease": [
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation-jvm:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.annotation:annotation:1.9.1"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-common:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-compiler-processing:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-external-antlr:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration-jvm:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "androidx.room:room-migration:2.8.5"
+            },
+            {
+                "direct": false,
+                "id": "com.github.bumptech.glide:annotations:4.11.0"
+            },
+            {
+                "direct": false,
+                "id": "com.google.auto.value:auto-value-annotations:1.6.3"
+            },
+            {
+                "direct": false,
+                "id": "com.google.auto:auto-common:1.2.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.code.findbugs:jsr305:3.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.devtools.ksp:symbol-processing-api:2.0.10-1.0.24"
+            },
+            {
+                "direct": false,
+                "id": "com.google.errorprone:error_prone_annotations:2.26.1"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:failureaccess:1.0.2"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:guava:33.2.1-jre"
+            },
+            {
+                "direct": false,
+                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.intellij:annotations:12.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:javapoet:1.13.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet-javapoet:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet-jvm:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "com.squareup:kotlinpoet:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "commons-codec:commons-codec:1.15"
+            },
+            {
+                "direct": false,
+                "id": "org.checkerframework:checker-qual:3.42.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-metadata-jvm:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-reflect:2.0.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains:annotations:13.0"
+            },
+            {
+                "direct": false,
+                "id": "org.jspecify:jspecify:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "org.xerial:sqlite-jdbc:3.41.2.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.room:room-compiler:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "com.github.bumptech.glide:compiler:4.11.0"
+            }
+        ],
+        "releaseRuntimeClasspath": [
             {
                 "direct": false,
                 "id": "androidx.activity:activity:1.13.0"
@@ -1911,156 +2061,6 @@
             {
                 "direct": true,
                 "id": "project::chanlib"
-            }
-        ],
-        "kaptFreeRelease": [
-            {
-                "direct": false,
-                "id": "androidx.annotation:annotation-jvm:1.9.1"
-            },
-            {
-                "direct": false,
-                "id": "androidx.annotation:annotation:1.9.1"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-common-jvm:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-common:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-compiler-processing:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-external-antlr:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-migration-jvm:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "androidx.room:room-migration:2.8.5"
-            },
-            {
-                "direct": false,
-                "id": "com.github.bumptech.glide:annotations:4.11.0"
-            },
-            {
-                "direct": false,
-                "id": "com.google.auto.value:auto-value-annotations:1.6.3"
-            },
-            {
-                "direct": false,
-                "id": "com.google.auto:auto-common:1.2.1"
-            },
-            {
-                "direct": false,
-                "id": "com.google.code.findbugs:jsr305:3.0.2"
-            },
-            {
-                "direct": false,
-                "id": "com.google.devtools.ksp:symbol-processing-api:2.0.10-1.0.24"
-            },
-            {
-                "direct": false,
-                "id": "com.google.errorprone:error_prone_annotations:2.26.1"
-            },
-            {
-                "direct": false,
-                "id": "com.google.guava:failureaccess:1.0.2"
-            },
-            {
-                "direct": false,
-                "id": "com.google.guava:guava:33.2.1-jre"
-            },
-            {
-                "direct": false,
-                "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
-            },
-            {
-                "direct": false,
-                "id": "com.intellij:annotations:12.0"
-            },
-            {
-                "direct": false,
-                "id": "com.squareup:javapoet:1.13.0"
-            },
-            {
-                "direct": false,
-                "id": "com.squareup:kotlinpoet-javapoet:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "com.squareup:kotlinpoet-jvm:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "com.squareup:kotlinpoet:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "commons-codec:commons-codec:1.15"
-            },
-            {
-                "direct": false,
-                "id": "org.checkerframework:checker-qual:3.42.0"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlin:kotlin-metadata-jvm:2.2.0"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlin:kotlin-reflect:2.0.10"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.1"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
-            },
-            {
-                "direct": false,
-                "id": "org.jetbrains:annotations:13.0"
-            },
-            {
-                "direct": false,
-                "id": "org.jspecify:jspecify:1.0.0"
-            },
-            {
-                "direct": false,
-                "id": "org.xerial:sqlite-jdbc:3.41.2.2"
-            },
-            {
-                "direct": true,
-                "id": "androidx.room:room-compiler:2.8.5"
-            },
-            {
-                "direct": true,
-                "id": "com.github.bumptech.glide:compiler:4.11.0"
             }
         ],
         "rootBuildscriptClasspath": [
@@ -2826,5 +2826,5 @@
             }
         ]
     },
-    "variant": "freeRelease"
+    "variant": "release"
 }
