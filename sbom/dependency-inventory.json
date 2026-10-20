@@ -153,7 +153,7 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.gridlayout:gridlayout:1.0.0"
+            "requested": "androidx.gridlayout:gridlayout:1.1.0"
         },
         {
             "configuration": "implementation",
@@ -1155,7 +1155,7 @@
             },
             {
                 "direct": true,
-                "id": "androidx.gridlayout:gridlayout:1.0.0"
+                "id": "androidx.gridlayout:gridlayout:1.1.0"
             },
             {
                 "direct": true,
@@ -1939,7 +1939,7 @@
             },
             {
                 "direct": true,
-                "id": "androidx.gridlayout:gridlayout:1.0.0"
+                "id": "androidx.gridlayout:gridlayout:1.1.0"
             },
             {
                 "direct": true,

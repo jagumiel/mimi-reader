@@ -161,7 +161,7 @@ dependencies {
     implementation 'androidx.browser:browser:1.2.0'
     // 1.15.0 is the newest WebKit release that keeps this app's minSdk 23.
     implementation 'androidx.webkit:webkit:1.15.0'
-    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'androidx.gridlayout:gridlayout:1.1.0'
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"

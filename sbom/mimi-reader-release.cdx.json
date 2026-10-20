@@ -1347,19 +1347,19 @@
             "version": "1.9.1"
         },
         {
-            "bom-ref": "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar",
+            "bom-ref": "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar",
             "description": "Android Support Grid Layout",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.gridlayout",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "a7e5dc6f39dbc3dc6ac6d57b02a9c6fd792e80f0e45ddb3bb08e8f03d23c8755"
+                    "content": "99dae726941cb2b11d22129be7883b58e8c244150cc65f6c2529920b7cba0de8"
                 }
             ],
             "licenses": [
@@ -1377,9 +1377,10 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar",
             "type": "library",
-            "version": "1.0.0"
+            "version": "1.1.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
@@ -5560,7 +5561,7 @@
                 "pkg:maven/androidx.documentfile/documentfile@1.0.0?type=aar",
                 "pkg:maven/androidx.drawerlayout/drawerlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
-                "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar",
+                "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-livedata@2.11.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-process@2.11.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
@@ -6071,6 +6072,14 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+            ],
+            "ref": "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar"
@@ -6427,13 +6436,6 @@
                 "pkg:maven/androidx.media/media@1.0.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.legacy/legacy-support-v4@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar"
         },
         {
             "dependsOn": [

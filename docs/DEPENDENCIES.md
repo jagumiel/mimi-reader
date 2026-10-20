@@ -6,6 +6,7 @@ migration. The fourth block aligned declarations without changing shipped versio
 the fifth deliberately replaces the old AppCompat/Fragment alpha selections.
 The sixth replaces direct legacy umbrellas with explicit consumer declarations,
 without changing the selected component set or versions.
+The seventh updates GridLayout alone and records the native-library release risk.
 
 The canonical release SBOM has **158 top-level components**: 156 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -66,7 +67,7 @@ under the third block. New cleanup changes still require their own matrix run.
 | --- | --- | --- |
 | AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
-| PDF | MimiReader AndroidPdfViewer 3.2.0-beta.2 pulls pdfium-android 1.9.0 and native binaries. | Review maintenance and native compatibility. Exercise opening, scrolling, rotation and release builds on all supported Android test targets. |
+| PDF | MimiReader AndroidPdfViewer 3.2.0-beta.2 pulls pdfium-android 1.9.0 and native binaries; the seventh block confirms 4 KB ELF load alignment in several 64-bit libraries. | Prioritize a separately tested replacement/rebuild before release. Keep Android 10/12 support and verify PDF interaction, lifecycle, errors and 16 KB devices. |
 | UI libraries | Preference is now **1.2.1**. Material 1.2.1, Glide 4.11.0, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.0. | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
@@ -79,8 +80,8 @@ No vulnerability database was queried in this phase.
 - The first three dependency candidates are resolved above. Continue reviewing
   indirect/generated usage rather than equating absent imports with safe removal.
 - Direct legacy AndroidX umbrella declarations and the filter editor's legacy
-  spacers are replaced in the sixth block. PDFium and GridLayout still introduce
-  umbrella artifacts transitively; assess those integrations before exclusions.
+  spacers are replaced in the sixth block. The seventh removes GridLayout's
+  legacy dependency path; PDFium still introduces the umbrellas transitively.
 - JUnit alignment, the empty local file-tree/repositories and obsolete commented
   build declarations are addressed in the fourth block below.
 - Keep the Serialization BOM: absence of application imports does not establish
@@ -400,8 +401,88 @@ in addition to the existing bundled-hash and canonical-ordering checks.
   The new three-theme/two-width filter case passed alongside navigation,
   restoration, insets, gallery/SWF, posting fixtures, migrations and downloads.
   No filters were saved and no public posts were made. The temporary stay-awake
-  setting was restored to its original value (`0`). The new commit's own remote
-  API 29/31/34/36 matrix remains pending.
+  setting was restored to its original value (`0`).
+- [Run 23 for `e485a71`](https://github.com/jagumiel/mimi-reader/actions/runs/39473553462)
+  passed all five jobs, confirming this cleanup and SBOM edge verification on
+  API 29/31/34/36. This does not validate subsequent GridLayout changes.
+
+## Seventh cleanup: GridLayout and native compatibility findings
+
+Update the only GridLayout declaration from 1.0.0 to
+[stable 1.1.0](https://developer.android.com/jetpack/androidx/releases/gridlayout#1.1.0).
+The release removes the legacy library dependency and expects platform `Space`,
+which the previous block already installed. Upstream puts this library in
+maintenance mode; this bounded update does not imply an application-wide Compose
+migration. The filter editor remains its single production consumer.
+
+Strengthen its existing offline three-theme/two-width test to check horizontal
+bounds, non-overlapping inputs, actions below the inputs, a shared action row,
+non-overlapping buttons and vertical containment. Run the stronger test against
+the old 1.0.0 baseline first, then against 1.1.0 with the complete suite. No
+filter/preference write or public post is part of this validation.
+
+The reviewed SBOM still has 158 components and 77 declarations. Only GridLayout's
+component record changes version/hash; its outgoing dependencies are now Core,
+Annotation and JSpecify, all already selected elsewhere. Other component records,
+including native PDF/GIF artifacts and Ruffle, are unchanged. PDFium still requests
+`legacy-support-v4`, retaining the old umbrella subtree. Do not claim those legacy
+components have disappeared or add exclusions to force that appearance.
+
+### Native audit: a separate pre-release requirement
+
+Inspect the existing release APK and its stripped native build inputs with
+`readelf -lW`, and cross-check AAR ownership. The following are ELF **PT_LOAD
+alignment** observations, not results from a 16 KB runtime:
+
+| Origin / library | arm64-v8a alignment | x86_64 alignment |
+| --- | --- | --- |
+| PDFium 1.9.0: `libc++_shared.so`, `libjniPdfium.so` | 0x10000 (64 KB) | 0x1000 (4 KB) |
+| PDFium 1.9.0: `libmodft2.so`, `libmodpdfium.so`, `libmodpng.so` | 0x1000 (4 KB) | 0x1000 (4 KB) |
+| android-gif-drawable 1.2.21: `libpl_droidsonroids_gif.so` | 0x1000 (4 KB) | 0x1000 (4 KB) |
+
+All twelve entries exist in the APK, with SHA-256 values matching the inspected
+stripped build inputs. The PDFium AAR owns its five libraries per
+ABI; the GIF AAR owns its decoder. The Edge 20 reports `getconf PAGE_SIZE = 4096`.
+Its successful tests, and CI on API 36 alone, do not establish 16 KB compatibility.
+The current APK passes `zipalign -c -P 16 4`; ZIP packaging alignment is a separate
+check and cannot repair ELF load segments. Even a sufficiently aligned PT_LOAD
+entry alone is not full native compatibility certification.
+
+Following the [Android native page-size guidance](https://developer.android.com/guide/practices/page-sizes),
+replace or rebuild the affected PDF and GIF integrations and explicitly test in
+a 16 KB environment before release. This is a compatibility finding, not a CVE
+scan and not a change to native binaries in this block. Preserve API 23 support,
+32-bit Android 10 installations and existing user data. Do not silently remove
+PDF/GIF support or drop device ABIs to hide the problem.
+
+The PDF follow-up must cover local multipage fixtures, scrolling/zoom, rotation,
+gallery page changes, cancellation/resource release, malformed/encrypted files
+and visible load errors. Audit `PdfPage`'s asynchronous ready/error handling and
+the apparently orphaned `gallery_image_pdf.xml` before any removal. The GIF
+follow-up must preserve animation, pause/resume and autoplay's one-cycle advance.
+
+### GridLayout validation
+
+- The stronger filter test passed on the Edge 20 with GridLayout 1.0.0 before
+  upgrading (one isolated case). After upgrading, the complete Android 12 suite
+  passed: 43 cases, 40 passed, three expected opt-in skips and zero failures/
+  errors, including the same geometry assertions. The filter fixture never saves
+  filters or changes theme preferences; no public messages were posted.
+  Stay-awake was restored to 0.
+- Debug APK/test APK, 94 app unit tests, eight library tests, 22 CI-helper tests
+  and the application variant-ID check passed. The minimum SDK remains 23.
+- Dedicated debug lint passed with zero errors, the unchanged 1,019 warnings,
+  one hint and 485 `UnusedResources` findings; no suppression or baseline added.
+- Regenerated and reviewed both snapshots; SBOM schema, exact root-edge,
+  freshness, six negative-document, bundled-hash and canonical-order checks passed.
+- Minified release APK/AAB, R8 and release vital lint passed without new rules.
+  Packaged metadata retains the release ID, version 230 / 7.0.1, minimum API 23
+  and target API 36. APK size stays at 59,452,644 bytes; AAB changes from
+  36,640,635 to 36,641,843 bytes. These local sizes are not runtime performance
+  measurements. ZIP alignment passes but the documented ELF/native risk remains.
+- This block's own remote Android 10/12/14/16 matrix is still pending. Run 23
+  confirms only the preceding commit, not the new library version. Native 16 KB
+  compatibility remains an explicitly unresolved pre-release requirement.
 
 ## Remaining legacy-file review
 
@@ -432,12 +513,12 @@ only the method and leave a live caller behind. This block does not change that 
    checks. On Android 12, human resolution and one separately authorized text
    reply succeeded; do not repeat public submissions for automated regression.
    [Posting contracts and validation limits](POSTING.md) record that scope.
-3. The AndroidX UI block (`04b3a42`) is confirmed by green run 22. Confirm the
-   sixth cleanup's own remote matrix after pushing its commit. Continue bounded
-   refactoring with updated snapshots and unit/device/lint/release checks.
-4. Review PDF/native compatibility, GridLayout's remaining legacy dependency
-   path and other legacy adapters/resources;
-   compare APK/AAB size and startup behavior with appropriate measurements.
+3. The AndroidX UI block (`04b3a42`) and explicit-consumer block (`e485a71`) are
+   confirmed by green runs 22 and 23. Confirm the seventh cleanup's own remote
+   matrix after pushing its commit.
+4. Prioritize PDF/native replacement and GIF native compatibility with 16 KB
+   runtime validation, while retaining Android 10/12 and 32-bit support. Then
+   continue the remaining legacy adapter/resource reviews in bounded groups.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
    time-limited exceptions. Do not treat the scanner as the automatic next task

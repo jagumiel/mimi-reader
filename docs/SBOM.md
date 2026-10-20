@@ -68,6 +68,11 @@ raw report must not hide declaration-only cleanup. The sixth cleanup keeps all
 158 component records unchanged while replacing three application root edges
 with five explicit consumer edges; the inventory now has 77 declarations.
 
+The seventh cleanup updates only GridLayout from 1.0.0 to 1.1.0 and its outgoing
+edges. Counts remain 158 components / 77 declarations. PDF/GIF native artifacts
+and hashes are unchanged: the [native page-size audit](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement)
+does not imply a binary update or a CVE scan.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

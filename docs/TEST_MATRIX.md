@@ -69,12 +69,30 @@ The sixth cleanup adds a mandatory offline filter-editor case to
 ten grid columns, usable controls at 320/480dp, preserved fixture text and edit/
 cancel callbacks in all three themes. The editor stays detached: no board fetch,
 Save action, filter write or theme preference change. The suite now has 43 cases
-with the same three opt-in skips; this commit needs its own remote matrix.
+with the same three opt-in skips; its remote result is recorded below.
 
 On 20 October, after the owner unlocked the Edge 20 / Android 12, the complete
 43-case suite passed: 40 passed, three expected opt-in skips and zero failures/
 errors, including the new filter-editor case. No filter was saved and no public
 message was posted. The original phone stay-awake setting (0) was restored.
+
+[Run 23 for `e485a71`](https://github.com/jagumiel/mimi-reader/actions/runs/39473553462)
+confirms that six-block baseline: build/lint/unit/SBOM and all four Android
+instrumented jobs passed. The seventh cleanup strengthens the existing filter
+case with control bounds, input/button non-overlap, vertical order and action-row
+alignment at the same three themes/two widths. The stronger case passed against
+GridLayout 1.0.0 before upgrading to 1.1.0; the suite still has 43 cases.
+
+The complete suite with GridLayout 1.1.0 passed on the Edge 20 / Android 12 on
+20 October: 40 passed, three expected skips and zero failures/errors. The
+phone's original stay-awake setting (0) was restored. The filter fixture never
+saves filters or changes theme preferences; no public messages were posted.
+This library change still requires its own remote matrix after pushing the commit.
+
+Native 16 KB acceptance is a separate outstanding requirement. The Edge 20
+reports `PAGE_SIZE=4096`; neither its successful rendering tests nor an API 36
+label alone verifies 16 KB behaviour. PDF/GIF binary audit findings and required
+follow-up are in [DEPENDENCIES.md](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
 
 ## Local device validation
 

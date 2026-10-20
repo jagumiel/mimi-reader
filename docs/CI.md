@@ -156,7 +156,15 @@ theme preferences. The suite now has 43 cases with three opt-in skips. SBOM
 negative coverage expands from four to six malformed documents, checking exact
 application root edges as well as component coverage/schema/hashes. The raw
 generator refreshes even if only direct/transitive relationships change. This
-cleanup's own remote matrix still needs confirmation after its commit is pushed.
+cleanup is now confirmed by [run 23 for `e485a71`](https://github.com/jagumiel/mimi-reader/actions/runs/39473553462):
+all five jobs passed, including Android 10/12/14/16.
+
+The seventh cleanup upgrades only GridLayout to 1.1.0 and strengthens the same
+filter-editor case with bounds, overlap and action-row assertions (still 43 cases,
+three opt-in skips). Its own remote matrix remains pending. Neither a green
+API 36 job nor the existing 4 KB physical phone establishes native 16 KB page-size
+compatibility: PDF/GIF ELF findings and the separate runtime acceptance gate are
+recorded in [the dependency audit](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
 
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v

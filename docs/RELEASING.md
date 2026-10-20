@@ -57,6 +57,10 @@ The next public version is **8.0**, reflecting the unusually large scope of the 
 
 - Agree and complete the 8.0 changelog before preparing public artifacts.
 - Run unit tests, lint, and both release artifact tasks.
+- Resolve the PDF/GIF native alignment findings in [the dependency audit](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
+  Check both ELF load-segment and APK ZIP alignment and exercise playback/rendering
+  in a 16 KB environment; a green API 36 job or ZIP check alone is insufficient.
+  Retain Android 10/12 and 32-bit compatibility while replacing native integrations.
 - Verify the dependency snapshots with `verifySbom testSbomValidation` and generate
   a release-version SBOM as described in [the SBOM guide](SBOM.md).
 - Confirm the version code and version name in the built artifact.
