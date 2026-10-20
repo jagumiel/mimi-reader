@@ -43,6 +43,26 @@ stay-awake setting (0) was restored. An earlier, separately authorized text repl
 was confirmed publicly as post `110119159`; this regression run made no public
 submissions. See [POSTING.md](POSTING.md) for the precise scope.
 
+Remote [run 21 for `6541737`](https://github.com/jagumiel/mimi-reader/actions/runs/39409405146)
+passed build/lint/unit/SBOM and the complete Android 10/12/14/16 matrix,
+confirming the previous cleanup and posting regression coverage. Physical
+Android 10 CAPTCHA/keyboard/browser acceptance remains pending; emulators do
+not establish live provider acceptance.
+
+The AndroidX UI migration adds two mandatory offline compatibility tests:
+Material dialogs have view-tree lifecycle owners under light/dark/black themes,
+and a nested settings screen with an open preference dialog survives activity
+recreation, preserves its value when cancelled, and navigates Back correctly.
+They do not modify the user's chosen theme/preference or post public messages.
+The suite now has 42 cases, with three opt-in skips; the new dependency baseline
+requires its own remote matrix after pushing the commit.
+
+On 20 October the complete 42-case suite passed on the physical Motorola Edge
+20 / Android 12 / WebView 155 with the new AndroidX baseline: 39 passed, three
+expected skips, zero failures/errors. The two new cases also passed separately
+before the full run. No public posts were made and the original stay-awake
+setting (0) was restored after testing.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

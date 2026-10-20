@@ -136,6 +136,18 @@ test posts public messages or solves real CAPTCHA challenges. A third opt-in
 test, `livePostingCaptcha=true`, is a human-only widget preview with no posting
 API attached; it stays skipped in the normal matrix. See [POSTING.md](POSTING.md).
 
+[Run 21 for `6541737`](https://github.com/jagumiel/mimi-reader/actions/runs/39409405146)
+passed all five jobs: build/lint/unit/SBOM plus the Android 10, 12, 14 and 16
+instrumentation matrix. This confirms the fourth cleanup and posting blocks.
+It does not replace physical-device CAPTCHA acceptance on Android 10.
+
+The following AndroidX UI block adds two mandatory offline cases in
+`AndroidXUiCompatibilityTest`: lifecycle-owned Material dialogs under the light,
+dark and black themes, and settings nested-screen/dialog restoration followed
+by Back navigation without changing the selected preference. The suite now has
+42 cases, with the same three opt-in skips. Its own remote matrix must pass
+after the new commit is pushed; run 21 cannot validate later dependency changes.
+
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
 bash -n scripts/ci/install_emulator_sdk.sh

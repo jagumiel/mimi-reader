@@ -103,7 +103,7 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.appcompat:appcompat:1.2.0"
+            "requested": "androidx.appcompat:appcompat:1.8.0"
         },
         {
             "configuration": "implementation",
@@ -129,6 +129,11 @@
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "androidx.core:core:1.18.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.fragment:fragment:1.9.1"
         },
         {
             "configuration": "implementation",
@@ -188,12 +193,12 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.preference:preference-ktx:1.1.1"
+            "requested": "androidx.preference:preference-ktx:1.2.1"
         },
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.preference:preference:1.1.1"
+            "requested": "androidx.preference:preference:1.2.1"
         },
         {
             "configuration": "implementation",
@@ -534,11 +539,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.annotation:annotation-jvm:1.9.1"
+                "id": "androidx.annotation:annotation-jvm:1.10.0"
             },
             {
                 "direct": true,
-                "id": "androidx.annotation:annotation:1.9.1"
+                "id": "androidx.annotation:annotation:1.10.0"
             },
             {
                 "direct": true,
@@ -550,11 +555,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.collection:collection-jvm:1.5.0"
+                "id": "androidx.collection:collection-jvm:1.6.0"
             },
             {
                 "direct": true,
-                "id": "androidx.collection:collection:1.5.0"
+                "id": "androidx.collection:collection:1.6.0"
             },
             {
                 "direct": true,
@@ -618,7 +623,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.tracing:tracing:1.2.0"
+                "id": "androidx.tracing:tracing-android:2.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.tracing:tracing:2.0.0"
             },
             {
                 "direct": true,
@@ -676,11 +685,11 @@
             },
             {
                 "direct": false,
-                "id": "androidx.annotation:annotation-jvm:1.9.1"
+                "id": "androidx.annotation:annotation-jvm:1.10.0"
             },
             {
                 "direct": false,
-                "id": "androidx.appcompat:appcompat-resources:1.3.0-alpha02"
+                "id": "androidx.appcompat:appcompat-resources:1.8.0"
             },
             {
                 "direct": false,
@@ -696,15 +705,11 @@
             },
             {
                 "direct": false,
-                "id": "androidx.collection:collection-jvm:1.5.0"
+                "id": "androidx.collection:collection-jvm:1.6.0"
             },
             {
                 "direct": false,
-                "id": "androidx.collection:collection-ktx:1.5.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.collection:collection:1.5.0"
+                "id": "androidx.collection:collection:1.6.0"
             },
             {
                 "direct": false,
@@ -744,7 +749,7 @@
             },
             {
                 "direct": false,
-                "id": "androidx.customview:customview:1.0.0"
+                "id": "androidx.customview:customview:1.1.0"
             },
             {
                 "direct": false,
@@ -756,15 +761,19 @@
             },
             {
                 "direct": false,
+                "id": "androidx.emoji2:emoji2-views-helper:1.3.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.emoji2:emoji2:1.3.0"
+            },
+            {
+                "direct": false,
                 "id": "androidx.exifinterface:exifinterface:1.3.6"
             },
             {
                 "direct": false,
-                "id": "androidx.fragment:fragment-ktx:1.2.4"
-            },
-            {
-                "direct": false,
-                "id": "androidx.fragment:fragment:1.3.0-alpha08"
+                "id": "androidx.fragment:fragment-ktx:1.9.1"
             },
             {
                 "direct": false,
@@ -872,6 +881,10 @@
             },
             {
                 "direct": false,
+                "id": "androidx.resourceinspection:resourceinspection-annotation:1.0.1"
+            },
+            {
+                "direct": false,
                 "id": "androidx.room:room-common-jvm:2.8.5"
             },
             {
@@ -908,7 +921,7 @@
             },
             {
                 "direct": false,
-                "id": "androidx.slidingpanelayout:slidingpanelayout:1.0.0"
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
             },
             {
                 "direct": false,
@@ -936,15 +949,19 @@
             },
             {
                 "direct": false,
-                "id": "androidx.tracing:tracing-ktx:1.2.0"
+                "id": "androidx.tracing:tracing-android:2.0.0"
             },
             {
                 "direct": false,
-                "id": "androidx.tracing:tracing:1.2.0"
+                "id": "androidx.tracing:tracing-ktx:2.0.0"
             },
             {
                 "direct": false,
-                "id": "androidx.transition:transition:1.2.0"
+                "id": "androidx.tracing:tracing:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.transition:transition:1.4.1"
             },
             {
                 "direct": false,
@@ -961,6 +978,10 @@
             {
                 "direct": false,
                 "id": "androidx.viewpager:viewpager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.window:window:1.0.0"
             },
             {
                 "direct": false,
@@ -1084,11 +1105,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.annotation:annotation:1.9.1"
+                "id": "androidx.annotation:annotation:1.10.0"
             },
             {
                 "direct": true,
-                "id": "androidx.appcompat:appcompat:1.3.0-alpha02"
+                "id": "androidx.appcompat:appcompat:1.8.0"
             },
             {
                 "direct": true,
@@ -1113,6 +1134,10 @@
             {
                 "direct": true,
                 "id": "androidx.databinding:viewbinding:8.13.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.fragment:fragment:1.9.1"
             },
             {
                 "direct": true,
@@ -1160,11 +1185,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference-ktx:1.1.1"
+                "id": "androidx.preference:preference-ktx:1.2.1"
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference:1.1.1"
+                "id": "androidx.preference:preference:1.2.1"
             },
             {
                 "direct": true,
@@ -1468,11 +1493,11 @@
             },
             {
                 "direct": false,
-                "id": "androidx.annotation:annotation-jvm:1.9.1"
+                "id": "androidx.annotation:annotation-jvm:1.10.0"
             },
             {
                 "direct": false,
-                "id": "androidx.appcompat:appcompat-resources:1.3.0-alpha02"
+                "id": "androidx.appcompat:appcompat-resources:1.8.0"
             },
             {
                 "direct": false,
@@ -1488,15 +1513,11 @@
             },
             {
                 "direct": false,
-                "id": "androidx.collection:collection-jvm:1.5.0"
+                "id": "androidx.collection:collection-jvm:1.6.0"
             },
             {
                 "direct": false,
-                "id": "androidx.collection:collection-ktx:1.5.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.collection:collection:1.5.0"
+                "id": "androidx.collection:collection:1.6.0"
             },
             {
                 "direct": false,
@@ -1536,7 +1557,7 @@
             },
             {
                 "direct": false,
-                "id": "androidx.customview:customview:1.0.0"
+                "id": "androidx.customview:customview:1.1.0"
             },
             {
                 "direct": false,
@@ -1548,15 +1569,19 @@
             },
             {
                 "direct": false,
+                "id": "androidx.emoji2:emoji2-views-helper:1.3.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.emoji2:emoji2:1.3.0"
+            },
+            {
+                "direct": false,
                 "id": "androidx.exifinterface:exifinterface:1.3.6"
             },
             {
                 "direct": false,
-                "id": "androidx.fragment:fragment-ktx:1.2.4"
-            },
-            {
-                "direct": false,
-                "id": "androidx.fragment:fragment:1.3.0-alpha08"
+                "id": "androidx.fragment:fragment-ktx:1.9.1"
             },
             {
                 "direct": false,
@@ -1664,6 +1689,10 @@
             },
             {
                 "direct": false,
+                "id": "androidx.resourceinspection:resourceinspection-annotation:1.0.1"
+            },
+            {
+                "direct": false,
                 "id": "androidx.room:room-common-jvm:2.8.5"
             },
             {
@@ -1688,7 +1717,7 @@
             },
             {
                 "direct": false,
-                "id": "androidx.slidingpanelayout:slidingpanelayout:1.0.0"
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
             },
             {
                 "direct": false,
@@ -1716,15 +1745,19 @@
             },
             {
                 "direct": false,
-                "id": "androidx.tracing:tracing-ktx:1.2.0"
+                "id": "androidx.tracing:tracing-android:2.0.0"
             },
             {
                 "direct": false,
-                "id": "androidx.tracing:tracing:1.2.0"
+                "id": "androidx.tracing:tracing-ktx:2.0.0"
             },
             {
                 "direct": false,
-                "id": "androidx.transition:transition:1.2.0"
+                "id": "androidx.tracing:tracing:2.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.transition:transition:1.4.1"
             },
             {
                 "direct": false,
@@ -1741,6 +1774,10 @@
             {
                 "direct": false,
                 "id": "androidx.viewpager:viewpager:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.window:window:1.0.0"
             },
             {
                 "direct": false,
@@ -1852,11 +1889,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.annotation:annotation:1.9.1"
+                "id": "androidx.annotation:annotation:1.10.0"
             },
             {
                 "direct": true,
-                "id": "androidx.appcompat:appcompat:1.3.0-alpha02"
+                "id": "androidx.appcompat:appcompat:1.8.0"
             },
             {
                 "direct": true,
@@ -1881,6 +1918,10 @@
             {
                 "direct": true,
                 "id": "androidx.databinding:viewbinding:8.13.2"
+            },
+            {
+                "direct": true,
+                "id": "androidx.fragment:fragment:1.9.1"
             },
             {
                 "direct": true,
@@ -1928,11 +1969,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference-ktx:1.1.1"
+                "id": "androidx.preference:preference-ktx:1.2.1"
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference:1.1.1"
+                "id": "androidx.preference:preference:1.2.1"
             },
             {
                 "direct": true,

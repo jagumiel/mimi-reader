@@ -132,20 +132,20 @@ class BoardItemListFragment
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val userAgent = PreferenceManager.getDefaultSharedPreferences(activity).getString(getString(R.string.user_agent_pref), null)
+        val userAgent = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(getString(R.string.user_agent_pref), null)
         if (userAgent != null) {
             RequestQueueUtil.getInstance().userAgent = userAgent
         } else {
             try {
                 val webView = WebView(activity as Context)
                 val webViewAgent = webView.settings.userAgentString
-                PreferenceManager.getDefaultSharedPreferences(activity).edit().putString(getString(R.string.user_agent_pref), webViewAgent).apply()
+                PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString(getString(R.string.user_agent_pref), webViewAgent).apply()
                 webView.destroy()
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Caught exception", e)
-                if (PreferenceManager.getDefaultSharedPreferences(activity).getString(getString(R.string.user_agent_pref), null) == null) {
+                if (PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(getString(R.string.user_agent_pref), null) == null) {
                     val defaultAgent = System.getProperty("http.agent")
-                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putString(getString(R.string.user_agent_pref), defaultAgent).apply()
+                    PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString(getString(R.string.user_agent_pref), defaultAgent).apply()
                 }
             }
         }
@@ -311,7 +311,7 @@ class BoardItemListFragment
             initMenu()
         }
         setupTouchListeners()
-        val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val lastVersion = preferences.getInt(getString(R.string.last_version_code_pref), 0)
         if (BuildConfig.VERSION_CODE > lastVersion) {
             showChangeLog()
@@ -567,7 +567,7 @@ class BoardItemListFragment
                 .setView(dialogView)
                 .setPositiveButton(R.string.ok) { dialog: DialogInterface?, which: Int ->
                     if (activity != null) {
-                        val pref = PreferenceManager.getDefaultSharedPreferences(activity)
+                        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
                         pref.edit().putBoolean(getString(R.string.show_manage_boards_tutorial), !dontShow.isChecked).apply()
                     }
                 }

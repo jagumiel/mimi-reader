@@ -166,8 +166,13 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
         - [x] Validar 80 pruebas unitarias de app, ocho de biblioteca y 22 auxiliares de CI; compilar APK/APK de pruebas y comprobar el SBOM de runtime sin cambios. Añadir la suite de biblioteca a CI y una prueba instrumentada de equivalencia de colores con 136 entradas.
         - [x] Suite completa del Motorola con Android 12: 31 pruebas superadas y dos optativas omitidas, sin fallos; restaurar el ajuste de pantalla encendida. Lint sin errores, sin nuevas supresiones y con los avisos anteriores.
         - [x] Validar APK/AAB release minificados y vital lint, conservando identificador, versión, `minSdk 23` y objetivo API 36. Registrar tamaños locales sin atribuir mejoras de rendimiento no medidas.
-        - [ ] Confirmar la matriz remota de Android 10/12/14/16 con los cambios de este bloque.
-      - [ ] Grupo AndroidX posterior a recuperar CAPTCHA/publicación: rastrear y sustituir las selecciones alpha heredadas de AppCompat/Fragment, revisando también Preference y los adaptadores legacy que las introducen. Validar temas, diálogos, navegación/restauración, insets y R8 antes de ampliar el grupo.
+        - [x] Confirmar la matriz remota de Android 10/12/14/16: la ejecución 21 de `6541737` supera los cinco trabajos y cubre acumulativamente este bloque y la recuperación de publicación.
+      - [x] Quinto bloque: sustituir las selecciones alpha heredadas por AppCompat 1.8.0, Fragment 1.9.1 y Preference 1.2.1 con versiones compartidas. Rastrear `recyclerviewfastscroller → AppCompat alpha → Fragment alpha`; declarar Fragment explícitamente, sin exclusiones globales ni elevar `minSdk`.
+        - [x] Adaptar los contratos no nulos de Preference, retirar el enlace target-fragment sin consumidores y conservar la pantalla anidada, diálogo y pila Atrás de ajustes al recrear la actividad. Añadir dos pruebas locales de temas/diálogos/restauración sin cambiar preferencias del usuario ni publicar mensajes.
+        - [x] Suite completa en el Edge 20 / Android 12: 42 casos, 39 superados y tres optativos omitidos, sin fallos. Compilación debug/APK de pruebas, 94 pruebas unitarias de app, ocho de biblioteca y 22 auxiliares de CI correctos.
+        - [x] Validar lint sin errores, APK/AAB release minificados y SBOM actualizado (158 componentes, 75 declaraciones; Ruffle sin cambios). Conservar identificador, versión actual, `minSdk 23` y objetivo API 36; registrar tamaños y límites de validación en `docs/DEPENDENCIES.md`. Restaurar el ajuste de pantalla encendida del teléfono a 0.
+        - [ ] Confirmar la matriz remota de Android 10/12/14/16 para el nuevo commit de este bloque; la ejecución 21 solo valida el código anterior.
+      - [ ] Revisar en otro bloque las dependencias paraguas legacy y sustituir/declarar sus consumidores antes de retirarlas: hay cinco `androidx.legacy.widget.Space` en XML y usos reales de DrawerLayout, SlidingPaneLayout y SwipeRefreshLayout. Conservar por ahora los adaptadores fast-scroller y Novoda; su sustitución no forma parte del quinto bloque.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
     - [x] Cubrir el grafo de `release` (antes `freeRelease`) antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
@@ -194,7 +199,7 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
   - [x] Confirmar carga y resolución humana del desafío real en el Motorola Edge 20 / Android 12 / WebView 155: vista de prueba superada el 20 de octubre (`OK, 1 test`) tras permitir Spur/Monocle. El sitio aplica sus propios tiempos de espera y el recibo de la respuesta en la app no equivale a validación de una publicación por el servidor.
   - [ ] Repetir la aceptación manual en Android 10 y validar teclado/regreso desde navegador. La aceptación por los proveedores depende de WebView, dispositivo y red; el navegador externo no transfiere automáticamente su sesión al formulario nativo.
 - [x] Integrar la respuesta o token del CAPTCHA con el formulario y el envío explícito del usuario. Permitir responder en hilos y crear hilos donde la board lo admita, conservando los adjuntos ya admitidos por la app.
-  - Cobertura local de multipart, respuesta vacía válida, adjunto ausente y recibo oficial de éxito con IDs largos. La publicación real sigue pendiente de autorización y validación.
+  - Cobertura local de multipart, respuesta vacía válida, adjunto ausente y recibo oficial de éxito con IDs largos. La respuesta real de texto autorizada en Android 12 se validó el 20 de octubre, como se detalla al final de esta fase; no implica validar creación de hilos ni adjuntos reales.
 - [x] Permitir renovar el desafío cuando falle o caduque, cancelar y reintentar sin perder el borrador ni provocar envíos duplicados.
   - Retener un único intento durante rotación, no reintentar automáticamente y advertir de entrega incierta tras muerte del proceso. El formulario se cierra solo con recibo confirmado; los fallos conservan texto y adjunto.
 - [x] Mostrar con claridad errores de CAPTCHA, validación, red, límites de publicación o restricciones del sitio. No registrar respuestas, tokens ni cookies de sesión en logs.
@@ -203,11 +208,26 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
   - [x] Añadir 14 pruebas unitarias de protocolo y seis pruebas instrumentadas locales del nuevo flujo; vista real opcional sin API de publicación conectada, excluida de CI normal. La sexta cubre el formulario completo hasta HTTP simulado y recuperación tras rechazo.
   - [x] Aclarar el último paso: “Done” termina el CAPTCHA, no publica; “Get Captcha” solicita otro. Habilitar el botón nativo “Send message” solo con verificación lista, sin envíos ni recargas automáticos.
     - Validación posterior con el Motorola desbloqueado: suite completa de 40 casos, 37 superados y tres optativos omitidos, sin fallos; seis casos locales de publicación y 94 pruebas unitarias de app correctos. Ajuste de pantalla encendida restaurado a 0. El intento previo interrumpido por el bloqueo no se cuenta como correcto.
-  - [ ] Completar la matriz de interacción manual Android 10/12 y confirmar la matriz remota de este commit. En Android 12 ya se ha resuelto manualmente un desafío real sin publicar.
+  - [x] Confirmar la matriz remota de `6541737`: ejecución 21 con compilación/lint/unitarias/SBOM y Android 10/12/14/16 correctos.
+  - [ ] Completar la matriz de interacción manual Android 10/12 (incluidos teclado y regreso desde navegador). En Android 12 ya se ha resuelto un desafío real y enviado una respuesta de texto autorizada; Android 10 físico sigue pendiente.
 - [x] Realizar una prueba de publicación real solo después de acordar con el usuario el contenido y el destino y recibir su confirmación. Las pruebas automatizadas de CI no publicarán mensajes reales.
   - El 20 de octubre, el usuario autorizó el hilo `/g/110111399`, preparó el mensaje y resolvió el desafío. Una sola confirmación publicó `110119159`, comprobado por recibo y por lectura independiente del JSON público. No se hicieron más publicaciones de prueba. Cobertura: respuesta de texto en Android 12; no implica validar adjuntos ni creación de hilos.
 
-Resolver el CAPTCHA y decidir publicar son acciones del usuario. Esta fase tiene prioridad sobre AppCompat/Fragment y el escaneo; el resto de la modernización se retomará después.
+Resolver el CAPTCHA y decidir publicar son acciones del usuario. Tras recuperar y validar la respuesta de texto en Android 12 y confirmar CI, se retoma la modernización por bloques; las comprobaciones manuales pendientes siguen siendo requisitos de aceptación. El escaneo continúa aplazado hasta completar la limpieza acordada.
+
+## Propuestas posteriores a la publicación de 8.0
+
+Estas propuestas quedan fuera del alcance de 8.0: no implementarlas ahora ni retrasar el release por ellas. Su prioridad y alcance se definirán después de publicar esa versión.
+
+### Seguimiento de hilos y notificaciones
+
+- [ ] Revisar y reutilizar, cuando corresponda, el seguimiento de hilos y las notificaciones ya existentes antes de ampliar o sustituir su implementación.
+- [ ] Permitir activar y desactivar la vigilancia de hilos concretos y consultar una lista de los hilos vigilados.
+- [ ] Ofrecer avisos configurables por nuevas respuestas en un hilo vigilado y, por separado, por citas a mensajes propios dentro de ese hilo. Identificar esas citas mediante los IDs de publicaciones registradas por la app, no por el nombre anónimo de un usuario.
+- [ ] Conservar el estado del seguimiento y de lo ya notificado entre reinicios, evitando avisos duplicados. Definir la frecuencia de comprobación y el comportamiento en segundo plano teniendo en cuenta batería, conectividad, permisos de notificación y límites del sitio, sin prometer avisos instantáneos.
+- [ ] Cuando se confirme que un hilo ha sido purgado de 4chan (HTTP 404 del propio hilo), retirarlo del seguimiento activo y cancelar sus comprobaciones pendientes. No borrar por ello historial, marcadores ni descargas del usuario.
+  - Distinguir un hilo archivado o cerrado de uno purgado. Un 404 de una imagen o vídeo, un fallo de conexión, un bloqueo, un límite de peticiones o un error del servidor no deben eliminar el seguimiento del hilo.
+- [ ] Añadir pruebas de nuevas respuestas, citas a mensajes propios, deduplicación, restauración del seguimiento, permisos denegados y retirada por 404, conservando el seguimiento ante errores temporales.
 
 ## Criterios de compatibilidad
 

@@ -66,7 +66,7 @@ class NavDrawerFragment : Fragment() {
             return null
         }
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         themeId = sharedPreferences.getString(getString(R.string.theme_pref), "0")?.toInt() ?: 0
         themeColorId = sharedPreferences.getString(getString(R.string.theme_color_pref), "0")?.toInt()
                 ?: 0
@@ -144,7 +144,7 @@ class NavDrawerFragment : Fragment() {
         val dialogBuilder = MaterialAlertDialogBuilder(activity as Context)
         val dialogView = inflater.inflate(R.layout.dialog_close_tabs_prompt, null, false)
         val dontShow = dialogView.findViewById<View>(R.id.dialog_dont_show) as CheckBox
-        val pref = PreferenceManager.getDefaultSharedPreferences(activity)
+        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val shouldShowDialog = pref.getBoolean(getString(R.string.close_all_tabs_prompt_pref), true)
         if (shouldShowDialog) {
             dialogBuilder.setTitle(R.string.close_all_tabs)
@@ -291,7 +291,7 @@ class NavDrawerFragment : Fragment() {
         }
         val act = activity as Activity
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val themePref = sharedPreferences.getString(getString(R.string.theme_pref), "0")?.toInt()
                 ?: 0
         val themeColorPref = sharedPreferences.getString(getString(R.string.theme_color_pref), "0")?.toInt()

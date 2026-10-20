@@ -27,6 +27,9 @@ buildscript {
     ext.desugar_jdk_libs_version = "2.1.5"
     ext.okhttp_version = "4.12.0"
     ext.retrofit_version = "2.11.0"
+    ext.appcompat_version = '1.8.0'
+    ext.fragment_version = '1.9.1'
+    ext.preference_version = '1.2.1'
 
     repositories {
         google()

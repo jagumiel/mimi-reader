@@ -146,7 +146,9 @@ dependencies {
 
     implementation 'androidx.activity:activity-ktx:1.13.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    // Own the Fragment baseline instead of inheriting an old transitive alpha.
+    implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.core:core:1.18.0"
     implementation "androidx.core:core-ktx:1.18.0"
     implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
@@ -165,8 +167,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.preference:preference:1.1.1'
-    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation "androidx.preference:preference:$preference_version"
+    implementation "androidx.preference:preference-ktx:$preference_version"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation 'com.github.franmontiel:PersistentCookieJar:1.0.1'

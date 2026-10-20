@@ -239,7 +239,7 @@
             "version": "1.5.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.annotation/annotation-jvm@1.9.1?type=jar",
+            "bom-ref": "pkg:maven/androidx.annotation/annotation-jvm@1.10.0?type=jar",
             "description": "Provides source annotations for tooling and readability.",
             "externalReferences": [
                 {
@@ -251,7 +251,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "1e343917ebf27ba96fe4dc52b1cad7fd32b738fbc6355bb6cd5b3b305d7212d0"
+                    "content": "ddd072ddbb553178e205517ce777b2f05aa9e412982d9ecb4eedc74f1212f697"
                 }
             ],
             "licenses": [
@@ -270,12 +270,12 @@
                 }
             ],
             "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.annotation/annotation-jvm@1.9.1?type=jar",
+            "purl": "pkg:maven/androidx.annotation/annotation-jvm@1.10.0?type=jar",
             "type": "library",
-            "version": "1.9.1"
+            "version": "1.10.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+            "bom-ref": "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
             "description": "Provides source annotations for tooling and readability.",
             "externalReferences": [
                 {
@@ -300,13 +300,13 @@
                 }
             ],
             "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+            "purl": "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
             "type": "library",
-            "version": "1.9.1"
+            "version": "1.10.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.appcompat/appcompat-resources@1.3.0-alpha02?type=aar",
-            "description": "The Resources Library is a static library that you can add to your Android application in order to use resource APIs that backport the latest APIs to older versions of the platform. Compatible on devices running API 14 or later.",
+            "bom-ref": "pkg:maven/androidx.appcompat/appcompat-resources@1.8.0?type=aar",
+            "description": "Provides backward-compatible implementations of resource-related Android SDKfunctionality, including color state list theming.",
             "externalReferences": [
                 {
                     "type": "vcs",
@@ -317,7 +317,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "848f6e268fbcc15c02bad3f2ef1540961bbc3b5614bba9e9d422829fd942ce5b"
+                    "content": "3fe48cc3df409bed03063a4f5f5f9f8c51f1d63ea9e88d41e6489bf58495a5af"
                 }
             ],
             "licenses": [
@@ -335,13 +335,14 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.appcompat/appcompat-resources@1.3.0-alpha02?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.appcompat/appcompat-resources@1.8.0?type=aar",
             "type": "library",
-            "version": "1.3.0-alpha02"
+            "version": "1.8.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
+            "bom-ref": "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
+            "description": "Provides backwards-compatible implementations of UI-related Android SDK functionality, including dark mode and Material theming.",
             "externalReferences": [
                 {
                     "type": "vcs",
@@ -352,7 +353,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "8930d5f32db9ec4dbcb414dfeff1b8b7d2f69023c99080076ee06ed901d5eacb"
+                    "content": "773f79306eb0ca2447af8752e923ce6269e201e7fe6b275cc76e2998ee87e838"
                 }
             ],
             "licenses": [
@@ -370,9 +371,10 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
             "type": "library",
-            "version": "1.3.0-alpha02"
+            "version": "1.8.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar",
@@ -550,7 +552,7 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.collection/collection-jvm@1.5.0?type=jar",
+            "bom-ref": "pkg:maven/androidx.collection/collection-jvm@1.6.0?type=jar",
             "description": "Standalone efficient collections.",
             "externalReferences": [
                 {
@@ -562,7 +564,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "70b35924e4babcdffa37d0e575ee039c56a2d97123342624c48b603233704341"
+                    "content": "839fcec147704611a222159fa84e3e062f68eee80caa549ddd1222d5210a13df"
                 }
             ],
             "licenses": [
@@ -581,48 +583,12 @@
                 }
             ],
             "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.collection/collection-jvm@1.5.0?type=jar",
+            "purl": "pkg:maven/androidx.collection/collection-jvm@1.6.0?type=jar",
             "type": "library",
-            "version": "1.5.0"
+            "version": "1.6.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.collection/collection-ktx@1.5.0?type=jar",
-            "description": "Kotlin extensions for 'collection' artifact",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
-                }
-            ],
-            "group": "androidx.collection",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "939b4a8697640e77d83e4e8b4c4a9d18f8130198c5961194af8dd9db9dc7c353"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "collection-ktx",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.collection/collection-ktx@1.5.0?type=jar",
-            "type": "library",
-            "version": "1.5.0"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+            "bom-ref": "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
             "description": "Standalone efficient collections.",
             "externalReferences": [
                 {
@@ -647,9 +613,9 @@
                 }
             ],
             "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+            "purl": "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
             "type": "library",
-            "version": "1.5.0"
+            "version": "1.6.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.compose.runtime/runtime-annotation-android@1.9.0?type=aar",
@@ -1071,7 +1037,7 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.customview/customview@1.0.0?type=aar",
+            "bom-ref": "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
             "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
             "externalReferences": [
                 {
@@ -1083,7 +1049,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "20e5b8f6526a34595a604f56718da81167c0b40a7a94a57daa355663f2594df2"
+                    "content": "01f76ab043770a97b054046f9815717b82ce0355c02967d16c61981359dc189a"
                 }
             ],
             "licenses": [
@@ -1101,9 +1067,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.customview/customview@1.0.0?type=aar",
+            "purl": "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
             "type": "library",
-            "version": "1.0.0"
+            "version": "1.1.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.databinding/viewbinding@8.13.2?type=aar",
@@ -1204,6 +1170,76 @@
             "version": "1.0.0"
         },
         {
+            "bom-ref": "pkg:maven/androidx.emoji2/emoji2-views-helper@1.3.0?type=aar",
+            "description": "View helpers for Emoji2",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
+                }
+            ],
+            "group": "androidx.emoji2",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "9a1351295a4f739df0efe8344adaa9afb34856c3af584d4a9afbec105a45b90b"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "emoji2-views-helper",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/androidx.emoji2/emoji2-views-helper@1.3.0?type=aar",
+            "type": "library",
+            "version": "1.3.0"
+        },
+        {
+            "bom-ref": "pkg:maven/androidx.emoji2/emoji2@1.3.0?type=aar",
+            "description": "Core library to enable emoji compatibility in Kitkat and newer devices to avoid the empty emoji characters.",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
+                }
+            ],
+            "group": "androidx.emoji2",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "2bf23818b23a996ddaa1b5fd5bb32129daff6bbb2dce15166e2fccdd2010b1a5"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "emoji2",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/androidx.emoji2/emoji2@1.3.0?type=aar",
+            "type": "library",
+            "version": "1.3.0"
+        },
+        {
             "bom-ref": "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar",
             "description": "Android Support ExifInterface",
             "externalReferences": [
@@ -1239,19 +1275,19 @@
             "version": "1.3.6"
         },
         {
-            "bom-ref": "pkg:maven/androidx.fragment/fragment-ktx@1.2.4?type=aar",
+            "bom-ref": "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar",
             "description": "Kotlin extensions for 'fragment' artifact",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.fragment",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "85df2f19c757593467ba37ecd11c394a9b94361f4325c28c17c370679dfc4e30"
+                    "content": "83045658fc4cf0d4e3be235d7f249aee02ee847659003d663d1fdc887b22cbf4"
                 }
             ],
             "licenses": [
@@ -1269,12 +1305,13 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.fragment/fragment-ktx@1.2.4?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar",
             "type": "library",
-            "version": "1.2.4"
+            "version": "1.9.1"
         },
         {
-            "bom-ref": "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+            "bom-ref": "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
             "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
             "externalReferences": [
                 {
@@ -1286,7 +1323,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "dbaa0e16e002fb7484fefbc24f0d4bc2014b66a76815306160de1ce54195febd"
+                    "content": "72f70815c0a4d502f15c57e5e6bc861e64c5338ea06de75aed83969b17a2a727"
                 }
             ],
             "licenses": [
@@ -1304,9 +1341,10 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
             "type": "library",
-            "version": "1.3.0-alpha08"
+            "version": "1.9.1"
         },
         {
             "bom-ref": "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar",
@@ -2522,19 +2560,19 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.preference/preference-ktx@1.1.1?type=aar",
+            "bom-ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
             "description": "Kotlin extensions for preferences",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.preference",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "b9176f2c0a823fa6a9d8ee3389303c742ff6eb6507f0831cbbcc2b83b4d0a3b8"
+                    "content": "872a5e3e07c0b8d21cb77769ab2f468b209ab6ec08231874401aecfea304a81c"
                 }
             ],
             "licenses": [
@@ -2552,24 +2590,24 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.preference/preference-ktx@1.1.1?type=aar",
+            "purl": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
             "type": "library",
-            "version": "1.1.1"
+            "version": "1.2.1"
         },
         {
-            "bom-ref": "pkg:maven/androidx.preference/preference@1.1.1?type=aar",
+            "bom-ref": "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
             "description": "AndroidX Preference",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.preference",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "317dcbc38242aea2f6262c06d51b8a22827e98959967edd40f82600a15cb4bff"
+                    "content": "40ca8adfdb7effb61facb39bd9ca2e2f3a40d106743b0cd6dc9e21e8bedd4f85"
                 }
             ],
             "licenses": [
@@ -2587,9 +2625,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.preference/preference@1.1.1?type=aar",
+            "purl": "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
             "type": "library",
-            "version": "1.1.1"
+            "version": "1.2.1"
         },
         {
             "bom-ref": "pkg:maven/androidx.print/print@1.0.0?type=aar",
@@ -2697,6 +2735,41 @@
             "purl": "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
             "type": "library",
             "version": "1.4.0"
+        },
+        {
+            "bom-ref": "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar",
+            "description": "Annotation processors for Android resource and layout inspection",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
+                }
+            ],
+            "group": "androidx.resourceinspection",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "8cff870ec6fb31db48a52f4a792335b4bf8de07e03bd37823181526433ccd5cb"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "resourceinspection-annotation",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar",
+            "type": "library",
+            "version": "1.0.1"
         },
         {
             "bom-ref": "pkg:maven/androidx.room/room-common-jvm@2.8.5?type=jar",
@@ -3005,19 +3078,19 @@
             "version": "1.4.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
+            "bom-ref": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar",
+            "description": "SlidingPaneLayout offers a responsive, two pane layout that automatically switches between overlapping panes on smaller devices to a side by side view on larger devices.",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.slidingpanelayout",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "76bffb7cefbf780794d8817002dad1562f3e27c0a9f746d62401c8edb30aeede"
+                    "content": "5f53339be2a4f90a9abea3571dd59e70a8a49e7f15dd82974a3898b4652e8714"
                 }
             ],
             "licenses": [
@@ -3035,9 +3108,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.0.0?type=aar",
+            "purl": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar",
             "type": "library",
-            "version": "1.0.0"
+            "version": "1.2.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.sqlite/sqlite-android@2.6.2?type=aar",
@@ -3242,7 +3315,7 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.tracing/tracing-ktx@1.2.0?type=aar",
+            "bom-ref": "pkg:maven/androidx.tracing/tracing-android@2.0.0?type=aar",
             "description": "Android Tracing",
             "externalReferences": [
                 {
@@ -3254,7 +3327,43 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "c33f9cbd931e6190ca38aa09bf8a7a8a19391d4b0fb7a7605a6b59f2d42580d1"
+                    "content": "b21800b83ed0e3e214742c8a94edee90130e0a9970c85e59161d161546f5fe9a"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "tracing-android",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.tracing/tracing-android@2.0.0?type=aar",
+            "type": "library",
+            "version": "2.0.0"
+        },
+        {
+            "bom-ref": "pkg:maven/androidx.tracing/tracing-ktx@2.0.0?type=aar",
+            "description": "Android Tracing",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
+                }
+            ],
+            "group": "androidx.tracing",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "7e7cf1386841b11310138723eb9f36b5eaf6c8caec896b16f99e579d220d6a0c"
                 }
             ],
             "licenses": [
@@ -3272,12 +3381,13 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.tracing/tracing-ktx@1.2.0?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.tracing/tracing-ktx@2.0.0?type=aar",
             "type": "library",
-            "version": "1.2.0"
+            "version": "2.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar",
+            "bom-ref": "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
             "description": "Android Tracing",
             "externalReferences": [
                 {
@@ -3286,12 +3396,6 @@
                 }
             ],
             "group": "androidx.tracing",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "6faa90390d1fdbf0adb9a99bf99de67b94c6c6f35aea9510593a9d17973736a2"
-                }
-            ],
             "licenses": [
                 {
                     "license": {
@@ -3307,24 +3411,25 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar",
+            "publisher": "The Android Open Source Project",
+            "purl": "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
             "type": "library",
-            "version": "1.2.0"
+            "version": "2.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.transition/transition@1.2.0?type=aar",
+            "bom-ref": "pkg:maven/androidx.transition/transition@1.4.1?type=aar",
             "description": "Android Transition Support Library",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "http://source.android.com"
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
                 }
             ],
             "group": "androidx.transition",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "a1e059b3bc0b43a58dec0efecdcaa89c82d2bca552ea5bacf6656c46e853157e"
+                    "content": "36d28d9ec33a8c64313842bce99c95736da5b27a6b3a513639050de82f075726"
                 }
             ],
             "licenses": [
@@ -3342,9 +3447,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/androidx.transition/transition@1.2.0?type=aar",
+            "purl": "pkg:maven/androidx.transition/transition@1.4.1?type=aar",
             "type": "library",
-            "version": "1.2.0"
+            "version": "1.4.1"
         },
         {
             "bom-ref": "pkg:maven/androidx.vectordrawable/vectordrawable-animated@1.1.0?type=aar",
@@ -3557,6 +3662,41 @@
             "purl": "pkg:maven/androidx.webkit/webkit@1.15.0?type=aar",
             "type": "library",
             "version": "1.15.0"
+        },
+        {
+            "bom-ref": "pkg:maven/androidx.window/window@1.0.0?type=aar",
+            "description": "WindowManager Jetpack library. Currently only provides additional functionality on foldable devices.",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
+                }
+            ],
+            "group": "androidx.window",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "3212985be4127373ca4d0ea7f8b81a250ae2105e924f7940105d067a0f9ac130"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "window",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/androidx.window/window@1.0.0?type=aar",
+            "type": "library",
+            "version": "1.0.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.work/work-runtime-ktx@2.10.5?type=aar",
@@ -5408,14 +5548,15 @@
                 "pkg:generic/mimi-reader/chanlib@1.0",
                 "pkg:github/ruffle-rs/ruffle@v0.7.1",
                 "pkg:maven/androidx.activity/activity-ktx@1.13.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
                 "pkg:maven/androidx.browser/browser@1.2.0?type=aar",
                 "pkg:maven/androidx.cardview/cardview@1.0.0?type=aar",
                 "pkg:maven/androidx.constraintlayout/constraintlayout@2.0.1?type=aar",
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.databinding/viewbinding@8.13.2?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.gridlayout/gridlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar",
                 "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
@@ -5427,8 +5568,8 @@
                 "pkg:maven/androidx.media3/media3-exoplayer@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-ui@1.10.1?type=aar",
                 "pkg:maven/androidx.percentlayout/percentlayout@1.0.0?type=aar",
-                "pkg:maven/androidx.preference/preference-ktx@1.1.1?type=aar",
-                "pkg:maven/androidx.preference/preference@1.1.1?type=aar",
+                "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
+                "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
                 "pkg:maven/androidx.room/room-ktx@2.8.5?type=aar",
                 "pkg:maven/androidx.room/room-runtime@2.8.5?type=pom",
@@ -5467,46 +5608,61 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.activity/activity-ktx@1.13.0?type=aar",
-                "pkg:maven/androidx.collection/collection-ktx@1.5.0?type=jar",
-                "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
-                "pkg:maven/androidx.lifecycle/lifecycle-livedata-core-ktx@2.11.0?type=aar",
-                "pkg:maven/androidx.lifecycle/lifecycle-viewmodel-ktx@2.11.0?type=aar",
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
-            ],
-            "ref": "pkg:maven/androidx.fragment/fragment-ktx@1.2.4?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.activity/activity@1.13.0?type=aar",
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
+                "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-livedata-core@2.11.0?type=aar",
+                "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
+                "pkg:maven/androidx.lifecycle/lifecycle-viewmodel-ktx@2.11.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-viewmodel-savedstate@2.11.0?type=pom",
-                "pkg:maven/androidx.lifecycle/lifecycle-viewmodel@2.11.0?type=aar",
                 "pkg:maven/androidx.loader/loader@1.0.0?type=aar",
+                "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
                 "pkg:maven/androidx.savedstate/savedstate@1.4.0?type=pom",
-                "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar"
+                "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
+                "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar"
+            "ref": "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.activity/activity-ktx@1.13.0?type=aar",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar",
+                "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
+                "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.preference/preference@1.2.1?type=aar"
         },
         {
             "dependsOn": [
                 "pkg:maven/androidx.activity/activity@1.13.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.appcompat/appcompat-resources@1.3.0-alpha02?type=aar",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.appcompat/appcompat-resources@1.8.0?type=aar",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.cursoradapter/cursoradapter@1.0.0?type=aar",
                 "pkg:maven/androidx.drawerlayout/drawerlayout@1.0.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+                "pkg:maven/androidx.emoji2/emoji2-views-helper@1.3.0?type=aar",
+                "pkg:maven/androidx.emoji2/emoji2@1.3.0?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-viewmodel@2.11.0?type=aar",
-                "pkg:maven/androidx.savedstate/savedstate@1.4.0?type=pom"
+                "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
+                "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar",
+                "pkg:maven/androidx.savedstate/savedstate@1.4.0?type=pom",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar"
+            "ref": "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar"
         },
         {
             "dependsOn": [
@@ -5521,15 +5677,15 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
                 "pkg:maven/androidx.cardview/cardview@1.0.0?type=aar",
                 "pkg:maven/androidx.coordinatorlayout/coordinatorlayout@1.1.0?type=aar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
-                "pkg:maven/androidx.transition/transition@1.2.0?type=aar",
+                "pkg:maven/androidx.transition/transition@1.4.1?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar",
                 "pkg:maven/androidx.viewpager2/viewpager2@1.1.0?type=aar"
             ],
@@ -5538,9 +5694,9 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.room/room-common@2.8.5?type=pom",
                 "pkg:maven/androidx.sqlite/sqlite-framework@2.6.2?type=pom",
                 "pkg:maven/androidx.sqlite/sqlite@2.6.2?type=pom",
@@ -5554,14 +5710,14 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
-                "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar",
+                "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
                 "pkg:maven/androidx.versionedparcelable/versionedparcelable@1.1.1?type=aar",
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
@@ -5573,10 +5729,10 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.viewpager2/viewpager2@1.1.0?type=aar"
@@ -5584,7 +5740,7 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
@@ -5593,7 +5749,7 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/com.google.guava/guava@33.3.1-android?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-bom@1.8.0?type=pom"
             ],
@@ -5608,7 +5764,7 @@
                 "pkg:maven/androidx.lifecycle/lifecycle-service@2.11.0?type=aar",
                 "pkg:maven/androidx.room/room-ktx@2.8.5?type=aar",
                 "pkg:maven/androidx.startup/startup-runtime@1.1.1?type=aar",
-                "pkg:maven/androidx.tracing/tracing-ktx@1.2.0?type=aar",
+                "pkg:maven/androidx.tracing/tracing-ktx@2.0.0?type=aar",
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar"
@@ -5617,27 +5773,16 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation-jvm@1.9.1?type=jar"
+                "pkg:maven/androidx.annotation/annotation-jvm@1.10.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+            "ref": "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
-                "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.preference/preference@1.1.1?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar",
                 "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
                 "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
@@ -5649,23 +5794,23 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar"
             ],
             "ref": "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar",
                 "pkg:maven/androidx.coordinatorlayout/coordinatorlayout@1.1.0?type=aar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.cursoradapter/cursoradapter@1.0.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar",
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
                 "pkg:maven/androidx.drawerlayout/drawerlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
                 "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
-                "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.0.0?type=aar",
+                "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar",
                 "pkg:maven/androidx.swiperefreshlayout/swiperefreshlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar"
             ],
@@ -5673,8 +5818,8 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
@@ -5684,8 +5829,8 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-livedata-core@2.11.0?type=aar",
@@ -5700,8 +5845,8 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar",
@@ -5711,60 +5856,99 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.customview/customview-poolingcontainer@1.0.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar",
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
                 "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar"
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.coordinatorlayout/coordinatorlayout@1.1.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/androidx.lifecycle/lifecycle-process@2.11.0?type=aar",
+                "pkg:maven/androidx.startup/startup-runtime@1.1.1?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.emoji2/emoji2@1.3.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable-animated@1.1.0?type=aar",
-                "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar"
+                "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.appcompat/appcompat-resources@1.3.0-alpha02?type=aar"
+            "ref": "pkg:maven/androidx.appcompat/appcompat-resources@1.8.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar"
+            ],
+            "ref": "pkg:maven/androidx.window/window@1.0.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar"
             ],
-            "ref": "pkg:maven/androidx.transition/transition@1.2.0?type=aar"
+            "ref": "pkg:maven/androidx.customview/customview@1.1.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.transition/transition@1.4.1?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom"
+            ],
+            "ref": "pkg:maven/androidx.tracing/tracing-android@2.0.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.versionedparcelable/versionedparcelable@1.1.1?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.compose.runtime/runtime-annotation@1.9.0?type=pom",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
@@ -5775,7 +5959,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar",
                 "pkg:maven/androidx.startup/startup-runtime@1.1.1?type=aar",
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
@@ -5784,7 +5968,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
@@ -5794,7 +5978,7 @@
                 "pkg:maven/androidx.navigationevent/navigationevent@1.0.0?type=pom",
                 "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
                 "pkg:maven/androidx.savedstate/savedstate@1.4.0?type=pom",
-                "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar",
+                "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom"
             ],
@@ -5802,7 +5986,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/androidx.core/core-viewtree@1.0.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
@@ -5814,31 +5998,33 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar"
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
+                "pkg:maven/androidx.transition/transition@1.4.1?type=aar",
+                "pkg:maven/androidx.window/window@1.0.0?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.drawerlayout/drawerlayout@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.0.0?type=aar"
+                "pkg:maven/androidx.customview/customview@1.1.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.documentfile/documentfile@1.0.0?type=aar",
                 "pkg:maven/androidx.loader/loader@1.0.0?type=aar",
@@ -5849,7 +6035,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar"
             ],
@@ -5857,7 +6043,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-livedata@2.11.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-viewmodel@2.11.0?type=aar"
@@ -5866,7 +6052,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.versionedparcelable/versionedparcelable@1.1.1?type=aar"
             ],
@@ -5874,7 +6060,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
@@ -5882,21 +6068,14 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.customview/customview@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-container@1.10.1?type=aar",
@@ -5910,7 +6089,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-database@1.10.1?type=aar"
@@ -5919,14 +6098,14 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar"
             ],
             "ref": "pkg:maven/com.davemorrissey.labs/subsampling-scale-image-view@3.10.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
                 "pkg:maven/androidx.startup/startup-runtime@1.1.1?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
@@ -5935,7 +6114,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.lifecycle/lifecycle-runtime@2.11.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar"
@@ -5944,7 +6123,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-container@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-decoder@1.10.1?type=aar"
@@ -5953,7 +6132,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar"
             ],
@@ -5961,28 +6140,28 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar"
             ],
             "ref": "pkg:maven/androidx.media3/media3-container@1.10.1?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar"
             ],
             "ref": "pkg:maven/androidx.media3/media3-database@1.10.1?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar"
             ],
             "ref": "pkg:maven/androidx.media3/media3-decoder@1.10.1?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.sqlite/sqlite@2.6.2?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
@@ -5990,14 +6169,14 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.startup/startup-runtime@1.1.1?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/com.github.bumptech.glide/glide@4.11.0?type=aar",
                 "pkg:maven/com.squareup.okhttp3/okhttp@4.12.0?type=jar"
             ],
@@ -6005,14 +6184,14 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
             ],
             "ref": "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom",
                 "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
@@ -6021,101 +6200,102 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.collection/collection-jvm@1.5.0?type=jar"
+            "ref": "pkg:maven/androidx.collection/collection-jvm@1.6.0?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.room/room-common-jvm@2.8.5?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom",
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.sqlite/sqlite-android@2.6.2?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.cardview/cardview@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.cursoradapter/cursoradapter@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.databinding/viewbinding@8.13.2?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.documentfile/documentfile@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.localbroadcastmanager/localbroadcastmanager@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/androidx.print/print@1.0.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
-            "ref": "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar"
+            "ref": "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.9.1?type=pom"
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/com.github.bumptech.glide/gifdecoder@4.11.0?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
                 "pkg:maven/androidx.browser/browser@1.2.0?type=aar"
             ],
             "ref": "pkg:maven/com.github.novoda/simple-chrome-custom-tabs@0.1.6?type=aar"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
                 "pkg:maven/androidx.constraintlayout/constraintlayout-solver@2.0.1?type=jar",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar"
             ],
@@ -6123,7 +6303,7 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.appcompat/appcompat@1.3.0-alpha02?type=aar",
+                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-jdk7@1.9.10?type=jar"
             ],
@@ -6164,23 +6344,25 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.collection/collection-jvm@1.5.0?type=jar"
+                "pkg:maven/androidx.collection/collection-jvm@1.6.0?type=jar"
             ],
-            "ref": "pkg:maven/androidx.collection/collection@1.5.0?type=pom"
+            "ref": "pkg:maven/androidx.collection/collection@1.6.0?type=pom"
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom",
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
+                "pkg:maven/androidx.core/core@1.18.0?type=aar",
+                "pkg:maven/androidx.emoji2/emoji2@1.3.0?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.emoji2/emoji2-views-helper@1.3.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.vectordrawable/vectordrawable-animated@1.1.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.collection/collection@1.5.0?type=pom"
-            ],
-            "ref": "pkg:maven/androidx.collection/collection-ktx@1.5.0?type=jar"
         },
         {
             "dependsOn": [
@@ -6207,11 +6389,11 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment-ktx@1.2.4?type=aar",
-                "pkg:maven/androidx.preference/preference@1.1.1?type=aar",
+                "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar",
+                "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
-            "ref": "pkg:maven/androidx.preference/preference-ktx@1.1.1?type=aar"
+            "ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar"
         },
         {
             "dependsOn": [
@@ -6237,7 +6419,7 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar",
                 "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
                 "pkg:maven/androidx.media/media@1.0.0?type=aar"
@@ -6267,13 +6449,20 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.exifinterface/exifinterface@1.3.6?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.3.0-alpha08?type=aar",
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable-animated@1.1.0?type=aar",
                 "pkg:maven/com.github.bumptech.glide/annotations@4.11.0?type=jar",
                 "pkg:maven/com.github.bumptech.glide/disklrucache@4.11.0?type=jar",
                 "pkg:maven/com.github.bumptech.glide/gifdecoder@4.11.0?type=aar"
             ],
             "ref": "pkg:maven/com.github.bumptech.glide/glide@4.11.0?type=aar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
+            ],
+            "ref": "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar"
         },
         {
             "dependsOn": [
@@ -6387,10 +6576,16 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/androidx.tracing/tracing@1.2.0?type=aar",
+                "pkg:maven/androidx.tracing/tracing-android@2.0.0?type=aar"
+            ],
+            "ref": "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
-            "ref": "pkg:maven/androidx.tracing/tracing-ktx@1.2.0?type=aar"
+            "ref": "pkg:maven/androidx.tracing/tracing-ktx@2.0.0?type=aar"
         },
         {
             "dependsOn": [
@@ -6536,7 +6731,7 @@
             "dependsOn": [
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
-            "ref": "pkg:maven/androidx.annotation/annotation-jvm@1.9.1?type=jar"
+            "ref": "pkg:maven/androidx.annotation/annotation-jvm@1.10.0?type=jar"
         },
         {
             "dependsOn": [

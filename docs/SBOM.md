@@ -39,6 +39,13 @@ On 20 October 2026, the legacy product flavors were removed. The previous
 inventory configuration names now use `release`/`debug` without the old flavor.
 This is a build-variant/metadata change, not a dependency version update.
 
+The subsequent AndroidX UI migration deliberately changes the resolved runtime
+graph from 154 to 158 components and the direct inventory from 74 to 75
+declarations (explicit Fragment baseline). Fifteen retained components change
+version, five are added and one is removed. Ruffle's record and its seven hashes
+are unchanged. See the [reviewed graph changes](DEPENDENCIES.md#fifth-cleanup-a-deliberate-androidx-ui-baseline)
+before comparing these snapshots with the pre-migration baseline.
+
 Use JDK 17 and the Android SDK required by the project. On Windows replace
 `./gradlew` with `.\gradlew.bat`.
 

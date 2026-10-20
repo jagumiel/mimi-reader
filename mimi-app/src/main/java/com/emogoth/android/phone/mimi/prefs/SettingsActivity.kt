@@ -25,18 +25,15 @@ class SettingsActivity : MimiActivity(), PreferenceFragmentCompat.OnPreferenceSt
         toolbar.setNavigationIcon(R.drawable.ic_nav_arrow_back)
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
-                .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.settings, SettingsFragment())
+                    .commit()
+        }
 
     }
 
-    override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat?, pref: Preference?): Boolean {
-        if (pref == null) {
-            return false
-        }
-
+    override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
         Log.d("SettingsActivity", "Opening ${pref.fragment}...")
         if (classLoader == null) {
             Log.e("SettingsActivity", "Classloader is null", Exception())
@@ -45,9 +42,6 @@ class SettingsActivity : MimiActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
         // Instantiate the new Fragment
         val args = pref.extras
-//        val fragment = supportFragmentManager.fragmentFactory.instantiate(
-//                classLoader,
-//                pref.fragment)
 
         val fragment = when(pref.fragment) {
             "com.emogoth.android.phone.mimi.prefs.GeneralPrefsFragment" -> GeneralPrefsFragment()
@@ -60,7 +54,6 @@ class SettingsActivity : MimiActivity(), PreferenceFragmentCompat.OnPreferenceSt
         }
 
         fragment.arguments = args
-        fragment.setTargetFragment(caller, 0)
         // Replace the existing Fragment with the new Fragment
         supportFragmentManager.beginTransaction()
                 .replace(R.id.settings, fragment)

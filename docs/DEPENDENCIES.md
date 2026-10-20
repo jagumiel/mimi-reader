@@ -1,14 +1,14 @@
 # Dependency inventory and cleanup plan
 
 Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
-20 October after the bounded cleanups and single-app consolidation. The fourth
-block below aligns RxJava declarations with existing resolution and updates
-only the library's test-only JUnit version; shipped library versions are unchanged.
+20 October after the bounded cleanups, single-app consolidation and AndroidX UI
+migration. The fourth block aligned declarations without changing shipped versions;
+the fifth deliberately replaces the old AppCompat/Fragment alpha selections.
 
-The canonical release SBOM has **154 top-level components**: 152 Maven components,
+The canonical release SBOM has **158 top-level components**: 156 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **74 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 74 distinct libraries.
+files. The inventory records **75 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 75 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -62,10 +62,10 @@ under the third block. New cleanup changes still require their own matrix run.
 
 | Area | Observed state | Follow-up and verification |
 | --- | --- | --- |
-| AppCompat | Declared 1.2.0, but Gradle selects **1.3.0-alpha02**, including appcompat-resources. | Trace the incoming dependency and align a deliberate supported version. Check themes, menus, dialogs, startup, system insets and R8. |
+| AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
 | PDF | MimiReader AndroidPdfViewer 3.2.0-beta.2 pulls pdfium-android 1.9.0 and native binaries. | Review maintenance and native compatibility. Exercise opening, scrolling, rotation and release builds on all supported Android test targets. |
-| UI libraries | Material 1.2.1, Glide 4.11.0, Preference 1.1.1, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
+| UI libraries | Preference is now **1.2.1**. Material 1.2.1, Glide 4.11.0, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.0. | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
 
@@ -245,7 +245,81 @@ application data is removed.
   retains the original release ID, version 230 / 7.0.1, `minSdk 23` and target
   API 36. Local APK size remains 59,382,590 bytes; AAB changes from 36,448,009
   to 36,447,955 bytes. These are artifact observations, not startup/performance
-  measurements. The new block still needs its own remote matrix run.
+  measurements. The later remote run 21 for `6541737` confirms this block and
+  the posting changes cumulatively on Android 10/12/14/16.
+
+## Fifth cleanup: a deliberate AndroidX UI baseline
+
+GitHub Actions [run 21 for `6541737`](https://github.com/jagumiel/mimi-reader/actions/runs/39409405146)
+passed the build/lint/unit/SBOM job and all four instrumented jobs. This confirms
+the previous cleanup and posting regression coverage, not the new migration below.
+Human CAPTCHA acceptance on a physical Android 10 device remains pending; only
+the Android 12 phone is attached. No further public messages are sent for this block.
+
+Dependency insight and the upstream POM identify the unintended alpha path:
+`recyclerviewfastscroller:0.2.3` requests AppCompat `1.3.0-alpha02`, whose POM
+requests Fragment `1.3.0-alpha08`. Preference KTX also requested Fragment KTX
+`1.2.4`. Pin an explicit shared baseline rather than inheriting those versions:
+
+| Library | Previous selected version | New selected version / source |
+| --- | --- | --- |
+| AppCompat + resources | 1.3.0-alpha02 | [1.8.0 stable](https://developer.android.com/jetpack/androidx/releases/appcompat), released 12 August 2026 |
+| Fragment + compatibility KTX artifact | 1.3.0-alpha08 / 1.2.4 | [1.9.1 stable](https://developer.android.com/jetpack/androidx/releases/fragment), released 23 September 2026 |
+| Preference + KTX | 1.1.1 | [1.2.1 stable](https://developer.android.com/jetpack/androidx/releases/preference), released 26 July 2023 |
+
+The app directly declares Fragment and shares the three versions from the root
+build. No global force, exclusion or SDK increase is used. Existing fast-scroller
+and Novoda integrations remain: this changes their selected AndroidX dependencies,
+not their implementations. Material, PDF and image-loader modernization are separate.
+
+The stricter nullability contracts initially caused compilation errors. Adapt the
+Preference callback's non-null parameters and nine preference accesses to attached
+fragment `requireContext()` calls; do not suppress nullability checks. Remove the
+obsolete settings target-fragment link, which has no consumer. Preference's own
+internal dialog linkage is left to the library. Install the root settings fragment
+only on a fresh activity: replacing it on every `onCreate` discarded the restored
+nested screen/back stack and could strand a restored preference dialog.
+
+The reviewed runtime graph grows from 154 to 158 components. Five components are
+added (Emoji2 and its views helper, ResourceInspection annotation, Android tracing,
+Window); the old Collection KTX node disappears as its functionality is merged
+upstream. Fifteen retained Maven components change version, including CustomView,
+SlidingPaneLayout, Transition, Annotation, Collection and Tracing alongside the
+three primary groups. The inventory grows from 74 to 75 declarations due to the
+explicit Fragment baseline. Ruffle's component record and seven vendored hashes
+remain unchanged. This is a maintenance/compatibility change, not a size reduction.
+
+Legacy umbrella dependencies are **not** proven unused: `post_filter_view.xml`
+still contains five `androidx.legacy.widget.Space` views, and DrawerLayout,
+SlidingPaneLayout and SwipeRefreshLayout have code/XML consumers. Replace or
+declare those consumers explicitly in a separate tested cleanup before removing
+the umbrella artifacts; do not delete them on the basis of absent imports alone.
+
+### Validation of the AndroidX UI migration
+
+- Debug APK/test APK, 94 app unit tests, eight library unit tests and 22 CI-helper
+  tests passed. The existing debug/release application-ID contract also passed.
+- Both new device tests passed in isolation, then the complete Motorola Edge 20 /
+  Android 12 / WebView 155 suite passed: 42 cases, 39 passed, three expected
+  opt-in skips, no failures/errors. This includes posting fixtures, gallery/SWF,
+  tab and legacy-panel restoration, back navigation, insets, migrations and
+  downloads. No public messages were sent. The temporary stay-awake setting was
+  restored to its original value (`0`).
+- Dedicated `lintDebug` passed: zero errors, 1,019 warnings, one hint and 485
+  `UnusedResources` findings. No detector, baseline or suppression was added;
+  these existing warnings are not evidence that every flagged resource is unused.
+- Reviewed and regenerated both SBOM/inventory snapshots. Schema, freshness,
+  negative-document, bundled-hash and canonical-output checks passed. Processor,
+  desugaring, root build-tool and library unit-test graphs remain unchanged;
+  application runtime/unit/instrumentation resolution reflects the UI update.
+- Minified release APK/AAB and release vital lint passed, without new R8
+  suppressions. Packaged metadata retains `com.emogoth.android.phone.mimi`,
+  version 230 / 7.0.1, `minSdk 23` and target API 36. Compared with the posting
+  baseline, local APK size grows from 59,400,570 to 59,452,652 bytes; AAB grows
+  from 36,459,792 to 36,642,531 bytes. These are local artifact observations,
+  not startup/performance measurements or a byte-identical-build guarantee.
+- Physical Android 10 human-interaction acceptance and this commit's own remote
+  Android 10/12/14/16 matrix are pending. Run 21 is the previous-code baseline.
 
 ## Remaining legacy-file review
 
@@ -270,22 +344,16 @@ only the method and leave a live caller behind. This block does not change that 
 
 ## Sequence for subsequent iterations
 
-1. The validated fourth cleanup block is committed as `faaf5a7`; its remote
-   matrix still needs confirmation together with the posting block.
-2. Complete manual validation of the implemented user-solvable CAPTCHA and native
-   posting flow, ahead of the AndroidX group. Reading and participating are both core
-   application functionality. Keep CAPTCHA resolution and submission under the
-   user's control; use simulated posting in CI, and agree content/destination
-   and obtain confirmation before a real public test post. See phase 5 of
-   [the roadmap](../roadmap-2026.md) for scope and acceptance criteria.
-   [Posting contracts and validation limits](POSTING.md) describe the replacement
-   of the obsolete reCAPTCHA bridge/assets. It adds no Gradle dependencies and does
-   not alter the packaged SBOM graph; live provider scripts are loaded remotely.
-3. Resume dependency modernization and responsibility-focused refactoring:
-   trace and replace the unintended AppCompat/Fragment alpha selections as a
-   bounded AndroidX UI group, with themes, dialogs, restoration/navigation,
-   insets, R8 and the Android 10/12/14/16 matrix. Keep cleanup commits bounded,
-   regenerate affected snapshots and run the relevant tests/lint/release builds.
+1. The fourth cleanup (`faaf5a7`) and posting changes (`5ff224a`, `6541737`)
+   are confirmed remotely by green run 21 on Android 10/12/14/16.
+2. Retain the pending physical Android 10 CAPTCHA/keyboard/browser acceptance
+   checks. On Android 12, human resolution and one separately authorized text
+   reply succeeded; do not repeat public submissions for automated regression.
+   [Posting contracts and validation limits](POSTING.md) record that scope.
+3. Confirm the new AndroidX UI block's own remote matrix after pushing its
+   commit. Continue responsibility-focused refactoring in bounded groups, with
+   updated snapshots and relevant unit/device/lint/release checks. Review the
+   remaining legacy umbrella dependencies and their actual consumers next.
 4. Review PDF/native compatibility and remaining legacy adapters/resources;
    compare APK/AAB size and startup behavior with appropriate measurements.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
