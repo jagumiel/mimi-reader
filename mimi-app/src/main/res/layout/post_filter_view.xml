@@ -12,7 +12,7 @@
         app:columnCount="10"
         app:layout_gravity="center_horizontal">
 
-        <androidx.legacy.widget.Space
+        <android.widget.Space
             android:layout_height="10dp"
             app:layout_columnSpan="10"
             app:layout_rowSpan="2" />
@@ -38,7 +38,7 @@
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
 
-        <androidx.legacy.widget.Space
+        <android.widget.Space
             android:layout_height="10dp"
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
@@ -57,7 +57,7 @@
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
 
-        <androidx.legacy.widget.Space
+        <android.widget.Space
             android:layout_height="20dp"
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
@@ -71,13 +71,13 @@
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
 
-        <androidx.legacy.widget.Space
+        <android.widget.Space
             android:layout_width="10dp"
             android:layout_height="10dp"
             app:layout_columnSpan="10"
             app:layout_rowSpan="1" />
 
-        <androidx.legacy.widget.Space
+        <android.widget.Space
             android:layout_width="20dp"
             android:layout_height="10dp"
             app:layout_columnSpan="1"

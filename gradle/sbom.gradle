@@ -26,6 +26,9 @@ allprojects {
                 providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
         xmlOutput.convention((RegularFile) null)
         enabled = project.path == ':mimi-app'
+        // The same artifact set can have different direct/transitive edges.
+        // Refresh the raw graph too, not only the canonical wrapper below.
+        outputs.upToDateWhen { false }
     }
 }
 
@@ -167,6 +170,26 @@ def validateBom = { Map bom ->
     def reported = bom.components.findAll { it.purl?.startsWith('pkg:maven/') }
             .collect { "$it.group:$it.name:$it.version".toString() } as Set
     if (reported != selected) fail('SBOM Maven components do not match the resolved release/desugaring graph')
+    def expectedDirect = readJson(manifestFile).components.collect { it.purl } as Set
+    ['releaseRuntimeClasspath', 'coreLibraryDesugaring'].each { name ->
+        app.configurations.getByName(name).incoming.resolutionResult.rootComponent.get().dependencies.each { edge ->
+            if (!(edge instanceof ResolvedDependencyResult)) fail("Unresolved direct dependency in $name")
+            def id = edge.selected.id
+            def component
+            if (id instanceof ModuleComponentIdentifier) {
+                component = bom.components.find { it.group == id.group && it.name == id.module && it.version == id.version }
+            } else if (id instanceof ProjectComponentIdentifier && id.projectPath == ':chanlib') {
+                component = bom.components.find { it.group == 'mimi-reader' && it.name == 'chanlib' }
+            } else {
+                fail("Unsupported direct dependency identifier: $id")
+            }
+            if (!component) fail("Missing direct component: $id")
+            expectedDirect.add(component['bom-ref'])
+        }
+    }
+    if ((graph[bom.metadata.component['bom-ref']] as Set) != expectedDirect) {
+        fail('SBOM application edges do not match the resolved direct dependencies')
+    }
     if (!bom.components.any { it.name == 'desugar_jdk_libs_nio' }) fail('Missing desugaring runtime')
     readJson(manifestFile).components.each { expected ->
         def found = bom.components.find { it.purl == expected.purl }
@@ -280,7 +303,17 @@ tasks.register('testSbomValidation') {
                 { it.specVersion = '0.0' },
                 { it.components.add(deepCopy(it.components[0])) },
                 { it.dependencies[0].dependsOn.add('urn:missing:dependency') },
-                { it.components.removeAll { it.name == 'ruffle' } }
+                { it.components.removeAll { it.name == 'ruffle' } },
+                { bom ->
+                    // A wrong direct edge can keep every component reachable and pass schema checks.
+                    def root = bom.dependencies.find { it.ref == bom.metadata.component['bom-ref'] }
+                    def transitive = bom.components.find { !root.dependsOn.contains(it['bom-ref']) }
+                    root.dependsOn.add(transitive['bom-ref'])
+                },
+                { bom ->
+                    def root = bom.dependencies.find { it.ref == bom.metadata.component['bom-ref'] }
+                    root.dependsOn.removeAll { it.contains('/appcompat@') }
+                }
         ]
         cases.eachWithIndex { mutate, index ->
             def broken = deepCopy(valid)
@@ -300,6 +333,6 @@ tasks.register('testSbomValidation') {
         boolean rejected = false
         try { verifyManualFiles(manifest) } catch (GradleException expected) { rejected = true }
         if (!rejected) fail('Manual asset verifier accepted an incorrect SHA-256')
-        logger.lifecycle('SBOM validation: 4 malformed documents rejected, asset hash checked, canonical output stable.')
+        logger.lifecycle("SBOM validation: ${cases.size()} malformed documents rejected, asset hash checked, canonical output stable.")
     }
 }

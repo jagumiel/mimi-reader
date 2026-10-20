@@ -56,10 +56,17 @@ Use JDK 17 and the Android SDK required by the project. On Windows replace
 
 Generation writes to `build/reports/sbom/` and does not modify tracked snapshots.
 The verifier checks the CycloneDX schema, unique component references, complete
-and reachable dependency edges, versions/Package URLs, required manual components,
+and reachable dependency edges, exact application-to-direct-dependency edges,
+versions/Package URLs, required manual components,
 vendored file hashes, and equality with the committed SBOM and inventory.
 New JavaScript, WebAssembly, local JAR/AAR or `jniLibs` binaries must be inventoried
 explicitly; silently adding a bundled executable asset fails verification.
+
+Both the raw CycloneDX task and canonical generation refresh on each invocation.
+An unchanged artifact set can still have changed direct/transitive edges; a cached
+raw report must not hide declaration-only cleanup. The sixth cleanup keeps all
+158 component records unchanged while replacing three application root edges
+with five explicit consumer edges; the inventory now has 77 declarations.
 
 After a deliberate dependency or vendored runtime update:
 
@@ -81,7 +88,8 @@ LF snapshot formatting across Windows/Linux checkouts. Reproducibility is scoped
 to the same version, dependency resolution and artifact bytes, not the entire APK.
 
 `testSbomValidation` rejects malformed schemas, duplicate references, dangling
-edges, missing Ruffle components, and wrong asset hashes. It also verifies that
+edges, missing Ruffle components, incorrect extra/missing application root edges
+(six malformed-document cases in total), and wrong asset hashes. It also verifies that
 timestamp/serial-number/ordering changes do not change canonical output.
 
 ## CI and release artifacts

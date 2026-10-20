@@ -145,14 +145,18 @@ dependencies {
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs_nio:$desugar_jdk_libs_version"
 
     implementation 'androidx.activity:activity-ktx:1.13.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     // Own the Fragment baseline instead of inheriting an old transitive alpha.
     implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.core:core:1.18.0"
     implementation "androidx.core:core-ktx:1.18.0"
-    implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
-    implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
+    // Declare actual code/XML consumers instead of the legacy support umbrellas.
+    // Keep the previously resolved versions; modernization is a separate change.
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
+    implementation 'androidx.documentfile:documentfile:1.0.0'
+    implementation 'androidx.drawerlayout:drawerlayout:1.0.0'
+    implementation 'androidx.slidingpanelayout:slidingpanelayout:1.2.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.browser:browser:1.2.0'
     // 1.15.0 is the newest WebKit release that keeps this app's minSdk 23.

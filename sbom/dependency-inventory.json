@@ -123,6 +123,11 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
+            "requested": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
             "requested": "androidx.core:core-ktx:1.18.0"
         },
         {
@@ -133,27 +138,22 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
+            "requested": "androidx.documentfile:documentfile:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.drawerlayout:drawerlayout:1.0.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
             "requested": "androidx.fragment:fragment:1.9.1"
         },
         {
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "androidx.gridlayout:gridlayout:1.0.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
-            "requested": "androidx.legacy:legacy-support-core-ui:1.0.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
-            "requested": "androidx.legacy:legacy-support-core-utils:1.0.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
-            "requested": "androidx.legacy:legacy-support-v4:1.0.0"
         },
         {
             "configuration": "implementation",
@@ -219,6 +219,16 @@
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "androidx.room:room-rxjava2:2.8.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
         },
         {
             "configuration": "implementation",
@@ -733,10 +743,6 @@
             },
             {
                 "direct": false,
-                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
-            },
-            {
-                "direct": false,
                 "id": "androidx.core:core-viewtree:1.0.0"
             },
             {
@@ -750,14 +756,6 @@
             {
                 "direct": false,
                 "id": "androidx.customview:customview:1.1.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.documentfile:documentfile:1.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
             },
             {
                 "direct": false,
@@ -778,6 +776,18 @@
             {
                 "direct": false,
                 "id": "androidx.interpolator:interpolator:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-v4:1.0.0"
             },
             {
                 "direct": false,
@@ -921,10 +931,6 @@
             },
             {
                 "direct": false,
-                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
-            },
-            {
-                "direct": false,
                 "id": "androidx.sqlite:sqlite-android:2.6.2"
             },
             {
@@ -942,10 +948,6 @@
             {
                 "direct": false,
                 "id": "androidx.startup:startup-runtime:1.1.1"
-            },
-            {
-                "direct": false,
-                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
             },
             {
                 "direct": false,
@@ -1125,6 +1127,10 @@
             },
             {
                 "direct": true,
+                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+            },
+            {
+                "direct": true,
                 "id": "androidx.core:core-ktx:1.18.0"
             },
             {
@@ -1137,23 +1143,19 @@
             },
             {
                 "direct": true,
+                "id": "androidx.documentfile:documentfile:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
+            },
+            {
+                "direct": true,
                 "id": "androidx.fragment:fragment:1.9.1"
             },
             {
                 "direct": true,
                 "id": "androidx.gridlayout:gridlayout:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-v4:1.0.0"
             },
             {
                 "direct": true,
@@ -1210,6 +1212,14 @@
             {
                 "direct": true,
                 "id": "androidx.room:room-testing:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
             },
             {
                 "direct": true,
@@ -1541,10 +1551,6 @@
             },
             {
                 "direct": false,
-                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
-            },
-            {
-                "direct": false,
                 "id": "androidx.core:core-viewtree:1.0.0"
             },
             {
@@ -1558,14 +1564,6 @@
             {
                 "direct": false,
                 "id": "androidx.customview:customview:1.1.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.documentfile:documentfile:1.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
             },
             {
                 "direct": false,
@@ -1586,6 +1584,18 @@
             {
                 "direct": false,
                 "id": "androidx.interpolator:interpolator:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
+            },
+            {
+                "direct": false,
+                "id": "androidx.legacy:legacy-support-v4:1.0.0"
             },
             {
                 "direct": false,
@@ -1717,10 +1727,6 @@
             },
             {
                 "direct": false,
-                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
-            },
-            {
-                "direct": false,
                 "id": "androidx.sqlite:sqlite-android:2.6.2"
             },
             {
@@ -1738,10 +1744,6 @@
             {
                 "direct": false,
                 "id": "androidx.startup:startup-runtime:1.1.1"
-            },
-            {
-                "direct": false,
-                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
             },
             {
                 "direct": false,
@@ -1909,6 +1911,10 @@
             },
             {
                 "direct": true,
+                "id": "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+            },
+            {
+                "direct": true,
                 "id": "androidx.core:core-ktx:1.18.0"
             },
             {
@@ -1921,23 +1927,19 @@
             },
             {
                 "direct": true,
+                "id": "androidx.documentfile:documentfile:1.0.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.drawerlayout:drawerlayout:1.0.0"
+            },
+            {
+                "direct": true,
                 "id": "androidx.fragment:fragment:1.9.1"
             },
             {
                 "direct": true,
                 "id": "androidx.gridlayout:gridlayout:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-core-ui:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-core-utils:1.0.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.legacy:legacy-support-v4:1.0.0"
             },
             {
                 "direct": true,
@@ -1990,6 +1992,14 @@
             {
                 "direct": true,
                 "id": "androidx.room:room-rxjava2:2.8.5"
+            },
+            {
+                "direct": true,
+                "id": "androidx.slidingpanelayout:slidingpanelayout:1.2.0"
+            },
+            {
+                "direct": true,
+                "id": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
             },
             {
                 "direct": true,

@@ -1,7 +1,11 @@
 package com.emogoth.android.phone.mimi.activity
 
 import android.content.Intent
+import android.view.View
+import android.widget.EditText
+import android.widget.Space
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceDialogFragmentCompat
@@ -12,6 +16,7 @@ import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.prefs.GeneralPrefsFragment
 import com.emogoth.android.phone.mimi.prefs.SettingsActivity
 import com.emogoth.android.phone.mimi.prefs.SettingsFragment
+import com.emogoth.android.phone.mimi.view.FilterView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.junit.Assert.*
 import org.junit.Test
@@ -19,6 +24,59 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AndroidXUiCompatibilityTest {
+    @Test fun filterEditorUsesPlatformSpacersAndPreservesControlsInAllThemes() {
+        val scenario = ActivityScenario.launch<TabsActivity>(Intent(
+            InstrumentationRegistry.getInstrumentation().targetContext, TabsActivity::class.java))
+        try {
+            scenario.onActivity { activity ->
+                for (theme in intArrayOf(R.style.Theme_Mimi_Light_Toolbar_Default,
+                    R.style.Theme_Mimi_Dark_Toolbar_Default, R.style.Theme_Mimi_Black_Toolbar_Default)) {
+                    // Keep the editor detached: no board fetches or writes to the user's filters.
+                    val editor = FilterView(ContextThemeWrapper(activity, theme))
+                    val grid = editor.getChildAt(0) as GridLayout
+                    val spacers = (0 until grid.childCount).map { grid.getChildAt(it) }
+                        .filterIsInstance<Space>()
+                    assertEquals(5, spacers.size)
+                    assertEquals(10, grid.columnCount)
+                    val density = activity.resources.displayMetrics.density
+                    assertEquals(listOf(10, 10, 20, 10, 10).map { (it * density + 0.5f).toInt() },
+                        spacers.map { it.layoutParams.height })
+                    assertTrue(spacers.all { it.visibility == View.INVISIBLE })
+
+                    editor.setFilterName("Local fixture")
+                    editor.setFilterRegex("fixture.*")
+                    var editClicks = 0
+                    var cancelClicks = 0
+                    editor.setClickListener(object : FilterView.ButtonClickListener {
+                        override fun onSaveClicked(view: View) { fail("Test must not save a filter") }
+                        override fun onEditClicked(view: View) { editClicks++ }
+                        override fun onCancelClicked(view: View) { cancelClicks++ }
+                    })
+                    for (widthDp in intArrayOf(320, 480)) {
+                        val width = (widthDp * density + 0.5f).toInt()
+                        editor.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+                        editor.layout(0, 0, editor.measuredWidth, editor.measuredHeight)
+                        assertTrue(editor.measuredHeight > 0)
+                        for (id in intArrayOf(R.id.active_board, R.id.filter_name, R.id.filter_text,
+                            R.id.save_button, R.id.edit_button, R.id.cancel_button)) {
+                            val control = editor.findViewById<View>(id)
+                            assertEquals(View.VISIBLE, control.visibility)
+                            assertTrue(control.isEnabled)
+                            assertTrue(control.width > 0 && control.height > 0)
+                        }
+                    }
+                    assertEquals("Local fixture", editor.findViewById<EditText>(R.id.filter_name).text.toString())
+                    assertEquals("fixture.*", editor.findViewById<EditText>(R.id.filter_text).text.toString())
+                    editor.findViewById<View>(R.id.edit_button).performClick()
+                    editor.findViewById<View>(R.id.cancel_button).performClick()
+                    assertEquals(1, editClicks)
+                    assertEquals(1, cancelClicks)
+                }
+            }
+        } finally { scenario.close() }
+    }
+
     @Test fun materialDialogsHaveLifecycleOwnersInAllThreeThemes() {
         val scenario = ActivityScenario.launch<TabsActivity>(Intent(
             InstrumentationRegistry.getInstrumentation().targetContext, TabsActivity::class.java))

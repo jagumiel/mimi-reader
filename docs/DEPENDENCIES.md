@@ -4,11 +4,13 @@ Baseline: 18 October 2026, following the SWF playback correction. Refreshed on
 20 October after the bounded cleanups, single-app consolidation and AndroidX UI
 migration. The fourth block aligned declarations without changing shipped versions;
 the fifth deliberately replaces the old AppCompat/Fragment alpha selections.
+The sixth replaces direct legacy umbrellas with explicit consumer declarations,
+without changing the selected component set or versions.
 
 The canonical release SBOM has **158 top-level components**: 156 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **75 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 75 distinct libraries.
+files. The inventory records **77 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 77 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -76,8 +78,9 @@ No vulnerability database was queried in this phase.
 
 - The first three dependency candidates are resolved above. Continue reviewing
   indirect/generated usage rather than equating absent imports with safe removal.
-- Legacy AndroidX umbrella dependencies: check which APIs and resources still
-  require them after the ViewPager and background-work migrations.
+- Direct legacy AndroidX umbrella declarations and the filter editor's legacy
+  spacers are replaced in the sixth block. PDFium and GridLayout still introduce
+  umbrella artifacts transitively; assess those integrations before exclusions.
 - JUnit alignment, the empty local file-tree/repositories and obsolete commented
   build declarations are addressed in the fourth block below.
 - Keep the Serialization BOM: absence of application imports does not establish
@@ -318,8 +321,87 @@ the umbrella artifacts; do not delete them on the basis of absent imports alone.
   baseline, local APK size grows from 59,400,570 to 59,452,652 bytes; AAB grows
   from 36,459,792 to 36,642,531 bytes. These are local artifact observations,
   not startup/performance measurements or a byte-identical-build guarantee.
-- Physical Android 10 human-interaction acceptance and this commit's own remote
-  Android 10/12/14/16 matrix are pending. Run 21 is the previous-code baseline.
+- [Run 22 for `04b3a42`](https://github.com/jagumiel/mimi-reader/actions/runs/39469404001)
+  passed all five jobs, confirming this migration on Android 10/12/14/16 as well
+  as build/lint/unit/SBOM. Physical Android 10 human-interaction acceptance remains
+  pending; emulator success does not establish live CAPTCHA provider acceptance.
+
+## Sixth cleanup: explicit legacy consumers and platform spacers
+
+Remove the app's three direct `androidx.legacy` umbrella declarations rather than
+using them to supply unrelated APIs implicitly. The source/XML audit found five
+actual consumer groups; declare them explicitly at their **previously selected**
+versions. This is not an upgrade to those libraries' newest releases.
+
+| Direct dependency | Version retained | Actual consumer |
+| --- | --- | --- |
+| CoordinatorLayout | 1.1.0 | Main/detail/gallery XML, FAB offset/scroll behaviours |
+| DocumentFile | 1.0.0 | SAF downloads, attachments, gallery and folder preferences |
+| DrawerLayout | 1.0.0 | Main/list/detail/sliding-panel screens and system insets |
+| SlidingPaneLayout | 1.2.0 | Legacy two-panel activity |
+| SwipeRefreshLayout | 1.0.0 | Catalog/thread refresh layouts and fragments |
+
+Replace all five `androidx.legacy.widget.Space` instances in the filter editor
+with fully qualified `android.widget.Space`, retaining their dimensions, row/
+column spans and order. [Platform Space](https://developer.android.com/reference/android/widget/Space)
+exists since API 14, below this application's unchanged minimum API 23; a backport
+is unnecessary. The offline regression test checks all five invisible spacer
+heights, the ten-column layout, controls at 320/480dp, preserved text and edit/
+cancel callbacks across light/dark/black themes. It keeps the editor detached,
+does not load boards, and never presses Save or writes user filters.
+
+**Runtime removal is not claimed.** The selected graph still includes the legacy
+umbrellas: PDFium 1.9.0 requests `legacy-support-v4`, and GridLayout 1.0.0 requests
+`legacy-support-core-ui`. Their downstream Loader/Print/LocalBroadcastManager/Media
+artifacts are still reachable. Do not exclude them globally merely because the
+app has no corresponding imports. Review PDF/native compatibility and GridLayout
+separately, including their own bytecode/resource consumers. Fast-scroller and
+Novoda remain unchanged in this block too.
+
+There are still 158 components. Every component record (versions, licenses,
+artifact and Ruffle hashes) and non-application dependency edge is unchanged.
+Only the application's root edges replace three umbrellas with five actual
+consumers. All seven inventoried configurations retain the same selected IDs/
+versions; direct/transitive flags change where appropriate. The declaration
+count grows from 75 to 77 because three broad declarations become five precise
+ones. This improves ownership and auditability, not necessarily APK size.
+
+### SBOM graph freshness discovered during this cleanup
+
+The first generation reused `cyclonedxDirectBom` as up-to-date: the artifact set
+was identical, but its cached application edges still described the previous
+declarations. Regenerating only the canonical wrapper cannot fix a stale input.
+Always refresh the raw graph alongside the wrapper and validate its application
+edges against current resolved runtime/desugaring **direct** dependencies plus
+manual components. This catches a same-components/different-edges stale report.
+Two additional negative cases reject an extra transitive-as-direct edge and a
+missing AppCompat root edge, even when the rest of the document remains valid
+and its components are reachable. The verifier now rejects six malformed cases,
+in addition to the existing bundled-hash and canonical-ordering checks.
+
+### Validation of explicit consumers and SBOM edges
+
+- Debug APK/test APK compiled; 94 app unit tests, eight library tests and 22
+  CI-helper tests passed. The application variant-ID contract passed.
+- Dedicated debug lint passed with zero errors, the unchanged 1,019 warnings,
+  one hint and 485 `UnusedResources` findings. No new suppression or baseline.
+- Regenerated raw/canonical SBOM reports, reviewed the exact three-removed/five-
+  added root edges, and passed all six malformed-document cases plus hash and
+  normalization checks. A separate `verifySbom testSbomValidation` invocation
+  refreshed the raw report again and passed without updating the snapshots.
+  All component records and non-root edges are unchanged.
+- Minified release APK/AAB and release vital lint passed without new R8 rules.
+  Packaged metadata retains the release ID, version 230 / 7.0.1, minimum API 23
+  and target API 36. Local APK size changes from 59,452,652 to 59,452,644 bytes;
+  AAB changes from 36,642,531 to 36,640,635 bytes. No runtime performance or
+  startup improvement is inferred from these small artifact differences.
+- After the owner unlocked the phone, the complete Edge 20 / Android 12 suite
+  passed: 43 cases, 40 passed, three expected opt-in skips, no failures/errors.
+  The new three-theme/two-width filter case passed alongside navigation,
+  restoration, insets, gallery/SWF, posting fixtures, migrations and downloads.
+  No filters were saved and no public posts were made. The temporary stay-awake
+  setting was restored to its original value (`0`). The new commit's own remote
+  API 29/31/34/36 matrix remains pending.
 
 ## Remaining legacy-file review
 
@@ -350,11 +432,11 @@ only the method and leave a live caller behind. This block does not change that 
    checks. On Android 12, human resolution and one separately authorized text
    reply succeeded; do not repeat public submissions for automated regression.
    [Posting contracts and validation limits](POSTING.md) record that scope.
-3. Confirm the new AndroidX UI block's own remote matrix after pushing its
-   commit. Continue responsibility-focused refactoring in bounded groups, with
-   updated snapshots and relevant unit/device/lint/release checks. Review the
-   remaining legacy umbrella dependencies and their actual consumers next.
-4. Review PDF/native compatibility and remaining legacy adapters/resources;
+3. The AndroidX UI block (`04b3a42`) is confirmed by green run 22. Confirm the
+   sixth cleanup's own remote matrix after pushing its commit. Continue bounded
+   refactoring with updated snapshots and unit/device/lint/release checks.
+4. Review PDF/native compatibility, GridLayout's remaining legacy dependency
+   path and other legacy adapters/resources;
    compare APK/AAB size and startup behavior with appropriate measurements.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed

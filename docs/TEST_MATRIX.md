@@ -54,14 +54,27 @@ Material dialogs have view-tree lifecycle owners under light/dark/black themes,
 and a nested settings screen with an open preference dialog survives activity
 recreation, preserves its value when cancelled, and navigates Back correctly.
 They do not modify the user's chosen theme/preference or post public messages.
-The suite now has 42 cases, with three opt-in skips; the new dependency baseline
-requires its own remote matrix after pushing the commit.
+That block has 42 cases, with three opt-in skips. Its remote matrix is now
+confirmed by green [run 22 for `04b3a42`](https://github.com/jagumiel/mimi-reader/actions/runs/39469404001)
+on Android 10/12/14/16, alongside build/lint/unit/SBOM.
 
 On 20 October the complete 42-case suite passed on the physical Motorola Edge
 20 / Android 12 / WebView 155 with the new AndroidX baseline: 39 passed, three
 expected skips, zero failures/errors. The two new cases also passed separately
 before the full run. No public posts were made and the original stay-awake
 setting (0) was restored after testing.
+
+The sixth cleanup adds a mandatory offline filter-editor case to
+`AndroidXUiCompatibilityTest`. It checks five platform spacers and their heights,
+ten grid columns, usable controls at 320/480dp, preserved fixture text and edit/
+cancel callbacks in all three themes. The editor stays detached: no board fetch,
+Save action, filter write or theme preference change. The suite now has 43 cases
+with the same three opt-in skips; this commit needs its own remote matrix.
+
+On 20 October, after the owner unlocked the Edge 20 / Android 12, the complete
+43-case suite passed: 40 passed, three expected opt-in skips and zero failures/
+errors, including the new filter-editor case. No filter was saved and no public
+message was posted. The original phone stay-awake setting (0) was restored.
 
 ## Local device validation
 

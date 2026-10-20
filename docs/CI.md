@@ -145,8 +145,18 @@ The following AndroidX UI block adds two mandatory offline cases in
 `AndroidXUiCompatibilityTest`: lifecycle-owned Material dialogs under the light,
 dark and black themes, and settings nested-screen/dialog restoration followed
 by Back navigation without changing the selected preference. The suite now has
-42 cases, with the same three opt-in skips. Its own remote matrix must pass
-after the new commit is pushed; run 21 cannot validate later dependency changes.
+42 cases, with the same three opt-in skips. [Run 22 for `04b3a42`](https://github.com/jagumiel/mimi-reader/actions/runs/39469404001)
+now confirms this AndroidX baseline: all five jobs passed, including the four
+instrumented API targets.
+
+The sixth cleanup adds a third mandatory `AndroidXUiCompatibilityTest` case for
+the filter editor's platform spacers, controls, fixture text and edit/cancel
+callbacks under three themes and two widths. It never saves filters or changes
+theme preferences. The suite now has 43 cases with three opt-in skips. SBOM
+negative coverage expands from four to six malformed documents, checking exact
+application root edges as well as component coverage/schema/hashes. The raw
+generator refreshes even if only direct/transitive relationships change. This
+cleanup's own remote matrix still needs confirmation after its commit is pushed.
 
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
