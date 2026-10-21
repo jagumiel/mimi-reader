@@ -27,6 +27,8 @@ import com.shockwave.pdfium.PdfiumCore
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import pl.droidsonroids.gif.GifDrawable
 import java.io.File
@@ -36,8 +38,13 @@ import java.util.concurrent.atomic.AtomicInteger
 @RunWith(AndroidJUnit4::class)
 class NativeMediaCompatibilityTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
+    // TabsActivity may clear cache on first install/upgrade, including while it is launching.
+    // Give each case its own JUnit-owned directory outside all disposable app caches.
+    @get:Rule val fixtures = TemporaryFolder(context.filesDir)
 
     @Before fun verifyRequestedRuntimePageSize() {
+        assertEquals("Fixture storage must be outside disposable caches", context.filesDir.canonicalFile,
+                fixtures.root.canonicalFile.parentFile)
         InstrumentationRegistry.getArguments().getString("expectedPageSize")?.let {
             assertEquals("Wrong runtime page size", it.toLong(), Os.sysconf(OsConstants._SC_PAGESIZE))
         }
@@ -73,21 +80,19 @@ class NativeMediaCompatibilityTest {
                 page.load(file)
                 assertFalse("Ready must wait for native rendering", page.contentReady)
             }
-            waitFor(scenario) { page.contentReady && color(page) == Color.RED }
+            waitForPdf(scenario, page, "Initial red PDF page")
             scenario.onActivity {
                 assertEquals(2, page.view.pageCount)
-                page.view.jumpTo(1)
-                page.view.zoomTo(1.5f)
-                page.view.loadPages()
+                selectPdfPage(page, 1, 1.5f)
             }
-            waitFor(scenario) { color(page) == Color.BLUE }
+            waitForPdf(scenario, page, "Blue PDF page after zoom", 1, 1.5f, Color.BLUE)
             scenario.onActivity {
                 page.onHostPause()
                 assertTrue(page.view.isRecycled)
                 assertFalse(page.contentReady)
                 page.onHostResume()
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "Blue PDF page after host resume", 1, 1.5f, Color.BLUE)
             scenario.onActivity {
                 assertEquals(1, page.view.currentPage)
                 assertEquals(1.5f, page.view.zoom, 0.01f)
@@ -97,14 +102,14 @@ class NativeMediaCompatibilityTest {
                 assertFalse(page.contentReady)
                 parent.addView(page)
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "Blue PDF page after reattach", 1, 1.5f, Color.BLUE)
             scenario.onActivity {
                 assertEquals(1, page.view.currentPage)
                 page.onPageSelectedChange(false)
                 assertTrue(page.view.isRecycled)
                 page.onPageSelectedChange(true)
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "Blue PDF page after reselection", 1, 1.5f, Color.BLUE)
         } finally {
             scenario.onActivity { page.release() }
             scenario.close()
@@ -124,10 +129,12 @@ class NativeMediaCompatibilityTest {
                 activity.addContentView(page, FrameLayout.LayoutParams(600, 800))
                 page.load(file)
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "PDF before recreation")
             scenario.onActivity {
-                page.view.jumpTo(1)
-                page.view.zoomTo(2f)
+                selectPdfPage(page, 1, 2f)
+            }
+            waitForPdf(scenario, page, "Blue PDF page before recreation", 1, 2f, Color.BLUE)
+            scenario.onActivity {
                 page.onHostPause()
                 model.saveState(saved)
                 page.release()
@@ -140,7 +147,7 @@ class NativeMediaCompatibilityTest {
                 activity.addContentView(page, FrameLayout.LayoutParams(600, 800))
                 page.load(file)
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "Blue PDF page after recreation", 1, 2f, Color.BLUE)
             scenario.onActivity {
                 assertEquals(1, page.view.currentPage)
                 assertEquals(2f, page.view.zoom, 0.01f)
@@ -153,9 +160,9 @@ class NativeMediaCompatibilityTest {
     }
 
     @Test fun damagedAndPasswordProtectedPdfsShowErrorsAndRetryWorks() {
-        val bad = File.createTempFile("mimi-bad", ".pdf", context.cacheDir).apply { writeText("not a PDF") }
+        val bad = fixtureFile("mimi-bad", ".pdf").apply { writeText("not a PDF") }
         val valid = pdf()
-        val encrypted = File.createTempFile("mimi-password", ".pdf", context.cacheDir).apply {
+        val encrypted = fixtureFile("mimi-password", ".pdf").apply {
             writeBytes(Base64.decode(ENCRYPTED_PDF, Base64.DEFAULT))
         }
         val scenario = host()
@@ -166,16 +173,20 @@ class NativeMediaCompatibilityTest {
                 activity.addContentView(page, FrameLayout.LayoutParams(600, 800))
                 page.load(bad)
             }
-            waitFor(scenario) { page.findViewWithTag<TextView>("pdf-error-text").isShown }
+            waitFor(scenario, "Damaged PDF error", { pdfState(page) }) {
+                page.findViewWithTag<TextView>("pdf-error-text").isShown
+            }
             scenario.onActivity {
                 assertFalse(page.contentReady)
                 assertTrue(page.findViewWithTag<Button>("pdf-retry").isShown)
                 valid.copyTo(bad, overwrite = true)
                 page.findViewWithTag<Button>("pdf-retry").performClick()
             }
-            waitFor(scenario) { page.contentReady }
+            waitForPdf(scenario, page, "PDF after explicit retry")
             scenario.onActivity { page.load(encrypted) }
-            waitFor(scenario) { page.findViewWithTag<TextView>("pdf-error-text").isShown }
+            waitFor(scenario, "Password-protected PDF error", { pdfState(page) }) {
+                page.findViewWithTag<TextView>("pdf-error-text").isShown
+            }
             scenario.onActivity { assertFalse(page.contentReady) }
             // Prove this is an actual password-protected PDF, not just another malformed file.
             val core = PdfiumCore(context)
@@ -215,7 +226,7 @@ class NativeMediaCompatibilityTest {
     }
 
     @Test fun gifDecodesLoopsPausesResumesAndReleases() {
-        val file = File.createTempFile("mimi-native", ".gif", context.cacheDir).apply {
+        val file = fixtureFile("mimi-native", ".gif").apply {
             // Original two-frame, two-colour 1x1 GIF, 100 ms per frame, infinite loop.
             writeBytes(Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH/C05FVFNDQVBFMi4wAwEAAAAh+QQACgAAACwAAAAAAQABAAACAkQBACH5BAAKAAAALAAAAAABAAEAAAICRAEAOw==", Base64.DEFAULT))
         }
@@ -269,7 +280,12 @@ class NativeMediaCompatibilityTest {
 
     private fun host() = ActivityScenario.launch<TabsActivity>(Intent(context, TabsActivity::class.java))
 
-    private fun waitFor(scenario: ActivityScenario<TabsActivity>, condition: () -> Boolean) {
+    private fun waitFor(
+        scenario: ActivityScenario<TabsActivity>,
+        description: String = "Native media fixture",
+        diagnostics: () -> String = { "" },
+        condition: () -> Boolean
+    ) {
         val deadline = SystemClock.uptimeMillis() + 15000
         while (SystemClock.uptimeMillis() < deadline) {
             var done = false
@@ -277,20 +293,52 @@ class NativeMediaCompatibilityTest {
             if (done) return
             SystemClock.sleep(50)
         }
-        fail("Native media fixture did not reach its expected state")
+        var state = ""
+        scenario.onActivity { state = diagnostics() }
+        fail("$description did not reach its expected state within 15 seconds. $state")
     }
 
-    private fun color(page: FixturePdf): Int {
-        if (!page.contentReady || page.view.width == 0 || page.view.height == 0) return Color.TRANSPARENT
+    private fun selectPdfPage(page: FixturePdf, index: Int, zoom: Float) {
+        // zoomTo changes only the scale field. jumpTo must calculate offsets and load tiles
+        // AFTER that change; reversing them leaves the viewport on a page boundary.
+        page.view.zoomTo(zoom)
+        page.view.jumpTo(index)
+    }
+
+    private fun waitForPdf(
+        scenario: ActivityScenario<TabsActivity>, page: FixturePdf, stage: String,
+        expectedPage: Int = 0, expectedZoom: Float = 1f, expectedColor: Int = Color.RED
+    ) = waitFor(scenario, stage, { pdfState(page) }) {
+        page.contentReady && page.view.currentPage == expectedPage &&
+                kotlin.math.abs(page.view.zoom - expectedZoom) < 0.01f &&
+                colors(page).all { it == expectedColor }
+    }
+
+    private fun pdfState(page: FixturePdf): String =
+        "fileExists=${page.localFile.isFile}, ready=${page.contentReady}, " +
+                "attached=${page.isAttachedToWindow}, shown=${page.view.isShown}, " +
+                "recycled=${page.view.isRecycled}, page=${page.view.currentPage}/${page.view.pageCount}, " +
+                "zoom=${page.view.zoom}, offset=${page.view.currentXOffset},${page.view.currentYOffset}, " +
+                "size=${page.view.width}x${page.view.height}, " +
+                "pixels=${colors(page).map { Integer.toHexString(it) }}, " +
+                "errorShown=${page.findViewWithTag<TextView>("pdf-error-text").isShown}"
+
+    private fun fixtureFile(prefix: String, suffix: String): File =
+        File.createTempFile(prefix, suffix, fixtures.root)
+
+    private fun colors(page: FixturePdf): List<Int> {
+        if (!page.contentReady || page.view.width == 0 || page.view.height == 0) return listOf(Color.TRANSPARENT)
         val bitmap = Bitmap.createBitmap(page.view.width, page.view.height, Bitmap.Config.ARGB_8888)
         return try {
             page.view.draw(Canvas(bitmap))
-            bitmap.getPixel(bitmap.width / 2, bitmap.height / 2)
+            listOf(0.25f, 0.5f, 0.75f).map {
+                bitmap.getPixel(bitmap.width / 2, (bitmap.height * it).toInt())
+            }
         } finally { bitmap.recycle() }
     }
 
     private fun pdf(): File {
-        val file = File.createTempFile("mimi-native", ".pdf", context.cacheDir)
+        val file = fixtureFile("mimi-native", ".pdf")
         val document = PdfDocument()
         try {
             for ((index, colour) in listOf(Color.RED, Color.BLUE).withIndex()) {

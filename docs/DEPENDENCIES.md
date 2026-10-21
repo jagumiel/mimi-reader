@@ -582,6 +582,13 @@ processes were stopped. No local 16 KB runtime success is claimed. Do not use th
 old five-job run 24 as evidence for this new six-job commit. Keep the release gate,
 physical Android 10 checks, CVE scanning and the owner-approved changelog pending.
 
+Run 26 subsequently passed the build/release/native guards and reached a real
+16 KB emulator, with four of six native cases passing. Two fixture issues
+(zoom/position call order and startup cache cleanup deleting a test PDF) prevented
+full acceptance. [CI diagnosis and fixture corrections](CI.md#run-26-native-pdf-fixture-isolation-and-viewport-positioning)
+record the evidence; they do not change production code, dependency versions,
+ABI coverage or the requirement for a green six-job workflow.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in

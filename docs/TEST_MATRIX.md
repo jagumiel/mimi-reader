@@ -114,6 +114,21 @@ remote six-job run remain pending. Physical 32-bit Android 10 media/CAPTCHA
 acceptance also remains pending; retaining packaged ARM/x86 ABI files is not a
 claim that a physical 32-bit runtime has been tested in this block.
 
+Run 26 reached all five emulator jobs after a successful build. Each regular
+API failed only the blue-PDF viewport fixture; ps16k passed four of six cases,
+with the same viewport failure and one fixture deleted by startup cache cleanup.
+The fixtures now use per-test JUnit folders outside caches, apply zoom before
+positioning, and assert three pixel colours plus page/zoom through restoration.
+The six corrected native cases passed separately on the Edge 20 / Android 12.
+See [run-26 diagnosis](CI.md#run-26-native-pdf-fixture-isolation-and-viewport-positioning);
+the complete remote six-job result remains pending.
+
+After the correction, the complete Edge 20 / Android 12 suite passed again:
+49 cases, 46 passed, three existing opt-in skips and no failures/errors,
+including all six stricter native cases and cache-cleaner preservation checks.
+The temporary stay-awake change was restored to 0. No real posting was performed;
+actual 16 KB and cold-install acceptance still require the remote rerun.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

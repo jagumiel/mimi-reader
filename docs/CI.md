@@ -40,6 +40,58 @@ the JNI seed contract and SDK `zipalign -c -P 16 4`. Actionlint accepted the
 workflow. No device was connected in `adb devices`, so no new physical-device
 or emulator instrumentation pass is claimed for this fix.
 
+## Run 26: native PDF fixture isolation and viewport positioning
+
+[Run 26](https://github.com/jagumiel/mimi-reader/actions/runs/39627059043)
+confirms the run-25 correction: build/unit/lint/SBOM, minified release, native
+alignment and JNI checks passed. The four regular emulator jobs each failed
+only `pdfRendersPagesZoomsAndReleasesOnPauseAndDetach` at line 83, waiting for
+the blue second page (49 cases: 45 passed, three expected skips, one failure).
+API 29's separate original-provider capability check also passed.
+
+The dedicated ps16k job reached `PAGE_SIZE=16384` with backcompat disabled;
+its `device.txt` and per-case page-size assertions confirm a real 16 KB run.
+Four of six native cases passed. Besides the same blue-page failure, its first
+case, `pdfViewportSurvivesActivityAndModelRecreation`, failed before initial
+render: logcat shows the startup cache cleanup followed by a missing fixture
+and `FileNotFoundException`, not a linker error.
+
+Both failures were in the test setup:
+
+- The fixture called `jumpTo(1)` **before** `zoomTo(1.5f)`. In the
+  [viewer implementation](https://github.com/oothp/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/PDFView.java),
+  `zoomTo` only changes a field; it does not recalculate offsets. The viewport
+  then straddled both pages, and its centre landed on their shared boundary.
+  Apply zoom first, then `jumpTo` to reposition and request tiles at that scale.
+- Files were created in `cacheDir` before launching `TabsActivity`, whose
+  first-install/upgrade path clears that cache. Every native fixture now lives
+  in its own JUnit `TemporaryFolder` beneath `filesDir`, checked before each
+  case and cleaned by the rule even after failure. No user files or app cache
+  policy are changed to accommodate the tests.
+
+Pixel checks now sample three interior positions, together with the expected
+page and zoom, both before and after pause/resume, detach/reselection and
+activity/model recreation. This is stricter than the old single centre pixel
+or readiness-only checks. Timeout diagnostics include the stage, file existence,
+attachment, readiness, recycled state, page/zoom/offsets, size, sample colours
+and visible error state. The deadline remains 15 seconds; no retry, skip or
+16 KB compatibility bypass was added. Only tests and documentation change.
+
+The three-position assertion reproduced the old positioning failure on the
+Edge 20 / Android 12 before fixing the call order. All six corrected native
+cases then passed separately on that phone. Full remote six-job acceptance,
+including all six cases on the actual ps16k image, remains required.
+
+Post-fix local validation also passed the complete 49-case Edge 20 suite:
+46 passed, three existing opt-in skips, zero failures/errors. This includes
+the unchanged cache-cleaner test preserving `filesDir` data and all six native
+cases with the stronger pixel checks. Also passed: 96 app + 8 library unit
+tests, 40 CI helper tests, debug lint (zero errors), variant IDs, SBOM freshness
+and six negative cases, debug/release APK and release AAB builds, ELF/ZIP checks,
+release JNI seeds, SDK zipalign and actionlint. The phone's original stay-awake
+setting (0) was restored. This already-installed Android 12 phone is not a local
+cold-install or 16 KB emulator validation; those remote gates remain pending.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),
@@ -225,8 +277,10 @@ before any setting change. It verifies API 36 and actual `PAGE_SIZE=16384`, root
 only that disposable emulator, disables/verifies both native backcompat switches,
 then scopes Gradle to its serial. The instrumentation also checks the expected
 page size in every case. No failing test is retried. Preparation retries apply
-only to SDK downloads. This new job's first remote execution remains pending;
-the local Windows ps16k emulator did not reach ADB and is not counted as passing.
+only to SDK downloads. Its first remote execution in run 26 reached actual
+16 KB pages but failed the fixture cases described above; a fully passing job
+is still pending. The local Windows ps16k emulator did not reach ADB and is not
+counted as passing.
 See [native acceptance limits](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
 
 ```sh
