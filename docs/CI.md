@@ -4,6 +4,42 @@ The workflow builds debug/release artifacts, validates the release SBOM, and
 runs instrumentation on Android 10, 12, 14 and 16 (API 29/31/34/36). A passing
 build job alone is not a passing workflow: every instrumentation job must pass.
 
+## Run 25: download cleanup ordering (21 October 2026)
+
+[Run 25](https://github.com/jagumiel/mimi-reader/actions/runs/39573428637)
+failed `Build and verify debug`: 93 of 94 app unit tests passed, but
+`DownloadToFileTest.rejectsSuccessfulResponsesWhoseSizeDoesNotMatchTheCatalog`
+failed at line 90 while asserting that `truncated.swf.part` had been removed.
+The downloaded HTML report confirms this was the file-cleanup assertion, not
+the expected size-mismatch error. The preceding runs 22, 23 and 24 passed.
+The release/native alignment checks and all emulator jobs were skipped; this
+run supplies **no** 16 KB runtime result.
+
+`downloadToFile` notified `onError` before its `finally` deleted the partial.
+The subscriber (or an immediate retry) could therefore run before cleanup.
+Read failures also bypassed the manual sink close. Responses and file sinks
+now use scoped closing, incomplete partials are removed, and only then is a
+terminal event delivered. HTTP/size validation and final rename remain
+mandatory; no test retries or suppressions have been added to CI.
+
+The regression assertions capture partial-file state **inside** error
+notification, not after a scheduling-dependent wait. The catalog mismatch,
+mid-body disconnection and immediate subscriber-retry cases all failed locally
+against the old implementation before the correction. The two added cases
+bring the app unit suite to 96 (104 with chanlib); download tests have bounded
+10-second waits. CI report artifacts now retain JUnit XML for both modules as
+well as HTML, even on failure. A fresh remote six-job run is still required,
+including the actual 16 KB emulator; local builds do not replace it.
+
+Local post-fix verification passed: 96 app and 8 chanlib unit tests, 40 CI helper
+tests, application-ID verification, debug lint (zero errors, 1,012 existing
+warnings and one hint), debug/app-test APK compilation, SBOM freshness and six
+negative validation cases, and minified release APK/AAB builds. Both APKs
+passed native alignment checks (24 libraries, four ABIs); release also passed
+the JNI seed contract and SDK `zipalign -c -P 16 4`. Actionlint accepted the
+workflow. No device was connected in `adb devices`, so no new physical-device
+or emulator instrumentation pass is claimed for this fix.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

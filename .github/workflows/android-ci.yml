@@ -83,6 +83,8 @@ jobs:
           path: |
             mimi-app/build/reports/
             chanlib/build/reports/
+            mimi-app/build/test-results/
+            chanlib/build/test-results/
             build/reports/native-alignment/
           if-no-files-found: warn
           retention-days: 14

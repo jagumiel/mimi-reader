@@ -144,6 +144,10 @@ class RuntimeSafetyTest(unittest.TestCase):
         build = workflow.split("  build:", 1)[1].split("  instrumented-tests:", 1)[0]
         self.assertIn("name: Upload unsigned release artifacts", build)
         self.assertIn("name: Verify native ELF and APK alignment", build)
+        reports = build.split("name: Upload verification reports", 1)[1].split("name: Upload debug APK", 1)[0]
+        self.assertIn("if: always()", reports)
+        for module in ("mimi-app", "chanlib"):
+            self.assertIn(f"{module}/build/test-results/", reports)
         native_job = workflow.split("  native-16k-tests:", 1)[1]
         self.assertIn("target: google_apis_ps16k", native_job)
         self.assertIn("--test-16k emulator-5554", native_job)

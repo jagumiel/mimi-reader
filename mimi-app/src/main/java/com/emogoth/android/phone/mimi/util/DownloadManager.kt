@@ -347,85 +347,68 @@ fun downloadToFile(
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 var completed = false
+                var failure: Exception? = null
                 try {
-                    if (!response.isSuccessful) {
-                        emitter.tryOnError(
-                                MediaDownloadHttpException(response.code, url)
-                        )
-                        return
-                    }
-
-                    val body = response.body
-                    if (body == null) {
-                        emitter.tryOnError(IllegalStateException("Response from $url returned an empty body"))
-                        return
-                    }
-
-                    val contentLength = body.contentLength()
-                    val source = body.source()
-                    val sink = if (partialFile != null) {
-                        partialFile.parentFile?.mkdirs()
-                        partialFile.createNewFile()
-                        partialFile.sink().buffer()
-                    } else null
-                    val sinkBuffer = sink?.buffer
-
-                    if (sinkBuffer == null) {
-                        emitter.tryOnError(IllegalStateException("Could not write to file; File object is null"))
-                        return
-                    }
-
-                    var totalBytes = 0L
-                    while (!emitter.isCancelled) {
-                        val count = source.read(sinkBuffer, DownloadManager.BUFFER_SIZE)
-                        if (count == -1L) break
-                        sink.emit()
-
-                        totalBytes += count
-                        val progressLength = if (expectedSize > 0L) expectedSize else contentLength
-                        if (progressLength > 0L) {
-                            val progress = ((totalBytes.toFloat() / progressLength) * 100)
-                                    .toInt()
-                                    .coerceIn(0, 100)
-                            emitter.onNext(progress)
+                    response.use {
+                        if (!response.isSuccessful) {
+                            throw MediaDownloadHttpException(response.code, url)
                         }
-                    }
+                        val body = response.body
+                                ?: throw IllegalStateException("Response from $url returned an empty body")
+                        if (file == null || partialFile == null) {
+                            throw IllegalStateException("Could not write to file; File object is null")
+                        }
 
-                    sink.flush()
-                    sink.close()
+                        val contentLength = body.contentLength()
+                        val source = body.source()
+                        partialFile.parentFile?.mkdirs()
+                        var totalBytes = 0L
+                        partialFile.sink().buffer().use { sink ->
+                            while (!emitter.isCancelled) {
+                                val count = source.read(sink.buffer, DownloadManager.BUFFER_SIZE)
+                                if (count == -1L) break
+                                sink.emit()
 
-                    source.close()
+                                totalBytes += count
+                                val progressLength = if (expectedSize > 0L) expectedSize else contentLength
+                                if (progressLength > 0L) {
+                                    val progress = ((totalBytes.toFloat() / progressLength) * 100)
+                                            .toInt()
+                                            .coerceIn(0, 100)
+                                    emitter.onNext(progress)
+                                }
+                            }
+                        }
 
-                    if (emitter.isCancelled) {
-                        return
-                    }
-
-                    if (totalBytes <= 0L) {
-                        val fileException = if (file == null) Exception("Could not write to null file") else NoSuchFileException(file, null, "Wrote a 0-byte file")
-                        emitter.tryOnError(fileException)
-                    } else if (contentLength > 0L && totalBytes != contentLength) {
-                        emitter.tryOnError(
-                                IOException("Incomplete download from $url: expected $contentLength bytes, received $totalBytes")
-                        )
-                    } else if (expectedSize > 0L && totalBytes != expectedSize) {
-                        emitter.tryOnError(
-                                IOException("Unexpected download size from $url: expected $expectedSize bytes, received $totalBytes")
-                        )
-                    } else if (file == null || partialFile == null) {
-                        emitter.tryOnError(IllegalStateException("Could not write to file; File object is null"))
-                    } else if (!partialFile.renameTo(file)) {
-                        emitter.tryOnError(IOException("Could not finalize download to ${file.absolutePath}"))
-                    } else {
+                        if (emitter.isCancelled) return
+                        if (totalBytes <= 0L) {
+                            throw NoSuchFileException(file, null, "Wrote a 0-byte file")
+                        }
+                        if (contentLength > 0L && totalBytes != contentLength) {
+                            throw IOException("Incomplete download from $url: expected $contentLength bytes, received $totalBytes")
+                        }
+                        if (expectedSize > 0L && totalBytes != expectedSize) {
+                            throw IOException("Unexpected download size from $url: expected $expectedSize bytes, received $totalBytes")
+                        }
+                        if (!partialFile.renameTo(file)) {
+                            throw IOException("Could not finalize download to ${file.absolutePath}")
+                        }
                         completed = true
-                        emitter.onComplete()
                     }
                 } catch (e: Exception) {
-                    emitter.tryOnError(e)
+                    failure = e
                 } finally {
-                    response.close()
                     if (!completed) {
                         partialFile?.delete()
                     }
+                }
+                // Terminal callbacks may immediately retry this same file. Close streams and
+                // remove failed partials first, never after releasing the subscriber/queue slot.
+                val error = failure
+                if (error != null) {
+                    emitter.tryOnError(error)
+                } else if (completed) {
+                    emitter.onComplete()
                 }
             }
         })
