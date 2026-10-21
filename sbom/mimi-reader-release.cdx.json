@@ -447,41 +447,6 @@
             "version": "2.2.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.asynclayoutinflater",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "f7eab60c57addd94bb06275832fe7600611beaaae1a1ec597c231956faf96c8b"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "asynclayoutinflater",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.browser/browser@1.2.0?type=aar",
             "description": "Android Support Custom Tabs",
             "externalReferences": [
@@ -1418,111 +1383,6 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.legacy",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "0d1260c6e7e6a337f875df71b516931e703f716e90889817cd3a20fa5ac3d947"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "legacy-support-core-ui",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.legacy",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "a7edcf01d5b52b3034073027bc4775b78a4764bb6202bb91d61c829add8dd1c7"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "legacy-support-core-utils",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.legacy/legacy-support-v4@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.legacy",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "78fec1485f0f388a4749022dd51416857127cd2544ae1c3fd0b16589055480b0"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "legacy-support-v4",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.legacy/legacy-support-v4@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.lifecycle/lifecycle-common-jvm@2.11.0?type=jar",
             "description": "Android Lifecycle-Common",
             "externalReferences": [
@@ -2110,76 +1970,6 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.localbroadcastmanager/localbroadcastmanager@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.localbroadcastmanager",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "e71c328ceef5c4a7d76f2d86df1b65d65fe2acf868b1a4efd84a3f34336186d8"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "localbroadcastmanager",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.localbroadcastmanager/localbroadcastmanager@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.media/media@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.media",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "b23b527b2bac870c4a7451e6982d7132e413e88d7f27dbeb1fc7640a720cd9ee"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "media",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.media/media@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar",
             "description": "Media3 common module",
             "externalReferences": [
@@ -2629,41 +2419,6 @@
             "purl": "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
             "type": "library",
             "version": "1.2.1"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.print/print@1.0.0?type=aar",
-            "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs. Compatible on devices running API 14 or later.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.print",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "1d5c7f3135a1bba661fc373fd72e11eb0a4adbb3396787826dd8e4190d5d9edd"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "print",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.print/print@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
         },
         {
             "bom-ref": "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
@@ -3914,19 +3669,19 @@
             "version": "3.10.0"
         },
         {
-            "bom-ref": "pkg:maven/com.github.MimiReader/AndroidPdfViewer@3.2.0-beta.2?type=aar",
-            "description": "Android view for displaying PDFs rendered with PdfiumAndroid",
+            "bom-ref": "pkg:maven/com.getkeepsafe.relinker/relinker@1.4.5?type=aar",
+            "description": "A robust native library loader for Android",
             "externalReferences": [
                 {
                     "type": "vcs",
-                    "url": "https://github.com/barteksc/AndroidPdfViewer"
+                    "url": "https://github.com/KeepSafe/ReLinker"
                 }
             ],
-            "group": "com.github.MimiReader",
+            "group": "com.getkeepsafe.relinker",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "f5534701d09fa4d1de405aaf60307ab75e9424b50d63bdaa719cf552f1a61ce8"
+                    "content": "b03b4d113a9fef79400ae854c17757c2915725e6ffd1d61116eadaeb5613374a"
                 }
             ],
             "licenses": [
@@ -3937,51 +3692,16 @@
                 }
             ],
             "modified": false,
-            "name": "AndroidPdfViewer",
+            "name": "relinker",
             "properties": [
                 {
                     "name": "cdx:maven:package:test",
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/com.github.MimiReader/AndroidPdfViewer@3.2.0-beta.2?type=aar",
+            "purl": "pkg:maven/com.getkeepsafe.relinker/relinker@1.4.5?type=aar",
             "type": "library",
-            "version": "3.2.0-beta.2"
-        },
-        {
-            "bom-ref": "pkg:maven/com.github.barteksc/pdfium-android@1.9.0?type=aar",
-            "description": "Fork of library for rendering PDFs on Android's Surface or Bitmap",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://github.com/barteksc/PdfiumAndroid"
-                }
-            ],
-            "group": "com.github.barteksc",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "2992e86cce9ad5576e9c47a99cc2ba8cb75777016944ad30fbed3d7b8f6caf3f"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "pdfium-android",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/com.github.barteksc/pdfium-android@1.9.0?type=aar",
-            "type": "library",
-            "version": "1.9.0"
+            "version": "1.4.5"
         },
         {
             "bom-ref": "pkg:maven/com.github.bumptech.glide/annotations@4.11.0?type=jar",
@@ -4711,6 +4431,77 @@
             "purl": "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
             "type": "library",
             "version": "2.11.0"
+        },
+        {
+            "bom-ref": "pkg:maven/io.github.oothp/android-pdf-viewer@3.2.0-beta06?type=aar",
+            "description": "Fork of Barteksc AndroidPdfViewer - Android view for displaying PDFs rendered with PdfiumAndroid",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/oothp/AndroidPdfViewer"
+                }
+            ],
+            "group": "io.github.oothp",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "26131222795865ee952ec40073818c88bd10c39022bb9a41ea8a77c1c88d39bd"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "android-pdf-viewer",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/io.github.oothp/android-pdf-viewer@3.2.0-beta06?type=aar",
+            "type": "library",
+            "version": "3.2.0-beta06"
+        },
+        {
+            "bom-ref": "pkg:maven/io.github.oothp/pdfium-android@1.9.5-beta01?type=aar",
+            "description": "Fork of PdfiumAndroid with 16KB page alignment",
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/oothp/PdfiumAndroid"
+                }
+            ],
+            "group": "io.github.oothp",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "e6a8766906c190da3622fd54592f915c398a8b42c86a9a4fc656c68a147d1b55"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "pdfium-android",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/io.github.oothp/pdfium-android@1.9.5-beta01?type=aar",
+            "type": "library",
+            "version": "1.9.5-beta01"
         },
         {
             "bom-ref": "pkg:maven/io.reactivex.rxjava2/rxandroid@2.1.1?type=aar",
@@ -5464,27 +5255,19 @@
             "version": "1.0.4"
         },
         {
-            "bom-ref": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.21?type=aar",
+            "bom-ref": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.32?type=aar",
             "description": "Views and Drawable for displaying animated GIFs for Android",
             "externalReferences": [
                 {
-                    "type": "build-system",
-                    "url": "https://app.bitrise.io/app/f12c77eeaf952ab0#/builds"
-                },
-                {
-                    "type": "issue-tracker",
-                    "url": "https://github.com/koral--/android-gif-drawable/issues"
-                },
-                {
                     "type": "vcs",
-                    "url": "https://github.com/koral--/android-gif-drawable.git"
+                    "url": "https://github.com/koral--/android-gif-drawable"
                 }
             ],
             "group": "pl.droidsonroids.gif",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "60884abb832f1bb237c04512ae84e0f5f7b1bd28aa72a150b203d12f4ed1c722"
+                    "content": "369f7bed0e364ed2cc1bf6be8e2000c15b1e7a4fd2344a2812e8afbd47602dd6"
                 }
             ],
             "licenses": [
@@ -5502,45 +5285,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.21?type=aar",
+            "purl": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.32?type=aar",
             "type": "library",
-            "version": "1.2.21"
-        },
-        {
-            "bom-ref": "pkg:maven/pl.droidsonroids/relinker@1.3.1?type=aar",
-            "description": "A robust native library loader for Android",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://github.com/koral--/ReLinker"
-                }
-            ],
-            "group": "pl.droidsonroids",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "4c1ac7747af1a0ac2359f68e5fcef8549cb7262c3dfba5712c5cac073c58642a"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "name": "Apache-v2",
-                        "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "relinker",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/pl.droidsonroids/relinker@1.3.1?type=aar",
-            "type": "library",
-            "version": "1.3.1"
+            "version": "1.2.32"
         }
     ],
     "dependencies": [
@@ -5584,7 +5331,6 @@
                 "pkg:maven/androidx.work/work-rxjava2@2.10.5?type=aar",
                 "pkg:maven/com.android.tools/desugar_jdk_libs_nio@2.1.5?type=jar",
                 "pkg:maven/com.davemorrissey.labs/subsampling-scale-image-view@3.10.0?type=aar",
-                "pkg:maven/com.github.MimiReader/AndroidPdfViewer@3.2.0-beta.2?type=aar",
                 "pkg:maven/com.github.bumptech.glide/glide@4.11.0?type=aar",
                 "pkg:maven/com.github.bumptech.glide/okhttp3-integration@4.11.0?type=aar",
                 "pkg:maven/com.github.franmontiel/PersistentCookieJar@1.0.1?type=aar",
@@ -5597,6 +5343,7 @@
                 "pkg:maven/com.squareup.retrofit2/adapter-rxjava2@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
+                "pkg:maven/io.github.oothp/android-pdf-viewer@3.2.0-beta06?type=aar",
                 "pkg:maven/io.reactivex.rxjava2/rxandroid@2.1.1?type=aar",
                 "pkg:maven/io.reactivex.rxjava2/rxjava@2.2.21?type=jar",
                 "pkg:maven/io.reactivex.rxjava2/rxkotlin@2.4.0?type=jar",
@@ -5604,7 +5351,7 @@
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-serialization-bom@1.8.1?type=pom",
                 "pkg:maven/org.jsoup/jsoup@1.23.2?type=jar",
-                "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.21?type=aar"
+                "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.32?type=aar"
             ],
             "ref": "pkg:generic/mimi-reader@7.0.1?variant=release"
         },
@@ -5801,23 +5548,6 @@
                 "pkg:maven/androidx.arch.core/core-common@2.2.0?type=jar"
             ],
             "ref": "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
-                "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar",
-                "pkg:maven/androidx.coordinatorlayout/coordinatorlayout@1.1.0?type=aar",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.cursoradapter/cursoradapter@1.0.0?type=aar",
-                "pkg:maven/androidx.customview/customview@1.1.0?type=aar",
-                "pkg:maven/androidx.drawerlayout/drawerlayout@1.0.0?type=aar",
-                "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar",
-                "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
-                "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar",
-                "pkg:maven/androidx.swiperefreshlayout/swiperefreshlayout@1.0.0?type=aar",
-                "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar"
         },
         {
             "dependsOn": [
@@ -6029,17 +5759,6 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.documentfile/documentfile@1.0.0?type=aar",
-                "pkg:maven/androidx.loader/loader@1.0.0?type=aar",
-                "pkg:maven/androidx.localbroadcastmanager/localbroadcastmanager@1.0.0?type=aar",
-                "pkg:maven/androidx.print/print@1.0.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/androidx.interpolator/interpolator@1.0.0?type=aar"
             ],
             "ref": "pkg:maven/androidx.swiperefreshlayout/swiperefreshlayout@1.0.0?type=aar"
@@ -6057,14 +5776,6 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.versionedparcelable/versionedparcelable@1.1.1?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.media/media@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar"
@@ -6076,13 +5787,6 @@
                 "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
             ],
             "ref": "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
-                "pkg:maven/androidx.core/core@1.18.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.asynclayoutinflater/asynclayoutinflater@1.0.0?type=aar"
         },
         {
             "dependsOn": [
@@ -6277,18 +5981,6 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
-            "ref": "pkg:maven/androidx.localbroadcastmanager/localbroadcastmanager@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
-            ],
-            "ref": "pkg:maven/androidx.print/print@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
-            ],
             "ref": "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar"
         },
         {
@@ -6430,19 +6122,9 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar",
-                "pkg:maven/androidx.legacy/legacy-support-core-ui@1.0.0?type=aar",
-                "pkg:maven/androidx.legacy/legacy-support-core-utils@1.0.0?type=aar",
-                "pkg:maven/androidx.media/media@1.0.0?type=aar"
+                "pkg:maven/io.github.oothp/pdfium-android@1.9.5-beta01?type=aar"
             ],
-            "ref": "pkg:maven/androidx.legacy/legacy-support-v4@1.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/com.github.barteksc/pdfium-android@1.9.0?type=aar"
-            ],
-            "ref": "pkg:maven/com.github.MimiReader/AndroidPdfViewer@3.2.0-beta.2?type=aar"
+            "ref": "pkg:maven/io.github.oothp/android-pdf-viewer@3.2.0-beta06?type=aar"
         },
         {
             "dependsOn": [
@@ -6467,12 +6149,6 @@
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.legacy/legacy-support-v4@1.0.0?type=aar"
-            ],
-            "ref": "pkg:maven/com.github.barteksc/pdfium-android@1.9.0?type=aar"
         },
         {
             "dependsOn": [
@@ -6602,6 +6278,12 @@
                 "pkg:maven/com.android.tools/desugar_jdk_libs_configuration_nio@2.1.5?type=jar"
             ],
             "ref": "pkg:maven/com.android.tools/desugar_jdk_libs_nio@2.1.5?type=jar"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/com.getkeepsafe.relinker/relinker@1.4.5?type=aar"
+            ],
+            "ref": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.32?type=aar"
         },
         {
             "dependsOn": [
@@ -6787,12 +6469,6 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/pl.droidsonroids/relinker@1.3.1?type=aar"
-            ],
-            "ref": "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.21?type=aar"
-        },
-        {
-            "dependsOn": [
                 "urn:mimi:file:mimi-app/src/main/assets/ruffle/172de42e6619eac8f371.wasm",
                 "urn:mimi:file:mimi-app/src/main/assets/ruffle/878d548199cddef07035.wasm",
                 "urn:mimi:file:mimi-app/src/main/assets/ruffle/LICENSE_APACHE",
@@ -6814,6 +6490,12 @@
 
             ],
             "ref": "pkg:maven/com.android.tools/desugar_jdk_libs_configuration_nio@2.1.5?type=jar"
+        },
+        {
+            "dependsOn": [
+
+            ],
+            "ref": "pkg:maven/com.getkeepsafe.relinker/relinker@1.4.5?type=aar"
         },
         {
             "dependsOn": [
@@ -6850,6 +6532,12 @@
 
             ],
             "ref": "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
+        },
+        {
+            "dependsOn": [
+
+            ],
+            "ref": "pkg:maven/io.github.oothp/pdfium-android@1.9.5-beta01?type=aar"
         },
         {
             "dependsOn": [
@@ -6898,12 +6586,6 @@
 
             ],
             "ref": "pkg:maven/org.reactivestreams/reactive-streams@1.0.4?type=jar"
-        },
-        {
-            "dependsOn": [
-
-            ],
-            "ref": "pkg:maven/pl.droidsonroids/relinker@1.3.1?type=aar"
         },
         {
             "dependsOn": [

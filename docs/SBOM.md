@@ -73,6 +73,15 @@ edges. Counts remain 158 components / 77 declarations. PDF/GIF native artifacts
 and hashes are unchanged: the [native page-size audit](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement)
 does not imply a binary update or a CVE scan.
 
+On 21 October the eighth cleanup replaces the two PDF artifacts with the oothp
+Maven Central fork/Pdfium and updates GIF to 1.2.32 and its ReLinker dependency.
+The snapshots now contain **151 components / 77 declarations**: seven legacy
+components become unreachable without global exclusions. Ruffle and unrelated
+retained components are unchanged. Native binaries are covered by their AAR
+artifact hashes as before; this does not establish the embedded PDFium/GIFLib
+source revision or absence of CVEs. Separate ELF/ZIP reports and actual 16 KB
+runtime tests are documented in [the dependency audit](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

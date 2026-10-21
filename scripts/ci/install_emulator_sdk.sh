@@ -3,7 +3,11 @@ set -euo pipefail
 
 api="${1:?Expected an Android API level}"
 [[ "$api" =~ ^(29|31|34|36)$ ]] || { echo "Unsupported CI API: $api" >&2; exit 2; }
-image="system-images;android-${api};google_apis;x86_64"
+target="${2:-google_apis}"
+[[ "$target" == google_apis || ( "$api" == 36 && "$target" == google_apis_ps16k ) ]] || {
+  echo "Unsupported CI image target: $api/$target" >&2; exit 2;
+}
+image="system-images;android-${api};${target};x86_64"
 
 # Retry SDK preparation only, never failed application tests. A truncated image
 # archive previously prevented API 34 from even launching its emulator.

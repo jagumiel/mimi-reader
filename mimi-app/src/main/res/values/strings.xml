@@ -464,6 +464,7 @@
     <string name="layout_tabbed">Tabbed</string>
     <string name="layout_sliding_panel">Sliding Panel</string>
     <string name="video_failed_to_load">Video failed to load</string>
+    <string name="pdf_load_failed">Could not open this PDF. It may be damaged, password-protected, or unsupported.</string>
     <string name="video_playback_did_not_complete">Video did no complete</string>
     <string name="loading_video_please_wait">Loading video, please wait</string>
     <string name="save_file_permission_denied">Permission to save file was denied</string>

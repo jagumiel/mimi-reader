@@ -169,7 +169,7 @@ class WebViewPreparationTest(unittest.TestCase):
 
 
 class SdkPreparationTest(unittest.TestCase):
-    def run_script(self, failures, api="34"):
+    def run_script(self, failures, api="34", target="google_apis"):
         shell = shutil.which("bash")
         self.assertIsNotNone(shell, "SDK preparation tests require Bash")
         script = Path(__file__).with_name("install_emulator_sdk.sh").resolve().as_posix()
@@ -186,9 +186,9 @@ class SdkPreparationTest(unittest.TestCase):
               fi
             }
             sleep() { :; }
-            source "$1" "$2"
+            source "$1" "$2" "$3"
         '''.replace('"$3_FAILS"', str(failures))
-        return subprocess.run([shell, "-c", harness, "test-sdk", script, api],
+        return subprocess.run([shell, "-c", harness, "test-sdk", script, api, target],
                               text=True, capture_output=True)
 
     def test_retry_only_sdk_preparation_then_succeed(self):
@@ -205,6 +205,17 @@ class SdkPreparationTest(unittest.TestCase):
 
     def test_unknown_api_never_installs_or_cleans_anything(self):
         result = self.run_script(failures=0, api="../../")
+        self.assertEqual(2, result.returncode)
+        self.assertNotIn("install-", result.stdout)
+        self.assertNotIn("cleanup:", result.stdout)
+
+    def test_16kb_target_installs_the_distinct_api36_image(self):
+        result = self.run_script(failures=0, api="36", target="google_apis_ps16k")
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("system-images;android-36;google_apis_ps16k;x86_64", result.stdout)
+
+    def test_invalid_image_target_never_installs_or_cleans_anything(self):
+        result = self.run_script(failures=0, api="36", target="../../")
         self.assertEqual(2, result.returncode)
         self.assertNotIn("install-", result.stdout)
         self.assertNotIn("cleanup:", result.stdout)

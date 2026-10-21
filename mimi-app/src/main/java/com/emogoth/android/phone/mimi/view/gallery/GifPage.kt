@@ -2,6 +2,8 @@ package com.emogoth.android.phone.mimi.view.gallery
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.emogoth.android.phone.mimi.R
 import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -10,7 +12,10 @@ import pl.droidsonroids.gif.GifDrawable
 import pl.droidsonroids.gif.GifImageView
 
 @SuppressLint("ViewConstructor")
-class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(context, viewModel) {
+open class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(context, viewModel) {
+    private var released = false
+    private var hostResumed = (context as? LifecycleOwner)?.lifecycle?.currentState
+        ?.isAtLeast(Lifecycle.State.RESUMED) ?: true
     override fun onViewBind() {
         (view.drawable as? GifDrawable)?.recycle()
         view.setImageDrawable(null)
@@ -25,7 +30,7 @@ class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(conte
     override fun onComplete() {
         super.onComplete()
 
-        if (!isAttachedToWindow) {
+        if (!isAttachedToWindow || released) {
             return
         }
 
@@ -33,13 +38,13 @@ class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(conte
             (view.drawable as? GifDrawable)?.recycle()
             val drawable = GifDrawable(downloadItem.file)
             drawable.addAnimationListener {
-                if (pageSelected) {
+                if (pageSelected && hostResumed && view.drawable === drawable) {
                     notifyPlaybackCompleted()
                 }
             }
             view.setImageDrawable(drawable)
 
-            if (pageSelected) drawable.start() else drawable.stop()
+            if (pageSelected && hostResumed) drawable.start() else drawable.stop()
             loaded = true
             notifyContentReady()
         } catch (e: Exception) {
@@ -52,17 +57,30 @@ class GifPage(context: Context, viewModel: GalleryViewModel) : GalleryPage(conte
 
         val drawable = view.drawable
         if (drawable != null && drawable is GifDrawable) {
-            if (selected) drawable.start() else drawable.stop()
+            if (selected && hostResumed) drawable.start() else drawable.stop()
         }
     }
 
     override fun onHostPause() {
+        hostResumed = false
         (view.drawable as? GifDrawable)?.stop()
     }
 
     override fun onHostResume() {
+        hostResumed = true
         if (pageSelected) {
             (view.drawable as? GifDrawable)?.start()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        (view.drawable as? GifDrawable)?.stop()
+        super.onDetachedFromWindow()
+    }
+
+    fun release() {
+        released = true
+        onViewBind()
+        loaded = false
     }
 }

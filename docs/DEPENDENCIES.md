@@ -8,7 +8,9 @@ The sixth replaces direct legacy umbrellas with explicit consumer declarations,
 without changing the selected component set or versions.
 The seventh updates GridLayout alone and records the native-library release risk.
 
-The canonical release SBOM has **158 top-level components**: 156 Maven components,
+The eighth block replaces PDF/GIF native artifacts and adds strict alignment/runtime checks.
+
+The canonical release SBOM has **151 top-level components**: 149 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
 files. The inventory records **77 direct declarations** across the two modules;
 repeated declarations and dependency constraints are not 77 distinct libraries.
@@ -67,7 +69,7 @@ under the third block. New cleanup changes still require their own matrix run.
 | --- | --- | --- |
 | AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
-| PDF | MimiReader AndroidPdfViewer 3.2.0-beta.2 pulls pdfium-android 1.9.0 and native binaries; the seventh block confirms 4 KB ELF load alignment in several 64-bit libraries. | Prioritize a separately tested replacement/rebuild before release. Keep Android 10/12 support and verify PDF interaction, lifecycle, errors and 16 KB devices. |
+| PDF / GIF | The eighth block replaces the PDF fork with `io.github.oothp:android-pdf-viewer:3.2.0-beta06` / Pdfium 1.9.5-beta01, and updates GIF to 1.2.32. | Local rendering and ELF/ZIP checks pass; confirm the dedicated 16 KB runtime CI job before release. These are wrapper/artifact versions, not a complete audit of embedded PDFium/GIFLib security. |
 | UI libraries | Preference is now **1.2.1**. Material 1.2.1, Glide 4.11.0, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.0. | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
@@ -81,7 +83,7 @@ No vulnerability database was queried in this phase.
   indirect/generated usage rather than equating absent imports with safe removal.
 - Direct legacy AndroidX umbrella declarations and the filter editor's legacy
   spacers are replaced in the sixth block. The seventh removes GridLayout's
-  legacy dependency path; PDFium still introduces the umbrellas transitively.
+  legacy path; the eighth removes PDFium's remaining umbrella path as well.
 - JUnit alignment, the empty local file-tree/repositories and obsolete commented
   build declarations are addressed in the fourth block below.
 - Keep the Serialization BOM: absence of application imports does not establish
@@ -480,9 +482,105 @@ follow-up must preserve animation, pause/resume and autoplay's one-cycle advance
   and target API 36. APK size stays at 59,452,644 bytes; AAB changes from
   36,640,635 to 36,641,843 bytes. These local sizes are not runtime performance
   measurements. ZIP alignment passes but the documented ELF/native risk remains.
-- This block's own remote Android 10/12/14/16 matrix is still pending. Run 23
-  confirms only the preceding commit, not the new library version. Native 16 KB
-  compatibility remains an explicitly unresolved pre-release requirement.
+- [Run 24 for `3c5357f`](https://github.com/jagumiel/mimi-reader/actions/runs/39480315229)
+  passed all five jobs, confirming GridLayout on Android 10/12/14/16. It does not
+  cover the native replacements below or certify native 16 KB behaviour.
+
+## Eighth cleanup: PDF/GIF native replacement and resource lifecycle
+
+Use the API-compatible Maven Central [PDF viewer fork 3.2.0-beta06](https://central.sonatype.com/artifact/io.github.oothp/android-pdf-viewer/3.2.0-beta06),
+which selects `io.github.oothp:pdfium-android:1.9.5-beta01`. Its library minimum is
+API 21, so the app remains at API 23; a candidate requiring API 24 was not selected.
+The viewer is still a beta-versioned dependency, not presented as a stable release.
+Update [android-gif-drawable to 1.2.32](https://github.com/koral--/android-gif-drawable/releases/tag/v1.2.32).
+Inspect the actual AAR/APK binaries instead of accepting upstream alignment claims
+or treating compressed libraries as an ELF fix.
+
+All 24 libraries across `arm64-v8a`, `x86_64`, `armeabi-v7a` and `x86` remain
+packaged. The twelve 64-bit libraries now have PT_LOAD alignment of at least
+16 KB. Both ordinary 32-bit Android ABIs remain supported; the fork no longer
+ships obsolete MIPS/MIPS64 binaries. That upstream ABI change is disclosed, not
+hidden behind an application `abiFilters` exclusion. Physical 32-bit Android 10
+PDF/GIF acceptance remains pending; the attached Edge 20 runs 64-bit Android 12.
+
+The graph changes from 158 to 151 components with the same 77 declarations:
+replace the two old PDF coordinates and old `pl.droidsonroids:relinker:1.3.1`
+with the two oothp coordinates and `com.getkeepsafe.relinker:relinker:1.4.5`.
+Only GIF changes version among retained coordinates. Seven obsolete components
+become unreachable: all three `androidx.legacy` umbrellas, AsyncLayoutInflater,
+LocalBroadcastManager, old Media and Print. Loader/CursorAdapter/ViewPager still
+have other consumers and remain; no global exclusion is used. Ruffle is unchanged.
+
+`PdfPage` now reports readiness only after native rendering, not immediately after
+starting an asynchronous load. It displays a local error/retry panel for malformed,
+password-protected or unsupported documents and download errors. It does not add
+a password-entry flow; protected documents remain unsupported in the gallery but
+now show a useful error. Rebinding, leaving a page, host pause, detach and gallery
+destruction invalidate old callbacks and recycle native resources. Restore page
+and zoom per post with bounded, normalized ViewModel/Bundle state (64 entries).
+PDF gestures no longer share the generic image tap-to-close listener.
+
+GIF callbacks are scoped to the current drawable, selected page and resumed host.
+Pause/deselect/detach stop animation; gallery destruction explicitly recycles it.
+Keep loop notifications for autoplay. Remove the obsolete app-level GIF constructor
+keep rules and rely on the current library's consumer rule plus the existing JNI
+entry-point rule. Remove the unused `gallery_image_pdf.xml` after checking source,
+XML and generated-binding consumers; the gallery creates `PdfPage` directly.
+Update in-app native component attribution without deleting existing license text.
+
+The replacement AARs do not supply Pdfium JNI constructor keep rules. Binary
+strings and source inspection identify `PdfPasswordException` and `util.Size` as
+name-resolved JNI types; the first minified mapping had removed the exception.
+Add narrow class/constructor keep rules (not a whole-library keep or warning
+suppression), and require their entries in release `seeds.txt` through the native
+verifier. This checks static R8 preservation, not minified runtime execution.
+
+### Native alignment and runtime regression protection
+
+`scripts/ci/android_native.py` validates ELF class/machine/program-header bounds,
+64-bit PT_LOAD alignment/congruence and uncompressed APK entry alignment. It
+requires all four retained ABIs, so compression or silently dropping 32-bit code
+cannot satisfy the check. This is not a complete ELF/RELRO/security audit; actual
+native runtime tests remain required. CI checks debug and minified release APKs,
+also runs SDK `zipalign`, and retains reports for 14 days.
+
+The new sixth CI job uses the distinct API 36 `google_apis_ps16k` image and runs
+the six mandatory `NativeMediaCompatibilityTest` cases. Its launcher refuses a
+physical serial, non-emulator, wrong API or actual page size other than 16384
+**before** changing settings. Only then does it root that disposable emulator,
+disable and verify [16 KB backcompat](https://developer.android.com/guide/practices/page-sizes#16-kb-backcompat-mode),
+and run Gradle scoped to that serial. Each native test also asserts the requested
+page size with `sysconf`; a 4 KB job cannot silently pass this gate. Test failures
+are not retried. SDK image preparation alone retains its bounded retry policy.
+
+Six local cases cover two-page colour rendering, page changes/zoom, pause/detach/
+selection resource release, activity + model/Bundle recreation, damaged/encrypted
+files and explicit retry, stale-load cancellation, GIF loop/pause/resume/recycle,
+and bounded/invalid viewport state. The encrypted fixture is an original one-page
+Standard Security R2 document: opening it with the known test password proves that
+the password error is not simply malformed bytes. No live website or public post
+is involved.
+
+Local checks: all six cases and the complete Edge 20 / Android 12 suite passed
+(49 cases: 46 passed, three opt-in skips, no failures/errors). The original phone
+stay-awake value (0) was restored. 94 app + eight library unit tests and 40 CI-helper
+tests passed; actionlint 1.7.12 validated the workflow. Debug and minified release
+APK ELF/ZIP checks pass for all 24 libraries; SDK `zipalign -c -P 16 4` also passes.
+Release APK/AAB, R8, vital lint, SBOM schema/freshness and its six negative cases
+passed. The unused PDF binding is absent from regenerated debug/release outputs.
+Release metadata retains the package ID, version 230 / 7.0.1, minSdk 23 and target
+36. Local release APK size changes from 59,452,644 to 40,797,669 bytes; AAB from
+36,641,843 to 30,630,024 bytes, including the fork's MIPS removal and other binary
+changes. These are size observations, not startup/performance measurements.
+Dedicated lint passed with zero errors, 1,012 warnings, one hint
+and 484 `UnusedResources` findings, without a new baseline or suppression.
+
+**Runtime 16 KB remains unconfirmed until the new CI job passes.** A local
+API 36 ps16k image/AVD was installed, but Windows emulator 37.1.11 with AEHD 2.2
+did not reach ADB (one launch exited, another stalled); only this task's emulator
+processes were stopped. No local 16 KB runtime success is claimed. Do not use the
+old five-job run 24 as evidence for this new six-job commit. Keep the release gate,
+physical Android 10 checks, CVE scanning and the owner-approved changelog pending.
 
 ## Remaining legacy-file review
 
@@ -513,12 +611,12 @@ only the method and leave a live caller behind. This block does not change that 
    checks. On Android 12, human resolution and one separately authorized text
    reply succeeded; do not repeat public submissions for automated regression.
    [Posting contracts and validation limits](POSTING.md) record that scope.
-3. The AndroidX UI block (`04b3a42`) and explicit-consumer block (`e485a71`) are
-   confirmed by green runs 22 and 23. Confirm the seventh cleanup's own remote
-   matrix after pushing its commit.
-4. Prioritize PDF/native replacement and GIF native compatibility with 16 KB
-   runtime validation, while retaining Android 10/12 and 32-bit support. Then
-   continue the remaining legacy adapter/resource reviews in bounded groups.
+3. The preceding cleanup blocks through GridLayout are confirmed by green runs
+   22–24. Confirm this native-media commit's **six** jobs, especially actual 16 KB
+   execution without backcompat, after pushing it.
+4. Complete physical Android 10/32-bit media acceptance, then continue remaining
+   legacy adapter/resource reviews in bounded groups. Keep embedded native source
+   revision/security provenance distinct from wrapper Maven versions.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
    time-limited exceptions. Do not treat the scanner as the automatic next task

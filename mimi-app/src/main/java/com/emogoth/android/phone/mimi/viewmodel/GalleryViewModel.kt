@@ -20,6 +20,7 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
         val TAG: String = GalleryViewModel::class.java.simpleName
         const val DOWNLOAD_DIR = "full_images"
         private const val STATE_VIDEO_MUTED = "gallery_video_muted"
+        private const val STATE_PDF_VIEWPORTS = "gallery_pdf_viewports"
 
         fun get(context: FragmentActivity, imageBaseUrl: String, audioLock: Boolean): GalleryViewModel {
             val factory = object : ViewModelProvider.Factory {
@@ -39,6 +40,15 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
 
     var boardName: String = ""
     val audioState = GalleryAudioState(audioEnabledByDefault)
+    private val pdfViewports = LinkedHashMap<Long, Pair<Int, Float>>()
+
+    fun pdfViewport(id: Long): Pair<Int, Float> = pdfViewports[id] ?: (0 to 1f)
+
+    fun savePdfViewport(id: Long, page: Int, zoom: Float) {
+        if (id < 0) return
+        pdfViewports[id] = page.coerceAtLeast(0) to if (zoom.isFinite()) zoom.coerceIn(1f, 3f) else 1f
+        if (pdfViewports.size > 64) pdfViewports.remove(pdfViewports.keys.first())
+    }
     var threadId: Long = -1
     var keepFiles = false
     var fullScreen: Boolean = false
@@ -155,6 +165,13 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
         if (state.containsKey(STATE_VIDEO_MUTED)) {
             audioState.setMuted(state.getBoolean(STATE_VIDEO_MUTED))
         }
+        state.getBundle(STATE_PDF_VIEWPORTS)?.let { saved ->
+            saved.keySet().take(64).forEach { key ->
+                val value = saved.getFloatArray(key)
+                val id = key.toLongOrNull()
+                if (id != null && value?.size == 2) savePdfViewport(id, value[0].toInt(), value[1])
+            }
+        }
     }
 
     // put current state into a bundle
@@ -169,6 +186,11 @@ class GalleryViewModel(private val imageBaseUrl: String = "empty", audioEnabledB
         state.putInt(Extras.EXTRAS_POSITION, position)
         state.putString(Extras.EXTRAS_FILE_PATH, saveLocation)
         state.putBoolean(STATE_VIDEO_MUTED, audioState.muted)
+        state.putBundle(STATE_PDF_VIEWPORTS, Bundle().apply {
+            pdfViewports.forEach { (id, viewport) ->
+                putFloatArray(id.toString(), floatArrayOf(viewport.first.toFloat(), viewport.second))
+            }
+        })
     }
 
 

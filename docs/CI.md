@@ -166,6 +166,33 @@ API 36 job nor the existing 4 KB physical phone establishes native 16 KB page-si
 compatibility: PDF/GIF ELF findings and the separate runtime acceptance gate are
 recorded in [the dependency audit](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
 
+[Run 24 for `3c5357f`](https://github.com/jagumiel/mimi-reader/actions/runs/39480315229)
+passed all five preceding jobs. The native-media cleanup now has **six** jobs:
+the existing build and four-API full suite remain, plus a dedicated API 36
+`google_apis_ps16k` run of six native fixtures. The full suite expands to 49
+cases (46 mandatory, three opt-in skips). The physical Edge 20 / Android 12
+passed all 46 mandatory cases; that device has 4 KB pages, not 16 KB.
+
+The build also runs `scripts/ci/android_native.py` on debug/release APKs and SDK
+`zipalign` on release. The 24 packaged libraries retain arm64/x86_64 and ARM/x86
+32-bit coverage; ELF64 PT_LOAD and uncompressed ZIP entries must be 16 KB aligned.
+Reports are uploaded for 14 days. The verifier does not certify all ELF semantics
+or replace runtime tests. CI-helper coverage is now 40 tests, including synthetic
+old/malformed ELF/ZIP rejection, ABI preservation, emulator guards, SDK targets
+and workflow job boundaries.
+Release verification also checks `seeds.txt` for the two Pdfium JNI-resolved
+types/constructors, preventing R8 from silently stripping a password exception
+or native size constructor while keeping the ELF files correctly aligned.
+
+The native runtime launcher refuses physical devices and ordinary 4 KB emulators
+before any setting change. It verifies API 36 and actual `PAGE_SIZE=16384`, roots
+only that disposable emulator, disables/verifies both native backcompat switches,
+then scopes Gradle to its serial. The instrumentation also checks the expected
+page size in every case. No failing test is retried. Preparation retries apply
+only to SDK downloads. This new job's first remote execution remains pending;
+the local Windows ps16k emulator did not reach ADB and is not counted as passing.
+See [native acceptance limits](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
+
 ```sh
 python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
 bash -n scripts/ci/install_emulator_sdk.sh

@@ -441,9 +441,17 @@ class GalleryPagerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryPagerItemViewHolder {
         return when (viewType) {
             ItemType.IMAGE.value -> GalleryImageViewHolder(ImagePage(parent.context, viewModel))
-            ItemType.GIF.value -> GalleryGifViewHolder(GifPage(parent.context, viewModel))
+            ItemType.GIF.value -> {
+                val page = GifPage(parent.context, viewModel)
+                gifPages.add(page)
+                GalleryGifViewHolder(page)
+            }
             ItemType.VIDEO.value -> GalleryVideoViewHolder(VideoPage(parent.context, viewModel, player))
-            ItemType.PDF.value -> GalleryPdfViewHolder(PdfPage(parent.context, viewModel))
+            ItemType.PDF.value -> {
+                val page = PdfPage(parent.context, viewModel)
+                pdfPages.add(page)
+                GalleryPdfViewHolder(page)
+            }
             ItemType.FLASH.value -> {
                 val page = FlashPage(parent.context, viewModel)
                 flashPages.add(page)
@@ -487,9 +495,15 @@ class GalleryPagerAdapter(
     fun destroy() {
         flashPages.forEach(FlashPage::release)
         flashPages.clear()
+        pdfPages.forEach(PdfPage::release)
+        pdfPages.clear()
+        gifPages.forEach(GifPage::release)
+        gifPages.clear()
     }
 
     private val flashPages = Collections.newSetFromMap(WeakHashMap<FlashPage, Boolean>())
+    private val pdfPages = Collections.newSetFromMap(WeakHashMap<PdfPage, Boolean>())
+    private val gifPages = Collections.newSetFromMap(WeakHashMap<GifPage, Boolean>())
 
 }
 

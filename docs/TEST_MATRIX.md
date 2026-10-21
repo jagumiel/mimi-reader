@@ -8,6 +8,7 @@ Mimi Reader keeps `minSdk 23`, but the supported release baseline is exercised o
 | 12 | 31 | Regression target for startup, exported components, notifications, tabs, and the Motorola Edge 20. |
 | 14 | 34 | Modern permissions, foreground work, system bars, and activity restoration. |
 | 16 | 36 | Current compile/target SDK behaviour and forward compatibility. |
+| 16, 16 KB | 36, `google_apis_ps16k` | Separate native PDF/GIF fixture job; actual page size asserted, backcompat disabled. |
 
 The suite covers startup routing, tab and activity restoration, back navigation, Room and preference migrations, cache clearing, gallery playback and autoplay, MP4 decoding, and persistent WorkManager downloads.
 
@@ -93,6 +94,25 @@ Native 16 KB acceptance is a separate outstanding requirement. The Edge 20
 reports `PAGE_SIZE=4096`; neither its successful rendering tests nor an API 36
 label alone verifies 16 KB behaviour. PDF/GIF binary audit findings and required
 follow-up are in [DEPENDENCIES.md](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
+
+On 21 October, the PDF/GIF native replacement added six mandatory local cases:
+actual two-page colour rendering, scrolling/zoom, pause/detach/reselection release,
+activity + ViewModel/Bundle restoration, malformed/password errors and retry,
+stale-load cancellation, GIF loops/pause/resume/recycling, and bounded viewport
+state. Five initial native cases passed separately; the final complete suite
+then passed on the Edge 20 / Android 12: **49 cases, 46 passed, three expected
+opt-in skips, zero failures/errors**. Stay-awake was restored to 0. No public
+posts or user-data clearing were involved. The obsolete PDF layout/binding is no
+longer used; the production gallery creates PDF pages directly.
+
+The same six native cases run in the dedicated ps16k job with
+`expectedPageSize=16384`, checked via `sysconf` before each case. Its launcher
+also requires a matching API 36 emulator and disables/verifies both backcompat
+properties. A 4 KB phone/emulator cannot substitute for that job. The local
+Windows ps16k AVD did not reach ADB, so actual 16 KB acceptance and this commit's
+remote six-job run remain pending. Physical 32-bit Android 10 media/CAPTCHA
+acceptance also remains pending; retaining packaged ARM/x86 ABI files is not a
+claim that a physical 32-bit runtime has been tested in this block.
 
 ## Local device validation
 

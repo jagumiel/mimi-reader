@@ -35,5 +35,12 @@
 -keepclasseswithmembernames class * {
     native <methods>;
 }
--keep public class pl.droidsonroids.gif.GifIOException { <init>(int); }
--keep class pl.droidsonroids.gif.GifInfoHandle { <init>(long,int,int,int); }
+
+# Pdfium JNI resolves these names/constructors directly (not visible in Java call graphs).
+-keep class com.shockwave.pdfium.PdfPasswordException {
+    public <init>();
+    public <init>(java.lang.String);
+}
+-keep class com.shockwave.pdfium.util.Size {
+    public <init>(int, int);
+}
