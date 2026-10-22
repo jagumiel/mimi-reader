@@ -28,7 +28,6 @@ import com.emogoth.android.phone.mimi.util.MimiUtil
 import com.emogoth.android.phone.mimi.util.RxUtil
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs
 import io.reactivex.disposables.Disposable
 import java.io.File
 
@@ -156,14 +155,7 @@ class PostItemDetailActivity : MimiActivity(), View.OnClickListener, SharedPrefe
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {}
-    override fun onResume() {
-        super.onResume()
-        SimpleChromeCustomTabs.getInstance().connectTo(this)
-        //        setNavigationIconWithBadge(0, ThreadRegistry.getInstance().getUnreadCount());
-    }
-
     override fun onPause() {
-        SimpleChromeCustomTabs.getInstance().disconnectFrom(this)
         super.onPause()
         RxUtil.safeUnsubscribe(fetchHistorySubscription)
     }

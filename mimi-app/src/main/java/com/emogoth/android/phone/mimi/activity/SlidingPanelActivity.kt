@@ -21,7 +21,6 @@ import com.emogoth.android.phone.mimi.util.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mimireader.chanlib.models.ChanBoard
 import com.mimireader.chanlib.models.ChanPost
-import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs
 
 class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClickListener, ThumbnailClickListener, GalleryMenuItemClickListener, IToolbarContainer {
     private var listType = BOARD_LIST_ID
@@ -187,16 +186,6 @@ class SlidingPanelActivity : MimiActivity(), BoardItemClickListener, View.OnClic
         } else if (addContentFab?.isShown == false && visible) {
             addContentFab?.show()
         }
-    }
-
-    override fun onPause() {
-        SimpleChromeCustomTabs.getInstance().disconnectFrom(this)
-        super.onPause()
-    }
-
-    override fun onResume() {
-        SimpleChromeCustomTabs.getInstance().connectTo(this)
-        super.onResume()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

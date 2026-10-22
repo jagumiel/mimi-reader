@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextPaint;
@@ -32,11 +31,8 @@ import android.widget.Toast;
 import com.emogoth.android.phone.mimi.R;
 import com.emogoth.android.phone.mimi.activity.MimiActivity;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
+import com.emogoth.android.phone.mimi.util.BrowserNavigator;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs;
-import com.novoda.simplechromecustomtabs.navigation.IntentCustomizer;
-import com.novoda.simplechromecustomtabs.navigation.NavigationFallback;
-import com.novoda.simplechromecustomtabs.navigation.SimpleChromeCustomTabsIntentBuilder;
 
 
 public class LinkSpan extends LongClickableSpan {
@@ -97,35 +93,14 @@ public class LinkSpan extends LongClickableSpan {
     }
 
     private void openLink(final Context context, boolean inCustomTab) {
-        if (context instanceof MimiActivity && inCustomTab) {
-            final MimiActivity activity = (MimiActivity) context;
-            Uri url = Uri.parse(link);
-            NavigationFallback fallback = new NavigationFallback() {
-                @Override
-                public void onFallbackNavigateTo(Uri uri) {
-                    Intent browselink = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-                    context.startActivity(browselink);
-                }
-            };
-
-            IntentCustomizer customizer = new IntentCustomizer() {
-                @Override
-                public SimpleChromeCustomTabsIntentBuilder onCustomiseIntent(SimpleChromeCustomTabsIntentBuilder simpleChromeCustomTabsIntentBuilder) {
-                    if (activity.getToolbar() != null) {
-                        int color = ((ColorDrawable) activity.getToolbar().getBackground()).getColor();
-                        simpleChromeCustomTabsIntentBuilder.withToolbarColor(color);
-                    }
-                    return simpleChromeCustomTabsIntentBuilder;
-                }
-            };
-
-            SimpleChromeCustomTabs.getInstance().withFallback(fallback)
-                    .withIntentCustomizer(customizer)
-                    .navigateTo(url, activity);
-        } else {
-            Intent browselink = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-            context.startActivity(browselink);
+        Integer toolbarColor = null;
+        if (context instanceof MimiActivity) {
+            MimiActivity activity = (MimiActivity) context;
+            if (activity.getToolbar() != null && activity.getToolbar().getBackground() instanceof ColorDrawable) {
+                toolbarColor = ((ColorDrawable) activity.getToolbar().getBackground()).getColor();
+            }
         }
+        BrowserNavigator.open(context, link, inCustomTab, toolbarColor);
     }
 
     private void shareLink(Context context) {

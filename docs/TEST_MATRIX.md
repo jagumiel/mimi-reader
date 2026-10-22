@@ -90,7 +90,8 @@ phone's original stay-awake setting (0) was restored. The filter fixture never
 saves filters or changes theme preferences; no public messages were posted.
 This library change still requires its own remote matrix after pushing the commit.
 
-Native 16 KB acceptance is a separate outstanding requirement. The Edge 20
+Native 16 KB acceptance is a separate requirement, now confirmed remotely in
+run 27 for `fed11d2` (see below). The Edge 20
 reports `PAGE_SIZE=4096`; neither its successful rendering tests nor an API 36
 label alone verifies 16 KB behaviour. PDF/GIF binary audit findings and required
 follow-up are in [DEPENDENCIES.md](DEPENDENCIES.md#native-audit-a-separate-pre-release-requirement).
@@ -109,8 +110,8 @@ The same six native cases run in the dedicated ps16k job with
 `expectedPageSize=16384`, checked via `sysconf` before each case. Its launcher
 also requires a matching API 36 emulator and disables/verifies both backcompat
 properties. A 4 KB phone/emulator cannot substitute for that job. The local
-Windows ps16k AVD did not reach ADB, so actual 16 KB acceptance and this commit's
-remote six-job run remain pending. Physical 32-bit Android 10 media/CAPTCHA
+Windows ps16k AVD did not reach ADB; run 27 instead supplies remote actual-16-KB
+evidence after the fixture corrections below. Physical 32-bit Android 10 media/CAPTCHA
 acceptance also remains pending; retaining packaged ARM/x86 ABI files is not a
 claim that a physical 32-bit runtime has been tested in this block.
 
@@ -128,6 +129,26 @@ After the correction, the complete Edge 20 / Android 12 suite passed again:
 including all six stricter native cases and cache-cleaner preservation checks.
 The temporary stay-awake change was restored to 0. No real posting was performed;
 actual 16 KB and cold-install acceptance still require the remote rerun.
+
+That rerun is now confirmed: [run 27](https://github.com/jagumiel/mimi-reader/actions/runs/39669781921)
+passed all six jobs for `fed11d2`, including six actual-16-KB native cases without
+backcompat and the full ordinary API matrix. Physical 32-bit Android 10 and live
+CAPTCHA acceptance remain separate release checks.
+
+The ninth cleanup adds five intercepted-intent browser cases for the Novoda
+replacement: Custom Tab extras/toolbar colour/URL preservation, LinkSpan's real
+preference dispatch and style, external/non-web handling, fallback/missing
+handlers and Activity/wrapped-context task flags. They do not open real browsers,
+fetch URLs or change preferences. The suite has 54 cases with three opt-in skips;
+the six-case native job is unchanged. All five new cases passed separately on
+the Edge 20 / Android 12; this cleanup requires its own remote six-job result.
+
+On 22 October, the full ninth-block suite passed on that Edge 20: 54 cases,
+51 passed, three existing opt-in skips and zero failures/errors. All five new
+browser cases and all six native cases passed. The phone's stay-awake setting
+was restored to 0; no real browser navigation or public posting was triggered
+by the new fixtures. Remote Android 10/12/14/16 plus ps16k acceptance for the
+new cleanup commit remains pending.
 
 ## Local device validation
 

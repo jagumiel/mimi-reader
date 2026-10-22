@@ -34,7 +34,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 import com.mimireader.chanlib.models.ChanBoard
 import com.mimireader.chanlib.models.ChanPost
-import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs
 import io.reactivex.disposables.Disposable
 import java.util.*
 
@@ -158,7 +157,6 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
     override fun onResume() {
         super.onResume()
         startDatabaseObserver()
-        SimpleChromeCustomTabs.getInstance().connectTo(this)
         if (currentFragment != null) {
             setFabVisibility(currentFragment?.showFab() ?: false)
         }
@@ -166,7 +164,6 @@ class TabsActivity : MimiActivity(), BoardItemClickListener, View.OnClickListene
 
     override fun onPause() {
         RxUtil.safeUnsubscribe(historyObserver)
-        SimpleChromeCustomTabs.getInstance().disconnectFrom(this)
         super.onPause()
     }
 

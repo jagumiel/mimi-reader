@@ -9,11 +9,12 @@ without changing the selected component set or versions.
 The seventh updates GridLayout alone and records the native-library release risk.
 
 The eighth block replaces PDF/GIF native artifacts and adds strict alignment/runtime checks.
+The ninth removes the Novoda browser adapter in favour of the existing AndroidX Browser API.
 
-The canonical release SBOM has **151 top-level components**: 149 Maven components,
+The canonical release SBOM has **150 top-level components**: 148 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **77 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 77 distinct libraries.
+files. The inventory records **76 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 76 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -575,19 +576,82 @@ changes. These are size observations, not startup/performance measurements.
 Dedicated lint passed with zero errors, 1,012 warnings, one hint
 and 484 `UnusedResources` findings, without a new baseline or suppression.
 
-**Runtime 16 KB remains unconfirmed until the new CI job passes.** A local
+**Runtime 16 KB is confirmed by green run 27 for `fed11d2`.** All six native
+cases passed with `PAGE_SIZE=16384` and backcompat disabled. A local
 API 36 ps16k image/AVD was installed, but Windows emulator 37.1.11 with AEHD 2.2
 did not reach ADB (one launch exited, another stalled); only this task's emulator
 processes were stopped. No local 16 KB runtime success is claimed. Do not use the
 old five-job run 24 as evidence for this new six-job commit. Keep the release gate,
-physical Android 10 checks, CVE scanning and the owner-approved changelog pending.
+physical Android 10 checks, CVE scanning and the owner-approved changelog pending;
+each new cleanup must pass the six-job workflow again.
 
-Run 26 subsequently passed the build/release/native guards and reached a real
+Run 26 initially passed the build/release/native guards and reached a real
 16 KB emulator, with four of six native cases passing. Two fixture issues
 (zoom/position call order and startup cache cleanup deleting a test PDF) prevented
 full acceptance. [CI diagnosis and fixture corrections](CI.md#run-26-native-pdf-fixture-isolation-and-viewport-positioning)
 record the evidence; they do not change production code, dependency versions,
 ABI coverage or the requirement for a green six-job workflow.
+
+## Ninth cleanup: replace the Novoda browser adapter
+
+Remove `com.github.novoda:simple-chrome-custom-tabs:0.1.6`. Its only navigation
+consumer was `LinkSpan`; the application initialized a global instance and
+TabsActivity, SlidingPanelActivity and PostItemDetailActivity connected and
+disconnected its browser service. Replace that with a stateless first-party
+`BrowserNavigator` using the already-declared/resolved `androidx.browser:browser:1.2.0`.
+Do not update Browser or unrelated AndroidX libraries in this bounded removal.
+The [AndroidX CustomTabsIntent API](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent)
+builds a regular view intent carrying the Custom Tab extras; no application-wide
+service binding or installed-package query is needed for this navigation path.
+
+Preserve LinkSpan's external-opening preference, underline/link colour and long
+press open/share/copy menu. Copy the toolbar colour when its background is a
+ColorDrawable, without the old unsafe cast. Keep HTTP(S) URLs intact and let
+non-web schemes use their normal ACTION_VIEW handler. A missing/blocked custom
+tab falls back to a fresh ordinary view intent; if neither starts, show the
+existing opening-error message rather than crash. Activity-backed contexts,
+including wrappers, keep the existing task; application contexts get NEW_TASK.
+No activity/session is stored and browser warm-up is no longer requested.
+
+Five mandatory `BrowserNavigatorTest` cases intercept all outgoing intents:
+AndroidX extras/colour/URL, actual LinkSpan preference dispatch and styling,
+non-web/external modes, missing/blocked-handler recovery, and Activity/wrapped
+context flags. Preference overrides exist only in the recording test context;
+the user's stored preference is checked unchanged. No real browser is opened,
+no test URL is fetched and no public message is posted by these cases. The five
+cases passed separately on the Edge 20 / Android 12; real browser-provider UI
+acceptance is distinct from this intercepted-intent coverage.
+
+Regenerated snapshots lose exactly Novoda: **151 -> 150 components** and
+**77 -> 76 declarations**. Every retained component record (version, Package URL,
+hashes and metadata) matches the preceding snapshot, including Ruffle and all
+native artifacts. Runtime relationships lose the Novoda node/edge; no global
+exclusion or substitute dependency is added. Keep fast-scroller for the next
+separate review, physical Android 10 acceptance as a release gate, and CVE
+scanning/changelog/README sequencing unchanged.
+
+### Ninth-block validation (22 October 2026)
+
+- Five new cases passed separately, then the complete Edge 20 / Android 12 suite
+  passed: **54 cases, 51 passed, three existing opt-in skips**, no failures/errors.
+  The original stay-awake setting (0) was restored. Provider UI/real browser
+  hand-off is not claimed by the intercepted-intent tests.
+- 96 app unit tests, eight chanlib unit tests and 40 CI-helper tests passed.
+  Debug/test APK compilation, variant-ID contract and actionlint also passed.
+- Debug lint: zero errors, 1,012 warnings, one hint and 484 UnusedResources
+  findings, with no new baseline or suppression. Release APK/AAB and vital lint
+  passed with R8 and no new keep/dontwarn rules.
+- SBOM freshness and six malformed-document/hash/canonical-output checks passed.
+  Compared every retained component record and every retained dependency edge
+  against the preceding snapshot: only Novoda's node/edge disappears.
+- Both APKs passed the 24-library/four-ABI native ELF/ZIP guard. Release JNI seeds
+  and SDK `zipalign -c -P 16 4` passed. Native binaries are unchanged; this does
+  not replace the new commit's six-job remote run.
+- Local release APK size is unchanged at **40,797,669 bytes**; the AAB changed
+  from **30,629,989 to 30,623,925 bytes**. Padding/resource shrinkage can obscure
+  small removals in APK size. These are artifact observations, not a startup or
+  browser-performance benchmark. Release identity/version/minSdk/target remain
+  `com.emogoth.android.phone.mimi`, 230 / 7.0.1, 23 and 36 respectively.
 
 ## Remaining legacy-file review
 
@@ -618,12 +682,13 @@ only the method and leave a live caller behind. This block does not change that 
    checks. On Android 12, human resolution and one separately authorized text
    reply succeeded; do not repeat public submissions for automated regression.
    [Posting contracts and validation limits](POSTING.md) record that scope.
-3. The preceding cleanup blocks through GridLayout are confirmed by green runs
-   22–24. Confirm this native-media commit's **six** jobs, especially actual 16 KB
-   execution without backcompat, after pushing it.
-4. Complete physical Android 10/32-bit media acceptance, then continue remaining
-   legacy adapter/resource reviews in bounded groups. Keep embedded native source
-   revision/security provenance distinct from wrapper Maven versions.
+3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
+   for `fed11d2`, including six native cases on actual 16 KB pages without
+   backcompat. Every subsequent cleanup needs its own green six-job workflow.
+4. Novoda is replaced in the ninth block; review the still-used fast-scroller
+   next, separately. Physical Android 10/32-bit media and CAPTCHA acceptance
+   remains required before release. Keep embedded native source revision/security
+   provenance distinct from wrapper Maven versions.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
    time-limited exceptions. Do not treat the scanner as the automatic next task

@@ -75,12 +75,19 @@ does not imply a binary update or a CVE scan.
 
 On 21 October the eighth cleanup replaces the two PDF artifacts with the oothp
 Maven Central fork/Pdfium and updates GIF to 1.2.32 and its ReLinker dependency.
-The snapshots now contain **151 components / 77 declarations**: seven legacy
+Those snapshots contained **151 components / 77 declarations**: seven legacy
 components become unreachable without global exclusions. Ruffle and unrelated
 retained components are unchanged. Native binaries are covered by their AAR
 artifact hashes as before; this does not establish the embedded PDFium/GIFLib
 source revision or absence of CVEs. Separate ELF/ZIP reports and actual 16 KB
 runtime tests are documented in [the dependency audit](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
+
+On 22 October the ninth cleanup removes Novoda's Custom Tabs adapter, using the
+already-resolved AndroidX Browser API directly. The current snapshots contain
+**150 components / 76 declarations**. Only Novoda disappears; every retained
+component record and all Ruffle file hashes remain unchanged. Its node/root
+edge is removed without version changes, new dependencies or global exclusions.
+See [browser cleanup evidence](DEPENDENCIES.md#ninth-cleanup-replace-the-novoda-browser-adapter).
 
 After a deliberate dependency or vendored runtime update:
 

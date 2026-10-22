@@ -3980,41 +3980,6 @@
             "version": "3.0.1"
         },
         {
-            "bom-ref": "pkg:maven/com.github.novoda/simple-chrome-custom-tabs@0.1.6?type=aar",
-            "description": "Easy integration of Chrome Custom Tabs into your project. Just connect it to your activity, and navigate to the external website styling your tab as you wish.",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "git://github.com/novoda/simple-chrome-custom-tabs.git"
-                }
-            ],
-            "group": "com.github.novoda",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "ebb910d149fc6e348a92894bedaece7ad8c5d6dfcda7607be70c1ae4f5ecebff"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "name": "Other"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "simple-chrome-custom-tabs",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/com.github.novoda/simple-chrome-custom-tabs@0.1.6?type=aar",
-            "type": "library",
-            "version": "0.1.6"
-        },
-        {
             "bom-ref": "pkg:maven/com.google.android.material/material@1.2.1?type=aar",
             "description": "Material Components for Android is a static library that you can add to your Android application in order to use APIs that provide implementations of the Material Design specification. Compatible on devices running API 14 or later.",
             "externalReferences": [
@@ -5335,7 +5300,6 @@
                 "pkg:maven/com.github.bumptech.glide/okhttp3-integration@4.11.0?type=aar",
                 "pkg:maven/com.github.franmontiel/PersistentCookieJar@1.0.1?type=aar",
                 "pkg:maven/com.github.martin-stone/hsv-alpha-color-picker-android@3.0.1?type=aar",
-                "pkg:maven/com.github.novoda/simple-chrome-custom-tabs@0.1.6?type=aar",
                 "pkg:maven/com.google.android.material/material@1.2.1?type=aar",
                 "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar",
                 "pkg:maven/com.quiph.ui/recyclerviewfastscroller@0.2.3?type=aar",
@@ -5988,13 +5952,6 @@
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom"
             ],
             "ref": "pkg:maven/com.github.bumptech.glide/gifdecoder@4.11.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar",
-                "pkg:maven/androidx.browser/browser@1.2.0?type=aar"
-            ],
-            "ref": "pkg:maven/com.github.novoda/simple-chrome-custom-tabs@0.1.6?type=aar"
         },
         {
             "dependsOn": [

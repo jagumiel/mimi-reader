@@ -13,7 +13,6 @@ import com.emogoth.android.phone.mimi.db.DatabaseUtils.applySingleSchedulers
 import com.emogoth.android.phone.mimi.db.HiddenThreadTableConnection
 import com.emogoth.android.phone.mimi.db.UserPostTableConnection
 import com.emogoth.android.phone.mimi.util.MimiUtil
-import com.novoda.simplechromecustomtabs.SimpleChromeCustomTabs
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import java.io.IOException
@@ -58,7 +57,6 @@ open class MimiApplication : Application() {
                     }
                 }) { throwable: Throwable? -> Log.e(LOG_TAG, "Caught exception while setting up database", throwable) }
 
-        SimpleChromeCustomTabs.initialize(this)
     }
 
     private fun createLifecycleListener() {

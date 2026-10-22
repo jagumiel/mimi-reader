@@ -186,7 +186,6 @@ dependencies {
     implementation "org.jsoup:jsoup:$jsoup_version"
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.32'
-    implementation 'com.github.novoda:simple-chrome-custom-tabs:0.1.6'
     def media3_version = "1.10.1"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"

@@ -283,11 +283,6 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "com.google.android.material:material:1.2.1"
         },
         {
@@ -1235,10 +1230,6 @@
             },
             {
                 "direct": true,
-                "id": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
-            },
-            {
-                "direct": true,
                 "id": "com.google.android.material:material:1.2.1"
             },
             {
@@ -1984,10 +1975,6 @@
             {
                 "direct": true,
                 "id": "com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1"
-            },
-            {
-                "direct": true,
-                "id": "com.github.novoda:simple-chrome-custom-tabs:0.1.6"
             },
             {
                 "direct": true,

@@ -92,6 +92,32 @@ release JNI seeds, SDK zipalign and actionlint. The phone's original stay-awake
 setting (0) was restored. This already-installed Android 12 phone is not a local
 cold-install or 16 KB emulator validation; those remote gates remain pending.
 
+## Run 27 confirmed; ninth cleanup browser navigation
+
+[Run 27 for `fed11d2`](https://github.com/jagumiel/mimi-reader/actions/runs/39669781921)
+passed **all six jobs**. Besides build/unit/lint/SBOM/release and the ordinary
+Android 10/12/14/16 matrix, the native artifact contains `PAGE_SIZE=16384`,
+`backcompat=false` and JUnit results for six tests with zero failures/errors/skips.
+This closes the fixture corrections and the eighth block's actual 16 KB runtime
+gate. It does not validate a physical 32-bit Android 10 phone or future commits.
+
+The ninth cleanup removes Novoda's wrapper and uses AndroidX Browser directly.
+Five new mandatory offline `BrowserNavigatorTest` cases cover intent extras,
+toolbar colour, LinkSpan preference dispatch/styling, non-web/external modes,
+missing/blocked handlers and Activity/context-wrapper flags. All outgoing intents
+are captured: no browser UI or public URL is opened, and no stored preference is
+changed. The suite becomes **54 cases**, with the same three opt-in skips; the
+separate actual-16-KB job retains its six native tests. This new commit still
+requires its own complete remote workflow.
+
+Local ninth-block acceptance passed on the Edge 20 / Android 12: five isolated
+navigation cases and the complete 54-case suite (51 passed, three existing
+opt-in skips, no failures/errors). Also passed 104 app/library unit tests,
+40 CI-helper tests, lint without errors, variant IDs, SBOM freshness/negative
+checks, debug/test APK and minified release APK/AAB builds, native ELF/ZIP/JNI
+guards, SDK zipalign and actionlint. The original phone stay-awake setting (0)
+was restored. These results do not pre-approve this new commit's remote matrix.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),
@@ -278,8 +304,8 @@ only that disposable emulator, disables/verifies both native backcompat switches
 then scopes Gradle to its serial. The instrumentation also checks the expected
 page size in every case. No failing test is retried. Preparation retries apply
 only to SDK downloads. Its first remote execution in run 26 reached actual
-16 KB pages but failed the fixture cases described above; a fully passing job
-is still pending. The local Windows ps16k emulator did not reach ADB and is not
+16 KB pages but failed the fixture cases described above; run 27 subsequently
+passed all six native cases. The local Windows ps16k emulator did not reach ADB and is not
 counted as passing.
 See [native acceptance limits](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
 
