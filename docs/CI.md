@@ -215,6 +215,33 @@ ELF/ZIP/JNI guards, SDK 16 KB zipalign and actionlint. The original phone
 stay-awake setting (0) is restored. Remote acceptance for this new commit remains
 pending; the green run 30 does not pre-approve its successor.
 
+## Run 32 confirmed; thirteenth cleanup filter-row PercentLayout removal
+
+[Run 32 for `2cfa199`](https://github.com/jagumiel/mimi-reader/actions/runs/39841661911)
+passed all six jobs, confirming the Glide cleanup's build/unit/lint/SBOM/release,
+ordinary Android 10/12/14/16 matrix and actual native 16 KB execution.
+
+The thirteenth block removes PercentLayout after replacing its only row layout
+with platform equal weights. Three mandatory offline `FilterListLayoutTest`
+cases cover LTR/RTL bounds, relative padding/alignment, three themes, two widths
+(including an odd physical pixel), two font scales, colours/typography/long text
+and in-memory adapter replacement/removal/rebinding. No user filter is changed,
+dialog opened, or production adapter callback replaced by a test stub.
+All three cases pass separately on the Edge 20 / Android 12.
+
+The ordinary matrix becomes **68 cases**, with three unchanged opt-in skips;
+ps16k remains six native cases. Snapshots contain 152 components / 75 declarations,
+with only PercentLayout removed. No skip/retry/timeout relaxation is added; this
+commit still needs its own complete six-job remote acceptance.
+
+Final local thirteenth-block acceptance passes: **68 Edge 20 / Android 12 cases,
+65 passed, three expected opt-in skips, zero failures/errors**. Also pass 102 app
+and eight library unit tests, 40 CI-helper tests, lint with zero errors, variant
+IDs, SBOM freshness/negative checks, debug/test and minified release APK/AAB
+builds, native ELF/ZIP/JNI guards, SDK 16 KB zipalign and actionlint. The release
+mapping contains no PercentLayout classes. The original phone stay-awake setting
+(0) is restored. The new commit's complete remote workflow remains pending.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

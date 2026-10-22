@@ -188,11 +188,6 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.percentlayout:percentlayout:1.0.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "androidx.preference:preference-ktx:1.2.1"
         },
         {
@@ -1162,10 +1157,6 @@
             },
             {
                 "direct": true,
-                "id": "androidx.percentlayout:percentlayout:1.0.0"
-            },
-            {
-                "direct": true,
                 "id": "androidx.preference:preference-ktx:1.2.1"
             },
             {
@@ -1923,10 +1914,6 @@
             {
                 "direct": true,
                 "id": "androidx.media3:media3-ui:1.10.1"
-            },
-            {
-                "direct": true,
-                "id": "androidx.percentlayout:percentlayout:1.0.0"
             },
             {
                 "direct": true,

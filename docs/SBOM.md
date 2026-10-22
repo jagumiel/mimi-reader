@@ -114,6 +114,13 @@ See [compatibility selection and image/cache tests](DEPENDENCIES.md#twelfth-clea
 Do not confuse Glide's Java GIF decoder with the application's separate native
 GIF player, or this inventory refresh with a CVE scan.
 
+The thirteenth cleanup removes the sole PercentLayout consumer and its direct
+declaration. Current totals are **152 components / 75 declarations**. Only the
+PercentLayout component/node/root edge is removed; every retained component
+record and every retained edge outside that node is unchanged, including Ruffle
+and native media. See [the filter-row replacement and validation](DEPENDENCIES.md#thirteenth-cleanup-remove-percentlayout-from-filter-rows).
+No replacement dependency, version drift or global exclusion is introduced.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

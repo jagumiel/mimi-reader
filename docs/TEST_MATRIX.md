@@ -234,6 +234,33 @@ including the six native cases and cache reuse after cache clearing. Unit/CI
 helper tests, lint, SBOM, release APK/AAB and native guards pass; stay-awake is
 restored to 0. No production settings behaviour or CI skip/retry policy is changed.
 
+## Thirteenth cleanup: filter-row layout acceptance
+
+Run 32 (`2cfa199`) confirms the preceding Glide block across all six jobs.
+Three new mandatory `FilterListLayoutTest` cases bring the ordinary matrix to
+**68 cases**, with the same three opt-in skips. The actual-16-KB job stays at six.
+
+Use the real adapter and in-memory filters: LTR and RTL rows in light/dark/black
+themes, font scales 1.0/1.3, 320dp / 480dp-plus-one-pixel widths, equal columns
+without overflow, preserved height, padding/alignment, colours and SP typography,
+and unchanged full underlying long text. Replacement/removal/rebinding must keep
+adapter notifications and click handlers. Do not open dialogs, mutate real
+filters or claim that an actual swipe-to-delete/database edit was exercised.
+
+The old layout reproduced child overflow in RTL after fixing the fixture's
+missing LayoutManager. Allow expected nearest-pixel XML text-size rounding,
+not a font-size change. All three new cases pass separately on the Edge 20 /
+Android 12 with the platform weighted row. New remote six-job acceptance and
+physical/human release gates remain pending for the new commit.
+
+Final thirteenth-block acceptance passes on the Edge 20 / Android 12 on
+22 October: **68 cases, 65 passed, three existing opt-in skips**, zero failures/
+errors, including all three new cases and the six native cases. Also pass
+102 app + eight library unit tests, 40 CI-helper tests, lint without errors,
+SBOM, minified release APK/AAB and static native checks. The phone stay-awake
+setting is restored to 0. This does not pre-approve the new commit's remote
+matrix or replace physical/human acceptance.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

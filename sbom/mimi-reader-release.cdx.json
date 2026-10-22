@@ -2421,41 +2421,6 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.percentlayout/percentlayout@1.0.0?type=aar",
-            "description": "Android Percent Support Library",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "http://source.android.com"
-                }
-            ],
-            "group": "androidx.percentlayout",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "86fed7a3c77580df78d153d6e8c63079b2b9d3414e81a2654200022bab5413d0"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "percentlayout",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.percentlayout/percentlayout@1.0.0?type=aar",
-            "type": "library",
-            "version": "1.0.0"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
             "description": "Kotlin extensions for preferences",
             "externalReferences": [
@@ -5386,7 +5351,6 @@
                 "pkg:maven/androidx.lifecycle/lifecycle-viewmodel@2.11.0?type=aar",
                 "pkg:maven/androidx.media3/media3-exoplayer@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-ui@1.10.1?type=aar",
-                "pkg:maven/androidx.percentlayout/percentlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
                 "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
@@ -6223,12 +6187,6 @@
                 "pkg:maven/io.github.oothp/pdfium-android@1.9.5-beta01?type=aar"
             ],
             "ref": "pkg:maven/io.github.oothp/android-pdf-viewer@3.2.0-beta06?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.core/core@1.18.0?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.percentlayout/percentlayout@1.0.0?type=aar"
         },
         {
             "dependsOn": [

@@ -13,11 +13,12 @@ The ninth removes the Novoda browser adapter in favour of the existing AndroidX 
 The tenth replaces the archived Quiph fast-scroller and adapts scrolling to variable-height posts.
 The eleventh updates Material Components and its required ConstraintLayout baseline without changing themes.
 The twelfth updates Glide and removes first-party use of its deprecated generated API.
+The thirteenth replaces PercentLayout's sole consumer with a platform weighted row.
 
-The canonical release SBOM has **153 top-level components**: 151 Maven components,
+The canonical release SBOM has **152 top-level components**: 150 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **76 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 76 distinct libraries.
+files. The inventory records **75 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 75 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -74,7 +75,7 @@ under the third block. New cleanup changes still require their own matrix run.
 | AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
 | PDF / GIF | The eighth block replaces the PDF fork with `io.github.oothp:android-pdf-viewer:3.2.0-beta06` / Pdfium 1.9.5-beta01, and updates GIF to 1.2.32. | Local rendering and ELF/ZIP checks pass; confirm the dedicated 16 KB runtime CI job before release. These are wrapper/artifact versions, not a complete audit of embedded PDFium/GIFLib security. |
-| UI libraries | Preference is **1.2.1**, Material **1.14.0**, ConstraintLayout **2.2.1** and Glide **5.0.7**. Browser 1.2.0 and PercentLayout 1.0.0 still have consumers. | Continue bounded legacy layout/link review. Confirm Android 10/12 compatibility for each replacement; retaining MaterialComponents themes is not a Material 3 redesign. |
+| UI libraries | Preference is **1.2.1**, Material **1.14.0**, ConstraintLayout **2.2.1** and Glide **5.0.7**. PercentLayout is removed; Browser 1.2.0 still has consumers. | Continue bounded settings/link review. Confirm Android 10/12 compatibility for each replacement; retaining MaterialComponents themes is not a Material 3 redesign. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.22 (selected through Material's metadata). | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
 
@@ -941,6 +942,75 @@ cases then passed together in a separate seven-case run, without skips.
   complete remote six-job matrix, including actual 16 KB native execution;
   physical Android 10/32-bit and human-interaction release gates remain pending.
 
+## Thirteenth cleanup: remove PercentLayout from filter rows
+
+On 22 October 2026, replace the sole `androidx.percentlayout:percentlayout:1.0.0`
+consumer, `filter_list_item.xml`, with a platform horizontal LinearLayout whose
+two 0dp children have equal weights. The [Android reference](https://developer.android.com/reference/androidx/percentlayout/widget/PercentRelativeLayout)
+marks PercentRelativeLayout deprecated; this simple two-column row does not need
+another layout dependency. Keep minSdk 23 and compile/target 36.
+
+Source/layout/manifest/R8/binding checks found no other PercentLayout consumers.
+`FilterListAdapter` inflates the row by resource ID without casting its root;
+`EditFiltersActivity` uses the existing holder and swipe-removal path. Preserve
+the row's IDs, match-parent width, 48dp height, primary/secondary themed colours,
+16sp bold name and 14sp expression. Use start/end padding and start gravity so
+column order, padding and text alignment mirror in RTL rather than positioning
+the expression absolutely to the name's right. Do not change wrapping/ellipsis,
+stored filters, Room schemas, adapter mutations or dialog callbacks.
+
+Three mandatory offline `FilterListLayoutTest` cases inflate and bind the real
+adapter using in-memory models, without opening/saving dialogs or touching user
+filters. They check LTR and RTL geometry in three themes, font scales 1.0/1.3,
+320dp and 480dp-plus-one-pixel widths: equal columns within one pixel, exact
+combined width, no child overflow, height/layout params, relative padding/start
+alignment, colours, typography and full underlying long text. A third case checks
+replacement/removal/rebinding, adapter notifications and attached click handlers.
+It does not claim to exercise a real deletion gesture or a database-backed edit.
+
+After correcting the fixture's missing RecyclerView LayoutManager, the old row
+reproduced RTL child overflow; its in-memory adapter case passed. The initial
+typography assertion also exposed expected XML dimension rounding (45.5 → 46px),
+not an app font defect: allow nearest-pixel rounding without changing SP sizes.
+All three corrected cases pass separately on the Edge 20 / Android 12 with the
+weighted row. The full ordinary suite becomes **68 cases**, still with the same
+three opt-in skips; the separate actual-16-KB job retains its six native cases.
+
+SBOM/inventory change from **153/76 to 152 components / 75 declarations**.
+Only PercentLayout and its node/root edge disappear; all retained component
+records and graph edges outside that node remain identical, including Ruffle's
+seven hashes and native media. No other dependency version, new dependency,
+global exclusion or R8 keep/dontwarn rule is introduced. Run 32 for `2cfa199`
+confirms all six jobs for the previous Glide cleanup; require a new complete
+remote workflow for this block. Keep physical Android 10/32-bit and human
+CAPTCHA/keyboard/browser acceptance pending, without starting CVE scanning,
+the owner-gated 8.0 changelog or the final README rewrite.
+
+### Thirteenth-block validation (22 October 2026)
+
+- All three scoped filter-row cases pass, followed by the complete Edge 20 /
+  Android 12 suite: **68 cases, 65 passed, three existing opt-in skips**, zero
+  failures/errors. The six native cases and existing Glide cache/settings tests
+  also pass. No real filters are edited or public posts made. The original
+  phone stay-awake setting was restored to **0**, confirmed after validation.
+- **102 app + eight chanlib unit tests**, **40 CI-helper tests**, actionlint,
+  variant-ID checks, debug/test APK compilation, SBOM freshness/six negative/
+  hash/canonical checks and minified release APK/AAB generation pass. The release
+  mapping has no PercentLayout class records; no new R8 rule is needed.
+- Lint passes with **zero errors, 1,013 warnings, one hint**, and 482
+  UnusedResources findings (previous block: 1,016 warnings / 482 unused).
+  No new fixture finding, suppression or baseline is introduced. Warnings remain
+  separate follow-up work, not a list of safe deletions.
+- Both APKs pass native ELF/ZIP checks (24 libraries, four ABIs); release JNI
+  seeds and SDK 16 KB zipalign pass. Keep package
+  `com.emogoth.android.phone.mimi`, version **230 / 7.0.1**, minSdk **23** and
+  target **36**. APK changes from **41,413,250 to 41,412,351 bytes**; AAB from
+  **31,154,281 to 31,150,815 bytes**. These small local size changes are not
+  measured startup, memory or rendering performance improvements.
+- Run 32 closes the preceding Glide block. This new cleanup still requires its
+  own complete remote six-job matrix, including actual 16 KB native execution;
+  the physical Android 10/32-bit and human-interaction gates remain pending.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -973,12 +1043,13 @@ only the method and leave a live caller behind. This block does not change that 
 3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
    for `fed11d2`, including six native cases on actual 16 KB pages without
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
-4. Runs 28–30 confirm all six jobs for the ninth/tenth/eleventh browser,
-   fast-scroll and Material cleanups. The twelfth updates Glide and its consumers;
-   require its own remote matrix next. Next remove PercentLayout from the filter
-   row after checking its real layout contract, with theme/width/RTL tests; then
-   review remaining UI/link dependencies and confirmed orphans, including the
-   obsolete market/rating flow. Physical Android 10/32-bit media and CAPTCHA acceptance remains
+4. Runs 28–30 and 32 confirm all six jobs for the ninth through twelfth browser,
+   fast-scroll, Material and Glide cleanups. The thirteenth removes PercentLayout
+   from filter rows; require its own remote matrix next. Next review More Info's
+   obsolete market/rating flow, old website and feedback destinations together
+   with their real callers, before changing or removing them. Continue remaining
+   UI/link dependency and orphan review in bounded blocks. Physical Android
+   10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
