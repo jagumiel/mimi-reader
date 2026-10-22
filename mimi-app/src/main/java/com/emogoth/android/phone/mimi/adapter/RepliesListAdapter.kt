@@ -16,7 +16,7 @@ import com.emogoth.android.phone.mimi.app.MimiApplication
 import com.emogoth.android.phone.mimi.event.ReplyClickEvent
 import com.emogoth.android.phone.mimi.fourchan.FourChanEndpoints
 import com.emogoth.android.phone.mimi.model.OutsideLink
-import com.emogoth.android.phone.mimi.util.GlideApp
+import com.bumptech.glide.Glide
 import com.emogoth.android.phone.mimi.util.MimiUtil
 import com.emogoth.android.phone.mimi.util.MediaContract
 import com.emogoth.android.phone.mimi.util.MediaThumbnail
@@ -163,7 +163,7 @@ class ChanPostViewHolder(private val v: View,
             if (country != null) {
                 Log.i(LOG_TAG, "flag url=$flagUrl")
                 flagIcon.visibility = View.VISIBLE
-                MimiUtil.loadImageWithFallback(v.context, flagIcon, flagUrl, null, R.drawable.placeholder_image, null)
+                MimiUtil.loadImageWithFallback(flagIcon, flagUrl, null, R.drawable.placeholder_image, null)
             } else {
                 flagIcon.visibility = View.GONE
             }
@@ -195,7 +195,7 @@ class ChanPostViewHolder(private val v: View,
                 }
             } else {
                 thumbnailContainer.visibility = View.GONE
-                GlideApp.with(v.context).clear(thumbUrl)
+                Glide.with(v.context).clear(thumbUrl)
             }
         }
 

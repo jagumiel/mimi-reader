@@ -48,6 +48,9 @@ import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
@@ -723,44 +726,39 @@ public class MimiUtil {
         return false;
     }
 
-    public static void loadImageWithFallback(final Context context, @NonNull final ImageView into, String url, final String fallback, @DrawableRes final Integer placeholderRes, final RequestListener<Drawable> listener) {
-        GlideRequest<Drawable> originalRequest = GlideApp.with(context)
-                .load(url)
-                .diskCacheStrategy(DiskCacheStrategy.ALL);
-
-        if (!TextUtils.isEmpty(fallback)) {
-            GlideRequest<Drawable> stuff = originalRequest.listener(new RequestListener<Drawable>() {
+    public static void loadImageWithFallback(@NonNull final ImageView into, @Nullable String url,
+                                            @Nullable final String fallback, @Nullable @DrawableRes final Integer placeholderRes,
+                                            @Nullable final RequestListener<Drawable> listener) {
+        RequestManager requests = Glide.with(into);
+        RequestBuilder<Drawable> originalRequest = requests.load(url).diskCacheStrategy(DiskCacheStrategy.ALL);
+        final boolean hasFallback = !TextUtils.isEmpty(fallback);
+        if (placeholderRes != null) {
+            originalRequest.placeholder(placeholderRes);
+        }
+        if (hasFallback) {
+            RequestBuilder<Drawable> fallbackRequest = requests.load(fallback).diskCacheStrategy(DiskCacheStrategy.ALL);
+            if (placeholderRes != null) {
+                fallbackRequest.placeholder(placeholderRes);
+            }
+            if (listener != null) {
+                fallbackRequest.listener(listener);
+            }
+            // Glide coordinates this after failure; never start another into() inside a callback.
+            originalRequest.error(fallbackRequest);
+        }
+        if (listener != null) {
+            originalRequest.listener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Drawable> target, boolean b) {
-                    if (context != null) {
-                        GlideRequest requestBuilder = GlideApp.with(context)
-                                .load(fallback)
-                                .diskCacheStrategy(DiskCacheStrategy.ALL);
-
-                        if (listener != null) {
-                            requestBuilder = requestBuilder.listener(listener);
-                        }
-
-                        requestBuilder.placeholder(placeholderRes).into(into);
-
-                        return true;
-                    }
-                    return false;
+                    // A fallback's failure is terminal; the primary's intermediate failure is not.
+                    return !hasFallback && listener.onLoadFailed(e, o, target, b);
                 }
 
                 @Override
                 public boolean onResourceReady(Drawable drawable, Object o, Target<Drawable> target, DataSource dataSource, boolean b) {
-                    return false;
+                    return listener.onResourceReady(drawable, o, target, dataSource, b);
                 }
             });
-        } else {
-            if (listener != null) {
-                originalRequest.listener(listener);
-            }
-
-            if (placeholderRes != null) {
-                originalRequest.placeholder(placeholderRes);
-            }
         }
 
         originalRequest.into(into);

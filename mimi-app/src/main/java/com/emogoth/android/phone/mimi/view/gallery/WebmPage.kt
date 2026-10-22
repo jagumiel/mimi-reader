@@ -14,7 +14,7 @@ import com.emogoth.android.phone.mimi.databinding.ViewGalleryVideoErrorBinding
 import com.emogoth.android.phone.mimi.db.DatabaseUtils
 import com.emogoth.android.phone.mimi.util.MediaPlayerHelper
 import com.emogoth.android.phone.mimi.util.VideoPlaybackError
-import com.emogoth.android.phone.mimi.util.GlideApp
+import com.bumptech.glide.Glide
 import com.emogoth.android.phone.mimi.viewmodel.GalleryViewModel
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
@@ -124,7 +124,7 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
             player?.playVideo(downloadItem.file.toUri(), videoView, forceReloadOnNextPlayback)
             forceReloadOnNextPlayback = false
         } else if (downloadComplete && !pageSelected) {
-            GlideApp.with(preview).clear(preview)
+            Glide.with(preview).clear(preview)
 
             player?.removeListener(this)
             player?.detachVideo(videoView)
@@ -193,7 +193,7 @@ class VideoPage(context: Context, private val viewModel: GalleryViewModel, priva
         if (loadImage) {
             try {
                 preview.setImageDrawable(null)
-                GlideApp.with(preview)
+                Glide.with(preview)
                         .load(downloadItem.thumbUrl)
                         .error(R.drawable.ic_content_picture)
                         .into(preview)

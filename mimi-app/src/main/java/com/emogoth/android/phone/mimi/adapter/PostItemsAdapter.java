@@ -61,7 +61,7 @@ import com.emogoth.android.phone.mimi.db.HistoryTableConnection;
 import com.emogoth.android.phone.mimi.interfaces.GalleryMenuItemClickListener;
 import com.emogoth.android.phone.mimi.interfaces.PostItemClickListener;
 import com.emogoth.android.phone.mimi.model.HeaderFooterViewHolder;
-import com.emogoth.android.phone.mimi.util.GlideApp;
+import com.bumptech.glide.Glide;
 import com.emogoth.android.phone.mimi.util.MimiPrefs;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
 import com.emogoth.android.phone.mimi.util.MediaContract;
@@ -307,7 +307,7 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             if (country != null) {
                 viewHolder.flagIcon.setVisibility(View.VISIBLE);
 
-                MimiUtil.loadImageWithFallback(viewHolder.flagIcon.getContext(), viewHolder.flagIcon, url, null, null, new RequestListener<Drawable>() {
+                MimiUtil.loadImageWithFallback(viewHolder.flagIcon, url, null, null, new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Drawable> target, boolean b) {
                         if (viewHolder.flagIcon != null) {
@@ -371,7 +371,7 @@ public class PostItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         } else {
             viewHolder.thumbUrl.setVisibility(View.GONE);
-            GlideApp.with(viewHolder.thumbUrl.getContext()).clear(viewHolder.thumbUrl);
+            Glide.with(viewHolder.thumbUrl.getContext()).clear(viewHolder.thumbUrl);
         }
 
         if (threadItem.getSubject() != null) {

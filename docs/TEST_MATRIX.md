@@ -199,6 +199,41 @@ including all three new cases and the six native cases. Unit coverage remains
 release APK/AAB and static native guards pass, and phone stay-awake is restored
 to 0. Remote acceptance for this new cleanup remains pending.
 
+## Twelfth cleanup: Glide image/cache acceptance
+
+Run 30 (`cca6fa6`) confirms the eleventh cleanup across all six CI jobs.
+The Glide block adds four offline cases, growing the ordinary suite to **65
+cases** with three existing opt-in skips. The dedicated ps16k suite stays at six.
+
+`GlideCompatibilityTest` checks the actual registered OkHttp loader, then a
+separate intercepted client for image decoding and HTTP errors; local thumbnail
+pixels, recycled-view replacement and SWF/missing placeholders; five combinations
+of primary/fallback success/failure with exactly one terminal callback; and
+RESOURCE_DISK_CACHE pixel decoding after clearing memory. No registry/singleton
+replacement, public request, custom CA, cleartext permission or persistent
+preference change is needed. Each file fixture is isolated under filesDir.
+All four cases pass separately on the Edge 20 / Android 12 with Glide 5.0.7.
+Existing cache-cleaner, gallery playback/autoplay, lifecycle and native checks
+remain mandatory. The full-media queue still has two workers and nearest-first
+priority, with no ten-item limit.
+
+The 4.11.0 baseline exposed a null-placeholder crash in the latent fallback
+branch; transport and disk-cache cases passed. Correct the thumbnail fixture's
+false assumption that clear() must produce null: it may restore a placeholder.
+Retain checks that the old image is removed and the replacement pixels are blue.
+The new commit still needs its own complete remote six-job run and does not
+replace physical Android 10/32-bit or human-interaction acceptance.
+
+The first full local run exposed a phone sleep transition in the unchanged
+settings case and a disk-encoding race in the new fixture. Wake the phone and
+wait for cache-only availability within the same total ten-second deadline;
+Glide notifies targets before deferred encoding finishes. All seven scoped
+Glide/UI cases then pass. The final full Edge 20 / Android 12 suite passes on
+22 October: **65 cases, 62 passed, three expected skips, no failures/errors**,
+including the six native cases and cache reuse after cache clearing. Unit/CI
+helper tests, lint, SBOM, release APK/AAB and native guards pass; stay-awake is
+restored to 0. No production settings behaviour or CI skip/retry policy is changed.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

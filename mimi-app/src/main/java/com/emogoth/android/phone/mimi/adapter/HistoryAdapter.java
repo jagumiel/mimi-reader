@@ -35,7 +35,7 @@ import com.emogoth.android.phone.mimi.autorefresh.RefreshScheduler2;
 import com.emogoth.android.phone.mimi.db.DatabaseUtils;
 import com.emogoth.android.phone.mimi.db.HistoryTableConnection;
 import com.emogoth.android.phone.mimi.db.models.History;
-import com.emogoth.android.phone.mimi.util.GlideApp;
+import com.bumptech.glide.Glide;
 import com.emogoth.android.phone.mimi.util.MimiUtil;
 import com.emogoth.android.phone.mimi.util.MediaThumbnail;
 import com.emogoth.android.phone.mimi.util.RxUtil;
@@ -111,7 +111,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                     "f".equals(historyItem.getBoardName()) ? ".swf" : "");
         } else {
             viewHolder.image.setVisibility(View.INVISIBLE);
-            GlideApp.with(context).clear(viewHolder.image);
+            Glide.with(context).clear(viewHolder.image);
         }
 
         viewHolder.threadinfo.setText("/" + historyItem.getBoardName() + "/" + historyItem.getThreadId());

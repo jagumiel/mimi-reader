@@ -1,6 +1,7 @@
 package com.emogoth.android.phone.mimi.util;
 
 import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 import com.emogoth.android.phone.mimi.R;
 
 /** Keeps attachments without server thumbnails visible and clickable in every media list. */
@@ -11,6 +12,6 @@ public final class MediaThumbnail {
         boolean flash = ".swf".equals(MediaContract.normalizedExtension(extension));
         int fallback = flash ? R.drawable.thumbnail_flash : R.drawable.placeholder_image;
         Object model = flash && (url == null || url.isEmpty()) ? fallback : url;
-        GlideApp.with(view).load(model).placeholder(fallback).error(fallback).into(view);
+        Glide.with(view).load(model).placeholder(fallback).error(fallback).into(view);
     }
 }

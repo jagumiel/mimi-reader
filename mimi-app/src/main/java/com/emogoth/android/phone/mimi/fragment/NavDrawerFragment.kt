@@ -32,7 +32,7 @@ import com.emogoth.android.phone.mimi.interfaces.HistoryClickedListener
 import com.emogoth.android.phone.mimi.interfaces.HomeButtonListener
 import com.emogoth.android.phone.mimi.interfaces.TabEventListener
 import com.emogoth.android.phone.mimi.prefs.SettingsActivity
-import com.emogoth.android.phone.mimi.util.GlideApp
+import com.bumptech.glide.Glide
 import com.emogoth.android.phone.mimi.util.LayoutType
 import com.emogoth.android.phone.mimi.util.MimiPrefs.Companion.navDrawerBookmarkCount
 import com.emogoth.android.phone.mimi.util.MimiUtil
@@ -267,7 +267,7 @@ class NavDrawerFragment : Fragment() {
             viewHolder.image.visibility = View.VISIBLE
         } else {
             viewHolder.image.visibility = View.INVISIBLE
-            GlideApp.with(activity as Activity).clear(viewHolder.image)
+            Glide.with(viewHolder.image).clear(viewHolder.image)
         }
         viewHolder.boardName.text = "/" + bookmark.boardName + "/"
         viewHolder.threadId.text = bookmark.threadId.toString()

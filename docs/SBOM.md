@@ -105,6 +105,15 @@ and the old ConstraintLayout solver's removal. All other retained records and
 Ruffle hashes remain unchanged. See the [complete reviewed diff and UI scope](DEPENDENCIES.md#eleventh-cleanup-material-components-and-its-required-gallery-baseline).
 This is still inventory validation, not a CVE scan or proof of native source provenance.
 
+The twelfth cleanup updates five runtime artifact records from Glide 4.11.0
+to 5.0.7: core, OkHttp integration, annotations, gifdecoder and disklrucache.
+Totals remain **153 components / 76 declarations**; all other retained records,
+Ruffle hashes and PDF/native GIF artifacts are unchanged. The separate build
+inventory also updates Glide's compiler while retaining its build-only tools.
+See [compatibility selection and image/cache tests](DEPENDENCIES.md#twelfth-cleanup-glide-image-loading-fallback-and-caching).
+Do not confuse Glide's Java GIF decoder with the application's separate native
+GIF player, or this inventory refresh with a CVE scan.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

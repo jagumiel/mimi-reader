@@ -192,9 +192,12 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    // 5.0.9 requires compileSdk 37; 5.0.7 retains our tested SDK 36 baseline.
+    def glide_version = '5.0.7'
+    implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    // Still required for AppGlideModule/OkHttp registration, not the deprecated GlideApp API.
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     implementation 'me.zhanghai.android.fastscroll:library:1.3.0'
 

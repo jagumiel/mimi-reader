@@ -12,6 +12,7 @@ The eighth block replaces PDF/GIF native artifacts and adds strict alignment/run
 The ninth removes the Novoda browser adapter in favour of the existing AndroidX Browser API.
 The tenth replaces the archived Quiph fast-scroller and adapts scrolling to variable-height posts.
 The eleventh updates Material Components and its required ConstraintLayout baseline without changing themes.
+The twelfth updates Glide and removes first-party use of its deprecated generated API.
 
 The canonical release SBOM has **153 top-level components**: 151 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -73,7 +74,7 @@ under the third block. New cleanup changes still require their own matrix run.
 | AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
 | PDF / GIF | The eighth block replaces the PDF fork with `io.github.oothp:android-pdf-viewer:3.2.0-beta06` / Pdfium 1.9.5-beta01, and updates GIF to 1.2.32. | Local rendering and ELF/ZIP checks pass; confirm the dedicated 16 KB runtime CI job before release. These are wrapper/artifact versions, not a complete audit of embedded PDFium/GIFLib security. |
-| UI libraries | Preference is **1.2.1**, Material **1.14.0** and ConstraintLayout **2.2.1**. Glide 4.11.0 and Browser 1.2.0 remain declared. | Continue bounded image/cache and navigation review. Confirm Android 10/12 compatibility for each replacement; retaining MaterialComponents themes is not a Material 3 redesign. |
+| UI libraries | Preference is **1.2.1**, Material **1.14.0**, ConstraintLayout **2.2.1** and Glide **5.0.7**. Browser 1.2.0 and PercentLayout 1.0.0 still have consumers. | Continue bounded legacy layout/link review. Confirm Android 10/12 compatibility for each replacement; retaining MaterialComponents themes is not a Material 3 redesign. |
 | Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.22 (selected through Material's metadata). | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
 
@@ -820,6 +821,126 @@ keyboard/CAPTCHA/browser acceptance or a physical Android 10/32-bit test.
   complete remote six-job run, including actual native 16 KB execution. The
   physical Android 10/32-bit and human-interaction acceptance gates remain.
 
+## Twelfth cleanup: Glide image loading, fallback and caching
+
+On 22 October 2026, update Glide, OkHttp integration and compiler together from
+**4.11.0 to 5.0.7**, sharing one Gradle version. At review time Maven Central
+publishes 5.0.9 as the newest stable version, but its AAR metadata requires
+**minCompileSdk 37**. The published 5.0.7 AAR retains minSdk 14 and imposes no
+higher compile-SDK baseline. Keep the application's **minSdk 23 / compile and
+target 36** rather than bypassing AAR checks or widening this block into an SDK
+migration. Published 5.0.8 and 5.0.6 artifacts are absent from Central; GitHub
+release names alone are not evidence that a Maven coordinate is available.
+
+Primary sources:
+
+- [Glide generated-API migration guidance](https://bumptech.github.io/glide/doc/generatedapi.html)
+  and [coordinated error requests](https://bumptech.github.io/glide/doc/options.html#starting-a-new-request-on-failure).
+- [Glide 5.0.7 release](https://github.com/bumptech/glide/releases/tag/v5.0.7),
+  [published POM](https://repo.maven.apache.org/maven2/com/github/bumptech/glide/glide/5.0.7/glide-5.0.7.pom)
+  and [AAR](https://repo.maven.apache.org/maven2/com/github/bumptech/glide/glide/5.0.7/glide-5.0.7.aar).
+- [Glide 5.0.9 AAR](https://repo.maven.apache.org/maven2/com/github/bumptech/glide/glide/5.0.9/glide-5.0.9.aar)
+  for the explicit compile-SDK requirement; do not call 5.0.7 the latest upstream release.
+
+Replace every first-party `GlideApp` / `GlideRequest` consumer with `Glide` /
+`RequestBuilder`, including thumbnails, flags, history/drawer/reply recycling and
+video previews. Keep `MimiAppGlideModule` and the compiler: module/integration
+registration remains supported and necessary even though the generated convenience
+API is deprecated. The processor still emits convenience classes and its internal
+factory can use generated subclasses; first-party callers no longer name them.
+This is not a claim that every generated class disappears from R8 output. Do not migrate
+Room/KAPT or change unrelated libraries in this block.
+
+The fallback helper now binds to its target view and no longer accepts a redundant
+Context argument; both production callers are updated. Use Glide's `.error(...)`
+coordinator instead of starting another `into()` inside `onLoadFailed`. Apply
+nullable placeholders only when present. Deliver the listener on primary success
+or the fallback's terminal result, suppressing the intermediate primary failure.
+This fixes the lost primary-success listener when a fallback is configured.
+Current production flag callers pass no fallback; the failing fallback branch is
+a latent helper defect, not an established explanation for earlier user reports.
+
+Four mandatory offline `GlideCompatibilityTest` cases cover:
+
+- The actual application registry contains the OkHttp model loader. A separate
+  OkHttp client with a synthetic interceptor exercises that integration's image
+  decoding and HTTP 404 callback. No real request, server, custom CA, cleartext
+  exemption or replacement of Glide's registry/singleton is used.
+- Local red/blue thumbnail decoding and reused-view replacement, request clearing,
+  plus SWF/missing-image placeholders. `clear()` may restore the original placeholder;
+  assert that the old image disappears, not that the drawable must be null.
+- Primary/fallback success and terminal failure, with/without fallback and a null
+  placeholder, checking exactly one terminal callback and no intermediate failure.
+- A decoded image reloaded cache-only from **RESOURCE_DISK_CACHE** after clearing
+  memory, checking pixels rather than merely request completion. Glide notifies
+  targets before deferred disk encoding completes; poll cache-only availability
+  within the same total ten-second deadline, never fall back to a source reload.
+  Fixtures live in
+  a JUnit TemporaryFolder under filesDir, not the startup-cleaned app cache.
+
+The pre-change baseline passed transport registration/fetching and disk-cache
+tests. It exposed a real null-placeholder unboxing crash in the fallback helper;
+the first thumbnail fixture also incorrectly expected `clear()` to return a null
+drawable. Fix that fixture to check removal/replacement of the previous image.
+Sample decoded pixels through a software copy so hardware bitmap decoding stays
+enabled in production. Existing cache-cleaner and gallery playback/autoplay tests
+remain mandatory. Full-media download concurrency stays **two**, and the complete
+gallery queue still prioritizes nearest items; no ten-item limit or new parallel
+prefetch is introduced.
+
+Runtime SBOM remains **153 components / 76 direct declarations**. Exactly five
+component records change from 4.11.0 to 5.0.7: Glide, okhttp3-integration,
+annotations, gifdecoder and disklrucache (now packaged as an AAR rather than a JAR).
+Glide gains an edge to the already-selected Tracing 2.0.0 platform; this does not
+add or update a Tracing component. All other retained records, including
+Ruffle's seven hashes, OkHttp and the PDF/native GIF player, are unchanged.
+The separate build inventory also updates the compiler; its Guava/JavaPoet
+dependencies remain build-time tools, not new shipped application libraries.
+No global exclusions, new R8 keep/dontwarn rules or new test dependencies are added.
+
+### Validation setup corrections
+
+The first complete 65-case run exposed two setup issues. The unchanged settings
+test tried a transaction after state was saved; the Android event log shows its
+activity resumed and was immediately paused/stopped for `sleep` at 21:22:26.
+The phone was unlocked when inspected, so the exact cause of that sleep event is
+not established. Wake the device and repeat acceptance, without changing the
+settings transaction to allow state loss or omitting the test.
+
+The new disk-cache test also raced deferred encoding. In the versioned
+[DecodeJob implementation](https://github.com/bumptech/glide/blob/v5.0.7/library/src/main/java/com/bumptech/glide/load/engine/DecodeJob.java),
+`notifyComplete` precedes `deferredEncodeManager.encode`. Receiving pixels is not
+proof that the encoded file is already readable. The corrected test waits for
+cache-only availability within the original **total ten-second deadline**, still
+requiring red pixels and RESOURCE_DISK_CACHE. Cache misses cannot trigger a
+source/network load. All four Glide cases and all three existing UI compatibility
+cases then passed together in a separate seven-case run, without skips.
+
+### Twelfth-block validation (22 October 2026)
+
+- Final complete Edge 20 / Android 12 run: **65 cases, 62 passed, three existing
+  opt-in skips**, zero failures/errors. All four Glide cases, existing settings
+  restoration and six native cases pass, including cache reuse after the earlier
+  cache-cleaner case. No public posts are made. The original phone stay-awake
+  setting is restored to **0**.
+- **102 app + eight library unit tests**, **40 CI-helper tests**, actionlint,
+  application-ID checks, debug/test APK builds, minified release APK/AAB and
+  vital lint pass. SBOM freshness/six negative/hash/canonical checks pass with
+  153 components and 76 declarations. No new R8 keep/dontwarn rules are added;
+  the generated module's reflection name is retained in the release mapping.
+- Lint has **zero errors, 1,016 warnings, one hint**, and 482 UnusedResources
+  findings (previous block: 1,014 warnings / 482 unused), with no fixture findings
+  and no new suppression/baseline. Those warnings remain separate follow-up work.
+- Both APKs pass ELF/ZIP checks (24 native libraries, four ABIs); release JNI
+  seeds and SDK 16 KB zipalign pass. Release keeps package
+  `com.emogoth.android.phone.mimi`, version **230 / 7.0.1**, minSdk **23** and
+  target **36**. APK changes from **41,393,389 to 41,413,250 bytes**; AAB from
+  **31,128,081 to 31,154,281 bytes**. These are local artifact observations,
+  not measured performance or memory improvements.
+- Run 30 confirms the previous block. The new commit still requires its own
+  complete remote six-job matrix, including actual 16 KB native execution;
+  physical Android 10/32-bit and human-interaction release gates remain pending.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -852,11 +973,12 @@ only the method and leave a live caller behind. This block does not change that 
 3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
    for `fed11d2`, including six native cases on actual 16 KB pages without
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
-4. Runs 28 and 29 confirm all six jobs for the ninth/tenth browser and fast-scroll
-   cleanups. The eleventh updates Material and its required ConstraintLayout
-   baseline; require its own remote matrix next. Continue bounded review of
-   Glide and related image/cache consumers, then the remaining legacy UI/link
-   dependencies and confirmed orphans. Physical Android 10/32-bit media and CAPTCHA acceptance remains
+4. Runs 28–30 confirm all six jobs for the ninth/tenth/eleventh browser,
+   fast-scroll and Material cleanups. The twelfth updates Glide and its consumers;
+   require its own remote matrix next. Next remove PercentLayout from the filter
+   row after checking its real layout contract, with theme/width/RTL tests; then
+   review remaining UI/link dependencies and confirmed orphans, including the
+   obsolete market/rating flow. Physical Android 10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed

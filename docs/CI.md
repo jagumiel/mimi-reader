@@ -177,6 +177,44 @@ Native ELF/ZIP/JNI checks, SDK 16 KB zipalign and actionlint passed. The origina
 phone stay-awake setting (0) was restored. These results do not pre-approve the
 new commit's remote API matrix or actual 16 KB runtime.
 
+## Run 30 confirmed; twelfth cleanup Glide and image/cache contracts
+
+[Run 30 for `cca6fa6`](https://github.com/jagumiel/mimi-reader/actions/runs/39835334241)
+passed all six jobs: build/unit/lint/SBOM/release, Android 10/12/14/16 and native
+media on actual 16 KB pages. This confirms the eleventh-block Material migration,
+not the new Glide changes.
+
+The twelfth block updates Glide/integration/compiler to 5.0.7. The published
+5.0.9 AAR requires compile SDK 37; keep the tested SDK 36 baseline rather than
+bypassing its metadata check. Four mandatory offline `GlideCompatibilityTest`
+cases cover registered OkHttp integration and intercepted image/404 responses,
+local thumbnail recycling and placeholders, coordinated fallback callbacks, and
+cache-only disk decoding after clearing memory. They do not replace the global
+registry, alter production TLS/cleartext policy or access a live CDN. They pass
+separately on the Edge 20 / Android 12 after correcting the fallback helper and
+the fixture's assumption that clearing a request always sets a null drawable.
+
+The ordinary matrix grows to **65 cases**, with the same three opt-in skips.
+The ps16k job retains six native cases. No workflow retry, skip/timeout relaxation or new
+test dependency is introduced; require this commit's own complete six-job run.
+
+The initial local full run had a phone sleep/state-saved failure in the unchanged
+settings case and a premature assertion in the new disk-cache fixture. Android's
+event log confirms the sleep transition; Glide's DecodeJob delivers the resource
+before deferred encoding finishes. Wake the phone and poll cache-only readiness
+within the same total ten seconds, still requiring RESOURCE_DISK_CACHE and the
+correct pixels. The corrected four Glide cases plus three existing UI cases pass
+together (seven cases, no skips); no settings production logic is weakened.
+
+Final local twelfth-block acceptance passes: **65 Edge 20 / Android 12 cases,
+62 passed, three expected opt-in skips, zero failures/errors**, including the
+corrected cache case and unchanged settings restoration. Also pass 102 app +
+eight library unit tests, 40 CI-helper tests, lint with zero errors, SBOM freshness/
+negative checks, variant IDs, debug/test and minified release APK/AAB builds,
+ELF/ZIP/JNI guards, SDK 16 KB zipalign and actionlint. The original phone
+stay-awake setting (0) is restored. Remote acceptance for this new commit remains
+pending; the green run 30 does not pre-approve its successor.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

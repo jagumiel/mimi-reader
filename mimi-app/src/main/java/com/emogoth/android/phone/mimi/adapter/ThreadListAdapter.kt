@@ -33,7 +33,6 @@ import com.emogoth.android.phone.mimi.dialog.RepliesDialog
 import com.emogoth.android.phone.mimi.dialog.RepliesDialog.Companion.newInstance
 import com.emogoth.android.phone.mimi.interfaces.ReplyMenuClickListener
 import com.emogoth.android.phone.mimi.interfaces.ThumbnailClickListener
-import com.emogoth.android.phone.mimi.util.GlideApp
 import com.emogoth.android.phone.mimi.util.MimiPrefs.Companion.imageSpoilersEnabled
 import com.emogoth.android.phone.mimi.util.MimiUtil
 import com.emogoth.android.phone.mimi.util.MediaContract
@@ -300,7 +299,7 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
             } else {
                 flagIcon.visibility = View.GONE
                 flagIcon.setOnClickListener(null)
-                GlideApp.with(flagIcon as View).clear(flagIcon)
+                Glide.with(flagIcon as View).clear(flagIcon)
             }
         }
 
