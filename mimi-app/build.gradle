@@ -151,7 +151,7 @@ dependencies {
     implementation "androidx.core:core:1.18.0"
     implementation "androidx.core:core-ktx:1.18.0"
     // Declare actual code/XML consumers instead of the legacy support umbrellas.
-    // Keep the previously resolved versions; modernization is a separate change.
+    // Modernize remaining consumer families in bounded, separately tested changes.
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     implementation 'androidx.documentfile:documentfile:1.0.0'
     implementation 'androidx.drawerlayout:drawerlayout:1.0.0'
@@ -166,14 +166,16 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
-    implementation 'com.google.android.material:material:1.2.1'
+    // Stable Material baseline retains minSdk 23 and the existing MaterialComponents themes.
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation "androidx.preference:preference:$preference_version"
     implementation "androidx.preference:preference-ktx:$preference_version"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    // Material 1.14.0 already requires 2.2.1; own the gallery's actual baseline.
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation 'com.github.franmontiel:PersistentCookieJar:1.0.1'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

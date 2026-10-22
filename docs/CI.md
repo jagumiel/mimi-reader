@@ -150,6 +150,33 @@ without errors, variant IDs, SBOM freshness/negative tests, native ELF/ZIP/JNI
 checks, SDK 16 KB zipalign and actionlint passed. Restored phone stay-awake to 0.
 No remote-success claim is made for the new commit until its six jobs pass.
 
+## Run 29 confirmed; eleventh cleanup Material and ConstraintLayout
+
+[Run 29 for `db43b0b`](https://github.com/jagumiel/mimi-reader/actions/runs/39830199566)
+completed successfully, confirming the tenth cleanup's six-job workflow.
+Five job-detail records report success directly. API 29's detail endpoint still
+returned `in_progress` at review time, but its completed downloadable log confirms
+58 cases, three expected skips, zero failures, `BUILD SUCCESSFUL` and successful
+report upload. This is not a failed or still-running test hidden by a skip.
+
+The eleventh cleanup updates Material Components 1.2.1 → 1.14.0 and its required
+ConstraintLayout 2.0.1 → 2.2.1 baseline, keeping minSdk 23 and the existing themes.
+Three mandatory `MaterialComponentsCompatibilityTest` cases exercise production
+tabs/chrome/FAB, dialog and Snackbar callbacks, and gallery-container bounds.
+They use synthetic content, not public posting or persisted preference changes.
+All three pass with the old versions before migrating. The ordinary matrix
+grows to **61 cases**, with the same three existing opt-in skips; the ps16k job
+retains its six native cases. No workflow bypass, retry, timeout increase or
+weakened assertion is added. The new commit needs its own complete remote run.
+
+Local eleventh-block validation passed: 102 app + eight library unit tests,
+40 CI-helper tests, lint with zero errors, SBOM/negative checks, variant IDs,
+debug/test APK and minified release APK/AAB builds. The full Edge 20 / Android 12
+suite has **61 cases: 58 passed, three expected skips, zero failures/errors**.
+Native ELF/ZIP/JNI checks, SDK 16 KB zipalign and actionlint passed. The original
+phone stay-awake setting (0) was restored. These results do not pre-approve the
+new commit's remote API matrix or actual 16 KB runtime.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

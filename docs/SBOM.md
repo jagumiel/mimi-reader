@@ -83,7 +83,7 @@ source revision or absence of CVEs. Separate ELF/ZIP reports and actual 16 KB
 runtime tests are documented in [the dependency audit](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).
 
 On 22 October the ninth cleanup removes Novoda's Custom Tabs adapter, using the
-already-resolved AndroidX Browser API directly. The current snapshots contain
+already-resolved AndroidX Browser API directly. That block's snapshots contain
 **150 components / 76 declarations**. Only Novoda disappears; every retained
 component record and all Ruffle file hashes remain unchanged. Its node/root
 edge is removed without version changes, new dependencies or global exclusions.
@@ -97,6 +97,13 @@ artifact requests already-selected AndroidX dependencies and adds no native
 code. [Fast-scroll integration and tests](DEPENDENCIES.md#tenth-cleanup-thread-fast-scrolling-with-variable-height-posts)
 cover its variable-height adaptation and lifecycle/refresh behaviour. This is
 not a CVE scan or a claim that all remaining UI libraries have been updated.
+
+The eleventh cleanup updates Material to 1.14.0 and its required ConstraintLayout
+baseline to 2.2.1. Current totals are **153 components / 76 declarations**:
+six retained version changes (including a Kotlin BOM constraint), four additions
+and the old ConstraintLayout solver's removal. All other retained records and
+Ruffle hashes remain unchanged. See the [complete reviewed diff and UI scope](DEPENDENCIES.md#eleventh-cleanup-material-components-and-its-required-gallery-baseline).
+This is still inventory validation, not a CVE scan or proof of native source provenance.
 
 After a deliberate dependency or vendored runtime update:
 

@@ -11,8 +11,9 @@ The seventh updates GridLayout alone and records the native-library release risk
 The eighth block replaces PDF/GIF native artifacts and adds strict alignment/runtime checks.
 The ninth removes the Novoda browser adapter in favour of the existing AndroidX Browser API.
 The tenth replaces the archived Quiph fast-scroller and adapts scrolling to variable-height posts.
+The eleventh updates Material Components and its required ConstraintLayout baseline without changing themes.
 
-The canonical release SBOM has **150 top-level components**: 148 Maven components,
+The canonical release SBOM has **153 top-level components**: 151 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
 files. The inventory records **76 direct declarations** across the two modules;
 repeated declarations and dependency constraints are not 76 distinct libraries.
@@ -72,8 +73,8 @@ under the third block. New cleanup changes still require their own matrix run.
 | AppCompat / Fragment | Previously resolved **1.3.0-alpha02 / 1.3.0-alpha08**; the fifth block explicitly selects **1.8.0 / 1.9.1**. | The alpha path is traced below. Keep testing themes, dialogs, startup, system insets and R8 when changing the remaining legacy adapters. |
 | RxJava | Both modules now declare the already-selected **2.2.21** through one shared version; RxAndroid 2.1.1 and RxKotlin 2.4.0 remain. | Declaration alignment is complete in the fourth block; broader reactive-code replacement remains a separate refactor. |
 | PDF / GIF | The eighth block replaces the PDF fork with `io.github.oothp:android-pdf-viewer:3.2.0-beta06` / Pdfium 1.9.5-beta01, and updates GIF to 1.2.32. | Local rendering and ELF/ZIP checks pass; confirm the dedicated 16 KB runtime CI job before release. These are wrapper/artifact versions, not a complete audit of embedded PDFium/GIFLib security. |
-| UI libraries | Preference is now **1.2.1**. Material 1.2.1, Glide 4.11.0, ConstraintLayout 2.0.1 and Browser 1.2.0 remain declared. | Modernize in small groups with UI, image/cache and navigation regression checks. Confirm Android 10/12 compatibility for each proposed replacement. |
-| Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.0. | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
+| UI libraries | Preference is **1.2.1**, Material **1.14.0** and ConstraintLayout **2.2.1**. Glide 4.11.0 and Browser 1.2.0 remain declared. | Continue bounded image/cache and navigation review. Confirm Android 10/12 compatibility for each replacement; retaining MaterialComponents themes is not a Material 3 redesign. |
+| Kotlin | stdlib 2.3.21 coexists with jdk7/jdk8 compatibility artifacts 1.9.10 and kotlin-bom 1.8.22 (selected through Material's metadata). | Inspect dependency paths and distinguish compatibility/constraint artifacts from duplicate executable code before removing anything. |
 | Ruffle | Vendored 0.7.1 JS/WASM, MIT OR Apache-2.0. | Update its manifest, provenance and hashes together. Retain isolation, animation/pause tests and opt-in live SWF checks. |
 
 These are inventory findings, not conclusions that a package has a known CVE.
@@ -731,6 +732,94 @@ physical Android 10, remote six-job and later CVE/changelog/README gates intact.
   smaller artifact in every format. Native 16 KB execution and the ordinary API
   matrix for this new cleanup still require its own remote six-job run.
 
+## Eleventh cleanup: Material Components and its required gallery baseline
+
+On 22 October 2026, replace Material **1.2.1 with 1.14.0**, the latest stable
+release in Google's Maven metadata at review time. Its published AAR manifest
+requires minSdk **23**, matching the application. Keep compile/target 36, the
+existing IDs/version, MaterialComponents light/dark/black/gallery themes and
+dialog overlays. Do not switch to Material 3/Expressive or opt into a visual
+redesign, dynamic colours or different system-inset handling.
+
+Primary sources:
+
+- [Material 1.14.0 release and dependency changes](https://github.com/material-components/material-components-android/releases/tag/1.14.0).
+- [Published Material POM](https://dl.google.com/dl/android/maven2/com/google/android/material/material/1.14.0/material-1.14.0.pom)
+  and [AAR](https://dl.google.com/dl/android/maven2/com/google/android/material/material/1.14.0/material-1.14.0.aar).
+
+Material requires ConstraintLayout **2.2.1**, so update the application's direct
+gallery declaration from 2.0.1 to that actual baseline in the same block rather
+than pinning the old solver or suppressing transitive updates. This dependency
+requirement is why the two families are reviewed together. DrawerLayout remains
+declared at 1.0.0 but resolves to Material's 1.1.1; record that distinction instead
+of claiming every direct declaration now matches its resolution.
+
+Reviewed release snapshot changes (**150 → 153 components**, still **76 direct
+declarations**):
+
+| Component | Previous → selected |
+| --- | --- |
+| Material | 1.2.1 → 1.14.0 |
+| ConstraintLayout | 2.0.1 → 2.2.1 |
+| CustomView | 1.1.0 → 1.2.0 |
+| DrawerLayout | 1.0.0 → 1.1.1 |
+| Transition | 1.4.1 → 1.5.0 |
+| Kotlin BOM (constraints, not a second stdlib) | 1.8.0 → 1.8.22 |
+| ConstraintLayout solver | Remove 2.0.1; add constraintlayout-core 1.1.1 |
+| DynamicAnimation | Add 1.1.0 |
+| graphics-shapes / graphics-shapes-android | Add 1.0.1 POM / Android artifact |
+
+The six retained version changes, four additions and one removal are the complete
+component-record diff. Other retained records, including Ruffle's seven file
+hashes and PDF/GIF artifacts, are unchanged. Incoming/outgoing graph edges update
+with these selections; no global exclusions or new R8 keep/dontwarn rules are
+introduced. The higher component count is not proof of bloat or a security result.
+
+Three mandatory offline `MaterialComponentsCompatibilityTest` cases cover:
+
+- The production tabs layout with synthetic pages: bidirectional TabLayout/
+  ViewPager2 selection, chrome/FAB bounds, clickable FAB, and its movement and
+  restoration when collapsing/expanding AppBarLayout, in three themes with
+  320dp LTR / 480dp RTL layouts.
+- Single-choice dialog and confirmation callbacks, plus visible Snackbar action
+  and dismissal, in all three themes. AlertDialog's positive callback is queued
+  on the main looper: an initial baseline-test assertion incorrectly checked it
+  synchronously. Wait for dispatch, then assert exactly one callback; the app
+  itself is not changed to accommodate the fixture.
+- Both production ConstraintLayout gallery containers, checking their child
+  fills the available bounds without clipping at those widths/directions/themes.
+  Release each fixture's media player explicitly.
+
+All three cases passed on the Edge 20 / Android 12 **before** the upgrade with
+Material 1.2.1 / ConstraintLayout 2.0.1. The complete post-upgrade suite also
+retains startup/insets/recreation, settings, drawer/back navigation, gallery
+playback/autoplay and native media tests. These checks do not replace human
+keyboard/CAPTCHA/browser acceptance or a physical Android 10/32-bit test.
+
+### Eleventh-block validation (22 October 2026)
+
+- Full Edge 20 / Android 12 suite: **61 cases, 58 passed, three existing opt-in
+  skips**, zero failures/errors, including all three new cases and the six
+  native tests. The old-version baseline's three corrected fixtures also passed.
+  No public posts were made; the original stay-awake setting was restored to **0**.
+- **102 app + eight chanlib unit tests**, **40 CI-helper tests**, actionlint,
+  application-ID contract, debug/test APK builds and minified release APK/AAB
+  generation all passed. SBOM freshness/six negative/hash/canonical checks pass
+  with the reviewed 153 components and 76 declarations.
+- Lint passes with **zero errors, 1,014 warnings, one hint** and 482
+  UnusedResources findings (previous block: 1,012 warnings / 484 unused).
+  No suppression or baseline is added; no lint finding points to the new fixture.
+  Existing warnings remain follow-up work, not a safe deletion list.
+- Both APKs pass native ELF/ZIP checks (24 libraries / four ABIs), release JNI
+  seed checks and SDK 16 KB zipalign. Release retains package
+  `com.emogoth.android.phone.mimi`, version **230 / 7.0.1**, minSdk **23**, target
+  **36**. APK changes from **40,794,579 to 41,393,389 bytes**; AAB from
+  **30,624,238 to 31,128,081 bytes**. Record this increase without claiming
+  measured performance improvements or that every added library survives R8.
+- Run 29 confirms the preceding tenth block; this new block still needs its own
+  complete remote six-job run, including actual native 16 KB execution. The
+  physical Android 10/32-bit and human-interaction acceptance gates remain.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -763,11 +852,11 @@ only the method and leave a live caller behind. This block does not change that 
 3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
    for `fed11d2`, including six native cases on actual 16 KB pages without
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
-4. Run 28 confirms all six jobs for the ninth-block Novoda replacement. The tenth
-   replaces the archived fast-scroller with AndroidFastScroll and an index-aware
-   helper; require its own remote matrix next. Continue bounded review of the
-   remaining UI/image families (Material, ConstraintLayout, Glide and related
-   consumers). Physical Android 10/32-bit media and CAPTCHA acceptance remains
+4. Runs 28 and 29 confirm all six jobs for the ninth/tenth browser and fast-scroll
+   cleanups. The eleventh updates Material and its required ConstraintLayout
+   baseline; require its own remote matrix next. Continue bounded review of
+   Glide and related image/cache consumers, then the remaining legacy UI/link
+   dependencies and confirmed orphans. Physical Android 10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed

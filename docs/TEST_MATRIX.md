@@ -172,6 +172,33 @@ scoped four-case run also passed before that extra recovery assertion was added.
 The phone's temporary stay-awake setting was restored to 0. Full remote
 Android 10/12/14/16 and actual-16-KB validation of this cleanup remains pending.
 
+## Eleventh cleanup: Material and gallery-container acceptance
+
+Run 29 (`db43b0b`) confirms the tenth cleanup, including Android 10/12/14/16
+and actual 16 KB native execution. API 29's completed log confirms 58 cases
+with three expected skips, no failures and uploaded reports even though its
+job-detail response was stale at review time.
+
+Three mandatory offline `MaterialComponentsCompatibilityTest` cases protect
+the Material 1.14.0 / required ConstraintLayout 2.2.1 migration. The production
+tabs layout with synthetic pages checks two-way mediator selection, chrome/FAB
+bounds and clicks, collapse/expand movement and restoration in three themes at
+320dp LTR / 480dp RTL. Dialog choices/confirmation and Snackbar action/dismissal
+are checked in each theme. Both production gallery containers must fill their
+measured bounds at those widths/directions/themes, releasing their media
+fixtures. The three cases pass against the old versions before upgrading.
+The suite becomes **61 cases**, still with three opt-in skips; existing insets,
+recreation, drawer/back, settings and playback/autoplay checks remain mandatory.
+This commit requires its own remote six-job acceptance; human interaction and
+physical Android 10/32-bit gates remain pending.
+
+Final eleventh-block validation on 22 October passed on the Edge 20 / Android 12:
+**61 cases, 58 passed, three existing opt-in skips, zero failures/errors**,
+including all three new cases and the six native cases. Unit coverage remains
+102 app + eight library cases; 40 CI-helper tests also pass. Lint has zero errors,
+release APK/AAB and static native guards pass, and phone stay-awake is restored
+to 0. Remote acceptance for this new cleanup remains pending.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:
