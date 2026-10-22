@@ -8,49 +8,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:orientation="vertical">-->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh_layout"
+        <com.emogoth.android.phone.mimi.widget.MimiRecyclerView
+            android:id="@+id/thread_list"
+            style="?defaultListViewStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:dividerHeight="2.0sp"
+            android:fadingEdge="none"
+            android:paddingLeft="4dp"
+            android:paddingTop="15dp"
+            android:paddingRight="4dp"
+            android:paddingBottom="10dp"
+            android:scrollbars="none"
+            app:layout_behavior="@string/custom_scroll_behavior"
+            tools:listitem="@layout/thread_post_item" />
 
-            <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
-                android:id="@+id/fast_scroller"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:handleDrawable="@drawable/fastscroll_thumb_selector"
-                app:popupDrawable="@drawable/fastscroll_popup"
-                app:supportSwipeToRefresh="true">
-
-                <com.emogoth.android.phone.mimi.widget.MimiRecyclerView
-                    android:id="@+id/thread_list"
-                    style="?defaultListViewStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:dividerHeight="2.0sp"
-                    android:fadingEdge="none"
-                    android:paddingLeft="4dp"
-                    android:paddingTop="15dp"
-                    android:paddingRight="4dp"
-                    android:paddingBottom="10dp"
-                    android:scrollbars="none"
-                    app:fastScrollEnabled="false"
-                    app:fastScrollHorizontalThumbDrawable="@drawable/fastscroll_thumb_selector"
-                    app:fastScrollHorizontalTrackDrawable="@drawable/fastscroll_track_selector"
-                    app:fastScrollVerticalThumbDrawable="@drawable/fastscroll_thumb_selector"
-                    app:fastScrollVerticalTrackDrawable="@drawable/fastscroll_track_selector"
-                    app:layout_behavior="@string/custom_scroll_behavior"
-                    tools:listitem="@layout/thread_post_item" />
-            </com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-<!--    </LinearLayout>-->
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/message_container"

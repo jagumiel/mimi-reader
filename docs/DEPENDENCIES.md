@@ -10,6 +10,7 @@ The seventh updates GridLayout alone and records the native-library release risk
 
 The eighth block replaces PDF/GIF native artifacts and adds strict alignment/runtime checks.
 The ninth removes the Novoda browser adapter in favour of the existing AndroidX Browser API.
+The tenth replaces the archived Quiph fast-scroller and adapts scrolling to variable-height posts.
 
 The canonical release SBOM has **150 top-level components**: 148 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
@@ -653,6 +654,83 @@ scanning/changelog/README sequencing unchanged.
   browser-performance benchmark. Release identity/version/minSdk/target remain
   `com.emogoth.android.phone.mimi`, 230 / 7.0.1, 23 and 36 respectively.
 
+## Tenth cleanup: thread fast-scrolling with variable-height posts
+
+Replace `com.quiph.ui:recyclerviewfastscroller:0.2.3`: its
+[upstream repository is archived](https://github.com/quiph/RecyclerView-FastScroller).
+Use the official Maven Central artifact `me.zhanghai.android.fastscroll:library:1.3.0`
+from [AndroidFastScroll](https://github.com/zhanghai/AndroidFastScroll). The pinned
+AAR's manifest requires API 21, below this app's unchanged minimum of 23. Its
+AppCompat/RecyclerView requests resolve to the existing app selections; no
+unrelated upgrade, repository, force or global exclusion is added.
+
+The upstream default helper assumes equally tall rows. Thread posts are not
+uniform, so the first-party `ThreadFastScroll` implements index-based progress,
+including partial first-row progress and last-post targeting. It targets
+posts with `LinearLayoutManager.scrollToPositionWithOffset`, rather than using
+the first visible row as a pixel-height estimate. Retain the `position / total`
+popup and accent background. The library supplies standard thumb/track drawing
+and RTL placement. The old adapter popup interface is removed; counts come from
+the current adapter rather than a captured thread list.
+
+Remove the obsolete outer layout so `MimiRecyclerView` is SwipeRefreshLayout's
+direct child. Reserve only the scrollbar touch edge from refresh interception;
+normal content pulls still refresh. Attach once per view via a keyed tag, cancel
+active drags on data changes/replacement/detach, and unregister the observed
+adapter on detach. This is necessary because the library's disabled-range path
+ignores CANCEL once an emptied list no longer has a scrollbar. The initial device
+test reproduced that pending-drag state; the integration cancels before the
+disabled-state update. Reattachment retains one set of hooks and resumes observing
+the current adapter without cancelling a fresh first gesture.
+
+Six pure unit cases cover labels, short/unmeasured lists, both endpoints,
+intermediate indices, bounds and overflow. Four mandatory instrumented cases
+inflate the production layout and dispatch synthetic MotionEvents through its refresh
+container, using local variable-height text rows: index targets, dragging/popups
+in three themes/two widths/LTR-RTL, content refresh after cancellation, and empty,
+short, replaced and reattached adapters. They also check popup bounds, no duplicate
+controller/decorations, cancellation when data empties mid-drag and recovery on
+replacement. All four cases passed separately on the Edge 20 / Android 12.
+No real thread/media fixture, preference write or public post is used by them.
+
+Remove five verified orphan thumb/track drawables, including their now-unresolved
+reference to the former library's `corner_radius`; do not add an unused replacement
+dimension to mask resource-linking errors. Keep the live popup drawable/dimension.
+Add AndroidFastScroll's Google LLC/Apache-2.0 attribution without removing other
+notices. Deleted tracked resources remain recoverable from Git history.
+
+SBOM/inventory remain **150 components / 76 declarations**: one scroller artifact
+replaces another. Every retained component record and retained dependency edge
+outside the two replaced nodes is unchanged, including Ruffle and native media.
+Wrapper removal is not a claim that all old UI dependencies are modernized or
+that component versions identify embedded native source revisions. Keep the
+physical Android 10, remote six-job and later CVE/changelog/README gates intact.
+
+### Tenth-block validation (22 October 2026)
+
+- All four new device cases passed separately after the cancellation/attach
+  corrections, then the full Edge 20 / Android 12 suite passed: **58 cases,
+  55 passed, three existing opt-in skips**, zero failures/errors. The expanded
+  final run also checks successful dragging after adapter replacement and
+  cancellation when replacing an adapter mid-drag. The
+  original phone stay-awake setting (0) was restored. No public posts were made.
+- 102 app + eight chanlib unit tests and 40 CI-helper tests passed. Debug/test
+  APK compilation, application-ID contract and actionlint passed.
+- Lint passed with zero errors, 1,012 warnings, one hint and 484 UnusedResources
+  findings, without adding suppressions/baselines. The initial resource-link
+  failure is resolved by removing genuinely unused legacy drawables, not by
+  restoring their dependency on the removed library's dimension.
+- SBOM freshness/six negative/hash/canonical checks and minified release APK/AAB
+  generation passed. Release mapping contains no Quiph scroller classes. Both
+  APKs passed the native guard (24 libraries, four ABIs); release JNI seeds and
+  SDK 16 KB zipalign passed. No new keep/dontwarn rules were needed.
+- Release identity remains `com.emogoth.android.phone.mimi`, version 230 / 7.0.1,
+  minSdk 23 and target 36. Local APK changed from **40,797,669 to 40,794,579 bytes**;
+  AAB changed from **30,623,925 to 30,624,238 bytes**. These small mixed changes
+  are artifact observations, not evidence of faster startup, less memory or a
+  smaller artifact in every format. Native 16 KB execution and the ordinary API
+  matrix for this new cleanup still require its own remote six-job run.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -685,10 +763,12 @@ only the method and leave a live caller behind. This block does not change that 
 3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
    for `fed11d2`, including six native cases on actual 16 KB pages without
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
-4. Novoda is replaced in the ninth block; review the still-used fast-scroller
-   next, separately. Physical Android 10/32-bit media and CAPTCHA acceptance
-   remains required before release. Keep embedded native source revision/security
-   provenance distinct from wrapper Maven versions.
+4. Run 28 confirms all six jobs for the ninth-block Novoda replacement. The tenth
+   replaces the archived fast-scroller with AndroidFastScroll and an index-aware
+   helper; require its own remote matrix next. Continue bounded review of the
+   remaining UI/image families (Material, ConstraintLayout, Glide and related
+   consumers). Physical Android 10/32-bit media and CAPTCHA acceptance remains
+   required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
    cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
    time-limited exceptions. Do not treat the scanner as the automatic next task

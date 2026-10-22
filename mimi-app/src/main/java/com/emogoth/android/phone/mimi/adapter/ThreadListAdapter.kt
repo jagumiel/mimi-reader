@@ -47,7 +47,6 @@ import com.mimireader.chanlib.models.ArchivedChanThread
 import com.mimireader.chanlib.models.ChanPost
 import com.mimireader.chanlib.models.ChanThread
 import com.mimireader.chanlib.util.ChanUtil
-import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -56,7 +55,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
 
-class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, RecyclerViewFastScroller.OnPopupTextUpdate {
+class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     private val flagUrl: String
     private val trollUrl: String
     private val pinDrawable: VectorDrawableCompat?
@@ -919,7 +918,4 @@ class ThreadListAdapter(thread: ChanThread, fragmentManager: FragmentManager) : 
         setupThread()
     }
 
-    override fun onChange(position: Int): CharSequence {
-        return "${position + 1} / ${items.size}"
-    }
 }

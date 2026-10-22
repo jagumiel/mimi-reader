@@ -293,11 +293,6 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "com.squareup.okhttp3:okhttp:4.12.0"
         },
         {
@@ -334,6 +329,11 @@
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "io.reactivex.rxjava2:rxkotlin:2.4.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "me.zhanghai.android.fastscroll:library:1.3.0"
         },
         {
             "configuration": "implementation",
@@ -1238,10 +1238,6 @@
             },
             {
                 "direct": true,
-                "id": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
-            },
-            {
-                "direct": true,
                 "id": "com.squareup.okhttp3:mockwebserver:4.12.0"
             },
             {
@@ -1279,6 +1275,10 @@
             {
                 "direct": true,
                 "id": "junit:junit:4.13.2"
+            },
+            {
+                "direct": true,
+                "id": "me.zhanghai.android.fastscroll:library:1.3.0"
             },
             {
                 "direct": true,
@@ -1986,10 +1986,6 @@
             },
             {
                 "direct": true,
-                "id": "com.quiph.ui:recyclerviewfastscroller:0.2.3"
-            },
-            {
-                "direct": true,
                 "id": "com.squareup.okhttp3:okhttp:4.12.0"
             },
             {
@@ -2019,6 +2015,10 @@
             {
                 "direct": true,
                 "id": "io.reactivex.rxjava2:rxkotlin:2.4.0"
+            },
+            {
+                "direct": true,
+                "id": "me.zhanghai.android.fastscroll:library:1.3.0"
             },
             {
                 "direct": true,

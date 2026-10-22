@@ -150,6 +150,28 @@ was restored to 0; no real browser navigation or public posting was triggered
 by the new fixtures. Remote Android 10/12/14/16 plus ps16k acceptance for the
 new cleanup commit remains pending.
 
+## Tenth cleanup: fast-scroll acceptance
+
+Run 28 confirms the ninth cleanup: all six jobs passed for `dc17d6d`, including
+the complete Android 10/12/14/16 matrix and actual 16 KB native tests.
+
+The tenth cleanup adds four production-layout fast-scroll cases using synthetic
+variable-height posts and MotionEvents, not a network thread: index-based
+first/middle/last targets; popup bounds and drag gestures across three themes,
+320dp LTR/480dp RTL layouts; pull-to-refresh after cancellation; and empty/short/
+replaced adapters plus detach/reattach without duplicate controllers. A drag
+cancelled by clearing data must also recover with a new adapter. All four cases
+passed separately on the Edge 20 / Android 12. Six numerical unit tests cover
+bounds/overflow. The suite now contains 58 instrumented cases, still with three
+opt-in skips; the native 16 KB job remains six cases. A new remote run is required.
+
+The final tenth-block suite passed on the Edge 20 / Android 12 on 22 October:
+58 cases, 55 passed, three existing opt-in skips, no failures/errors. All four
+new cases passed, including resumed dragging with replacement data; the earlier
+scoped four-case run also passed before that extra recovery assertion was added.
+The phone's temporary stay-awake setting was restored to 0. Full remote
+Android 10/12/14/16 and actual-16-KB validation of this cleanup remains pending.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

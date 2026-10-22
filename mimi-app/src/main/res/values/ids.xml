@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
+    <item type="id" name="thread_fast_scroll" />
     <item type="id" name="gallery2_pager" />
     <item type="id" name="gallery2_grid" />
     <item name="captch_webview" type="id" />

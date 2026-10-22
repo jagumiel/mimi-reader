@@ -118,6 +118,38 @@ checks, debug/test APK and minified release APK/AAB builds, native ELF/ZIP/JNI
 guards, SDK zipalign and actionlint. The original phone stay-awake setting (0)
 was restored. These results do not pre-approve this new commit's remote matrix.
 
+## Run 28 confirmed; tenth cleanup thread fast-scrolling
+
+[Run 28 for `dc17d6d`](https://github.com/jagumiel/mimi-reader/actions/runs/39823710636)
+passed all six jobs, confirming the ninth-block browser replacement on the
+ordinary Android 10/12/14/16 matrix plus actual native 16 KB execution.
+
+The tenth cleanup swaps the archived Quiph wrapper for AndroidFastScroll 1.3.0
+with an index-aware helper for variable-height posts. Four mandatory offline
+`ThreadFastScrollTest` cases cover production-layout MotionEvent dispatch,
+first/middle/last posts, counter bounds, themes/widths/LTR-RTL, scrollbar/refresh
+gesture separation, active-drag cancellation when data empties, short/replaced
+adapters and idempotent reattachment. Six additional pure unit tests cover
+numeric boundaries/overflow. The instrumented suite becomes **58 cases**, with
+the same three opt-in skips; app/library unit coverage becomes **102 + 8**.
+CI-helper coverage remains 40 cases and the ps16k job still runs six native
+cases. No skip, retry, timeout increase or relaxed check is introduced.
+
+Initial local runs exposed an emptied-list drag that was not cancelled, then
+an attach/observe timing issue that cancelled a fresh gesture. The integration
+now observes before interaction and cancels mutations before the library's
+disabled-scrollbar path. All four new instrumented cases passed separately on
+the Edge 20 / Android 12. The full remote six-job workflow for this new cleanup
+remains pending; run 28 does not pre-approve its successor.
+
+Final local tenth-block checks passed: 102 app + eight library unit tests,
+40 CI-helper tests, four isolated fast-scroll device cases and the full
+58-case Edge 20 / Android 12 suite (55 passed, three existing opt-in skips,
+no failures/errors). Debug/test and minified release APK/AAB builds, lint
+without errors, variant IDs, SBOM freshness/negative tests, native ELF/ZIP/JNI
+checks, SDK 16 KB zipalign and actionlint passed. Restored phone stay-awake to 0.
+No remote-success claim is made for the new commit until its six jobs pass.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

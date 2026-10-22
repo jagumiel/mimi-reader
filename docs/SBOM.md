@@ -89,6 +89,15 @@ component record and all Ruffle file hashes remain unchanged. Its node/root
 edge is removed without version changes, new dependencies or global exclusions.
 See [browser cleanup evidence](DEPENDENCIES.md#ninth-cleanup-replace-the-novoda-browser-adapter).
 
+The tenth cleanup replaces `com.quiph.ui:recyclerviewfastscroller:0.2.3` with
+`me.zhanghai.android.fastscroll:library:1.3.0`. Totals remain **150 components /
+76 declarations**. No retained component version/metadata/hash or retained graph
+edge outside the two scroller nodes changes; Ruffle is untouched. The new
+artifact requests already-selected AndroidX dependencies and adds no native
+code. [Fast-scroll integration and tests](DEPENDENCIES.md#tenth-cleanup-thread-fast-scrolling-with-variable-height-posts)
+cover its variable-height adaptation and lifecycle/refresh behaviour. This is
+not a CVE scan or a claim that all remaining UI libraries have been updated.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

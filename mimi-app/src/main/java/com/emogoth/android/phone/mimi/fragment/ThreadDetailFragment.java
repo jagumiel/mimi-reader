@@ -84,6 +84,7 @@ import com.emogoth.android.phone.mimi.util.NetworkErrorMessage;
 import com.emogoth.android.phone.mimi.util.RxUtil;
 import com.emogoth.android.phone.mimi.viewmodel.ThreadViewModel;
 import com.emogoth.android.phone.mimi.widget.MimiRecyclerView;
+import com.emogoth.android.phone.mimi.widget.ThreadFastScroll;
 import com.google.android.material.snackbar.Snackbar;
 ;
 import com.mimireader.chanlib.models.ArchivedChanThread;
@@ -284,6 +285,7 @@ public class ThreadDetailFragment extends MimiFragmentBase implements
         }
 
         recyclerView.setAdapter(threadListAdapter);
+        ThreadFastScroll.attach(recyclerView);
 
         TypedValue typedValue = new TypedValue();
         getActivity().getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true);
