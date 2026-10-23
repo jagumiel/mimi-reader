@@ -349,6 +349,29 @@ file is verified absent afterward. See [final local acceptance and artifact
 limits](LOCAL_DOCUMENTS.md#final-local-acceptance-23-october-2026); this does not
 claim the next remote run has passed.
 
+## Sixteenth cleanup: live settings navigation and legacy values
+
+[Run 35](https://github.com/jagumiel/mimi-reader/actions/runs/39930834599) accepts
+the previous block in all six jobs, including API 29 and native 16 KB. This new
+block raises ordinary instrumentation to **80 cases**, keeping the three opt-in
+skips and six native 16 KB cases unchanged.
+
+`SettingsNavigationTest` clicks all six actual headers, checks live controls and
+restores each category after activity recreation, then returns with Back to the
+same root. Existing saved values must stay equal; a fresh installation may
+initialize missing XML defaults. No destructive/authentication/external control
+is clicked. `PreferenceMigrationTest` separately preserves stored legacy key
+values and unknown data in isolated preferences, including repeated migration.
+Existing posting and document tests are not replaced. See [the orphan-resource
+audit](SETTINGS_RESOURCE_AUDIT.md) for deletion evidence and acceptance limits.
+
+Local acceptance on 23 October passes the full Edge 20 / Android 12 suite:
+**80 distinct JUnit cases, 77 passed, three existing opt-in skips, zero
+failures/errors**. The API 29 emulator separately passes all five scoped
+settings/migration cases without skips. Restore stay-awake to 0 on the phone
+and 1 on the owned emulator, then shut down the emulator. This is not a new
+physical Android 10, cold-install, minified-release UI or remote-matrix pass.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

@@ -278,6 +278,31 @@ tests, actionlint, lint without errors, variant IDs, SBOM checks, minified relea
 APK/AAB and ELF/ZIP/JNI/SDK zipalign guards. Stay-awake is restored and verified
 as 0. The new commit's six-job remote acceptance remains pending until push.
 
+## Run 35 confirmed; sixteenth cleanup of orphan settings resources
+
+[Run 35 for `f1b63df`](https://github.com/jagumiel/mimi-reader/actions/runs/39930834599)
+passes **all six jobs**, accepting the preceding document/cache/runtime cleanup.
+API 29's native startup log confirms `MojoUseBinder` is disabled before its
+78-case suite; original-provider capability and pinned preflight also pass.
+The dedicated native 16 KB job succeeds, not just the static alignment checks.
+
+The next bounded change removes two verified orphan settings XML copies, five
+exclusive/definition-only strings and commented nonexistent header examples.
+Two mandatory cases cover real navigation/recreation/Back for all six live
+categories and isolated migration of legacy/unknown stored values. The ordinary
+suite becomes **80 cases**, with the same three opt-in skips; the dedicated
+native suite remains six. No CI gates, dependencies or production settings
+logic change. See [audit evidence and boundaries](SETTINGS_RESOURCE_AUDIT.md).
+This cleanup still needs its own green six-job run after pushing.
+
+Local sixteenth-block checks pass: 110 app/library unit tests, 54 CI-helper
+tests, lint with zero errors (seven fewer unused-resource warnings), SBOM,
+debug/test and minified release builds, actionlint and static native guards.
+The Edge 20 full suite passes 80 JUnit cases (77 passed, three existing skips),
+and API 29 passes five scoped settings/migration cases without skips. Restore
+device settings after testing. Detailed evidence, APK resource-table/R8 checks
+and the initial Windows file-lock build failure are in the audit above.
+
 ## Run 34: API 29 native Binder failure and local document cleanup
 
 [Run 34 for `f5afe2f`](https://github.com/jagumiel/mimi-reader/actions/runs/39922242383)

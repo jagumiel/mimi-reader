@@ -192,14 +192,11 @@
     <string name="save_history_pref">save_history_pref</string>
     <string name="history_prune_time_pref">history_prune_time_pref</string>
     <string name="full_board_list_enabled">full_board_list_enabled</string>
-    <string name="about_pref">about_pref</string>
     <string name="website_pref">website_pref</string>
     <string name="privacy_pref">privacy_pref</string>
     <string name="licenses_pref">licenses_pref</string>
     <string name="changelog_pref">changelog_pref</string>
     <string name="version_pref">version_pref</string>
-    <string name="posting_pref">posting_pref</string>
-    <string name="board_pref">board_pref</string>
     <string name="show_all_boards">show_all_boards</string>
     <string name="general_preference_category">general_preference_category</string>
     <string name="advanced_preference_category">advanced_preference_category</string>

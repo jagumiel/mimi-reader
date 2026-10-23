@@ -91,6 +91,23 @@ class PreferenceMigrationTest {
     }
 
     @Test
+    fun removingUnusedResourceKeysDoesNotDeleteStoredLegacyOrUnknownValues() {
+        assertTrue(preferences.edit()
+            .putString("about_pref", "legacy-about")
+            .putBoolean("posting_pref", true)
+            .putInt("board_pref", 2)
+            .putStringSet("unrelated_custom_value", setOf("keep", "unknown"))
+            .commit())
+        val original = preferences.all.toMap()
+
+        PreferenceMigration.migrate(preferences, keys)
+        for ((key, value) in original) assertEquals("Preserve stored $key", value, preferences.all[key])
+        val migrated = preferences.all.toMap()
+        PreferenceMigration.migrate(preferences, keys)
+        assertEquals(migrated, preferences.all)
+    }
+
+    @Test
     fun newerPreferenceSchemaIsNotDowngradedOrModified() {
         assertTrue(
             preferences.edit()

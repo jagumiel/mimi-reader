@@ -51,21 +51,4 @@
         app:summary="@string/more_info_summary"
         app:title="@string/more_info_title" />
 
-    <!--<header app:fragment="com.emogoth.android.phone.mimi.prefs.PreferencesHC$PostingPrefsHCFragment"-->
-    <!--app:title="Posting"-->
-    <!--app:summary="Preferences for posting">-->
-    <!--&lt;!&ndash; Arbitrary key/value pairs can be included with a header as-->
-    <!--arguments to its fragment. &ndash;&gt;-->
-    <!--<extra app:name="someKey" app:value="someHeaderValue" />-->
-    <!--</header>-->
-    <!---->
-    <!--<header app:fragment="com.emogoth.android.phone.mimi.prefs.PreferencesHC$ThreadPrefsHCFragment"-->
-    <!--app:title="Thread"-->
-    <!--app:summary="Preferences for threads">-->
-    <!--&lt;!&ndash; Arbitrary key/value pairs can be included with a header as-->
-    <!--arguments to its fragment. &ndash;&gt;-->
-    <!--<extra app:name="someKey" app:value="someHeaderValue" />-->
-    <!--</header>-->
-
-
 </PreferenceScreen>

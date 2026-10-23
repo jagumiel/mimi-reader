@@ -1165,6 +1165,40 @@ Detailed artifact sizes, evidence and acceptance limits are recorded in
 [LOCAL_DOCUMENTS.md](LOCAL_DOCUMENTS.md#final-local-acceptance-23-october-2026).
 Fresh remote six-job acceptance remains required.
 
+## Sixteenth cleanup: confirmed orphan settings resources
+
+[Run 35 for `f1b63df`](https://github.com/jagumiel/mimi-reader/actions/runs/39930834599)
+passes all six jobs, accepting the fifteenth block's API 29 correction and local
+viewers. Native startup flags proof, capability/preflight and the ordinary suite
+pass; the dedicated native 16 KB job also succeeds. This does not accept later
+commits automatically.
+
+Audit both unused settings XML against source, live preference routing,
+manifests, variants, R8 and dynamic lookups. `board_prefs.xml`/`posting_prefs.xml`
+are identical abandoned More Info copies, not real board/posting functionality.
+Remove them, the exclusive `about_pref`/`more_info_website` strings, the
+definition-only `posting_pref`/`board_pref`/`more_info_version` strings, and
+commented headers naming nonexistent PreferencesHC classes. Keep current shared
+keys and all six live preference screens. No persisted values are removed.
+
+Add actual six-category header click/recreation/Back coverage plus isolated
+migration coverage preserving stored legacy/unknown values. The ordinary suite
+becomes **80 cases**, retaining three opt-in skips and the separate six-case
+native suite. Dependencies, 152 SBOM components / 75 declarations, R8, package
+IDs, SDK/version settings, posting/CAPTCHA and legal documents are unchanged.
+[Evidence, boundaries and next bounded review](SETTINGS_RESOURCE_AUDIT.md).
+
+Final local acceptance passes **80 Edge 20 / Android 12 cases: 77 passed, three
+existing opt-in skips, no failures/errors**, plus five scoped settings/migration
+cases on API 29 without skips. Pass 110 app/library unit tests, 54 CI-helper
+tests, SBOM checks, debug/test and minified release APK/AAB builds, actionlint
+and static native/JNI/SDK guards. Lint has zero errors, 1,005 warnings and one
+hint, with UnusedResources reduced from 482 to 475. Dump both actual APK resource
+tables and check release mapping to confirm removed/retained resources and live
+fragment names. Restore phone stay-awake to 0 and owned emulator to 1, then stop
+the emulator. Detailed size comparisons and the initial Windows file-lock build
+failure are retained in the audit; fresh six-job remote acceptance is pending.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -1202,9 +1236,11 @@ The old email/logcat feedback path is also removed with its live caller.
    fourteenth updates More Info and removes obsolete market/email workflows.
    Run 34 passes five jobs but fails API 29; the fifteenth consolidates local
    viewers, protects live provider cache and corrects the pinned test runtime.
-   Require fresh six-job acceptance, not a green claim for run 34. Next audit
-   confirmed orphan resources/screens in a bounded block, without drafting the
-   8.0 changelog. Physical Android
+   Run 35 confirms all six jobs for the fifteenth block, including API 29 and
+   native 16 KB. The sixteenth removes confirmed orphan settings XML/strings
+   and tests all six live categories and legacy-value preservation. Require its
+   own green workflow. Next audit legacy settings layouts and generated binding
+   consumers, without drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

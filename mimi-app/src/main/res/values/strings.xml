@@ -152,11 +152,9 @@
     <string name="history_prune_time_title">Prune History</string>
     <string name="history_prune_time_summary">Every %s</string>
     <string name="more_info_about">About</string>
-    <string name="more_info_website">MimiReader.com</string>
     <string name="more_info_privacy">Privacy Policy</string>
     <string name="more_info_licences">Licences</string>
     <string name="more_info_changelog">ChangeLog</string>
-    <string name="more_info_version">Version</string>
     <string name="all_boards_visible">Show All Boards</string>
     <string name="image_file_location">Save Location</string>
     <string name="use_original_filename_title">Use Original Filename</string>
