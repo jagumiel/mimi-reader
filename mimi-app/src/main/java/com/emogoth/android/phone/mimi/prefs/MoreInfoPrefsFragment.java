@@ -19,9 +19,6 @@ package com.emogoth.android.phone.mimi.prefs;
 import android.os.Bundle;
 
 import androidx.annotation.StringRes;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -43,7 +40,8 @@ public class MoreInfoPrefsFragment extends PreferenceFragmentCompat {
         if (changelogPreference != null) {
             changelogPreference.setOnPreferenceClickListener(preference -> {
                 // Create and show the dialog.
-                LicensesFragment.displayLicensesFragment(getParentFragmentManager(), R.raw.changelog, "ChangeLog");
+                LicensesFragment.displayLicensesFragment(getParentFragmentManager(), R.raw.changelog,
+                        getString(R.string.more_info_changelog));
                 return true;
             });
         }
@@ -58,33 +56,13 @@ public class MoreInfoPrefsFragment extends PreferenceFragmentCompat {
 
         final Preference privacy = findPreference(getString(R.string.privacy_pref));
         privacy.setOnPreferenceClickListener(preference -> {
-            // Create & show a licenses fragment just as you would any other DialogFragment.
-            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-            Fragment prev = getParentFragmentManager().findFragmentByTag("privacyDialogFragment");
-            if (prev != null) {
-                ft.remove(prev);
-            }
-            ft.addToBackStack(null);
-
-            // Create and show the dialog.
-            DialogFragment newFragment = PrivacyPolicyFragment.newInstance();
-            newFragment.show(ft, "privacyDialogFragment");
+            PrivacyPolicyFragment.displayLicensesFragment(getParentFragmentManager());
             return true;
         });
 
         final Preference license = findPreference(getString(R.string.licenses_pref));
         license.setOnPreferenceClickListener(preference -> {
-            // Create & show a licenses fragment just as you would any other DialogFragment.
-            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-            Fragment prev = getParentFragmentManager().findFragmentByTag("licensesDialogFragment");
-            if (prev != null) {
-                ft.remove(prev);
-            }
-            ft.addToBackStack(null);
-
-            // Create and show the dialog.
-            DialogFragment newFragment = LicensesFragment.newInstance(R.raw.licenses);
-            newFragment.show(ft, "licensesDialogFragment");
+            LicensesFragment.displayLicensesFragment(getParentFragmentManager(), R.raw.licenses, null);
             return true;
         });
 

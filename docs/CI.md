@@ -278,6 +278,58 @@ tests, actionlint, lint without errors, variant IDs, SBOM checks, minified relea
 APK/AAB and ELF/ZIP/JNI/SDK zipalign guards. Stay-awake is restored and verified
 as 0. The new commit's six-job remote acceptance remains pending until push.
 
+## Run 34: API 29 native Binder failure and local document cleanup
+
+[Run 34 for `f5afe2f`](https://github.com/jagumiel/mimi-reader/actions/runs/39922242383)
+passes build/lint/unit/SBOM/release, API 31/34/36 and actual 16 KB native tests.
+Only API 29 fails: the mandatory bundled SWF test receives a renderer exit. Its
+artifact includes native descriptor-ownership (`fdsan`) failure during document
+recreation, then missing `cache/WebView` paths after the cache test. This is not
+a reason to mark all six jobs green, retry the failing assertion or skip SWF.
+
+The fifteenth block fixes live WebView-profile deletion and consolidates the
+four local document source entry points with view-scoped I/O, safe rendering,
+error/retry and WebView teardown. Six new mandatory tests bring the ordinary
+suite to **78 cases**, with the same three opt-in skips. Native ps16k remains six.
+Documents, Ruffle, provider version/hash and SBOM components are unchanged.
+
+For the historical API 29 test provider only, explicitly disable its experimental
+`MojoUseBinder` transport, which its test-variations configuration enables despite
+the feature's normal default. A local unmodified baseline reproduced the native
+Binder descriptor failure; the override is checked against native startup logs,
+not only the presence of a command-line file. Keep fdsan, sandboxing, rendering
+and all assertions enabled. No app/phone runtime flags are changed.
+
+The helper refuses physical serials, non-debuggable/non-29 images, wrong active
+providers and pre-existing developer flags. It verifies its owned file, restarts
+only the test app, and attempts cleanup even when app stopping fails. The original
+provider's capability case still runs before pinning; then one existing
+startup-error case proves native flags before the complete ordinary suite.
+Preserve that extra preflight's JUnit/logcat in
+`build/reports/legacy-webview/pinned-runtime`, covered by the existing artifact
+upload. No failing test retry or relaxed timeout is introduced. **54 CI-helper
+tests** cover the new environment/proof/cleanup guards and Windows/Linux wrapper
+selection. Newer API jobs keep their image provider and never enter this runtime.
+
+Local acceptance on 23 October: **78 cases / 75 passed / three existing skips**
+on the Edge 20 / Android 12 and by direct instrumentation on the Google APIs
+API 29 emulator with the pinned provider. The original WebView 74 passes eleven
+scoped document/cache cases on the local AOSP image and one capability check on
+Google APIs. Unlike the earlier unavailable Windows AVD attempts, the SDK's
+ASCII path and AEHD now produce working local emulators; Google APIs uses native
+1080x1920 / 420dpi geometry, two cores, 2 GB and SwiftShader. An early baseline
+attempt with unsuitable overridden geometry was interrupted, not accepted.
+
+Require the new commit's own six-job remote acceptance, including actual 16 KB.
+The final real helper invocation also passes end to end locally: original
+capability, pinned startup/native flags proof and all 78 ordinary cases
+(75 passed, three expected skips), with its owned flags file removed afterward.
+See [final local acceptance](LOCAL_DOCUMENTS.md#final-local-acceptance-23-october-2026)
+for the complete build/unit/lint/native evidence and limits.
+Physical Android 10/32-bit media, human CAPTCHA/keyboard/browser, CVE scanning,
+owner-approved changelog and final README gates remain. Detailed sources and
+boundaries are in [the local-document review](LOCAL_DOCUMENTS.md).
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

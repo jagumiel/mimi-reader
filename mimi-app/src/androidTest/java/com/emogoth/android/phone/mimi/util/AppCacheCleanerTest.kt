@@ -25,6 +25,9 @@ class AppCacheCleanerTest {
         }
         val filesMarker = File(context.filesDir, "cache-cleaner-test/preserved-file.txt")
         val databaseMarker = context.getDatabasePath("cache-cleaner-preserved.db")
+        val webViewMarker = File(context.cacheDir, "WebView/cache-cleaner-preserved-marker")
+        val suffixedWebViewMarker = File(context.cacheDir,
+            "WebView_cache_cleaner_fixture/cache-cleaner-preserved-marker")
         val downloadMarker = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.let {
             File(it, "cache-cleaner-preserved-download.bin")
         }
@@ -34,6 +37,8 @@ class AppCacheCleanerTest {
             externalCacheMarker?.let { createMarker(it, 2_048) }
             createMarker(filesMarker, 128)
             createMarker(databaseMarker, 128)
+            createMarker(webViewMarker, 128)
+            createMarker(suffixedWebViewMarker, 128)
             downloadMarker?.let { createMarker(it, 128) }
             preferences.edit().putString(preferenceKey, "preserved").commit()
 
@@ -49,11 +54,16 @@ class AppCacheCleanerTest {
             assertTrue(downloadMarker?.exists() != false)
             assertTrue(preferences.getString(preferenceKey, null) == "preserved")
             assertTrue(File(context.cacheDir, HttpClientFactory.HTTP_CACHE_DIRECTORY).exists())
+            assertTrue("A live WebView profile must not be deleted", webViewMarker.exists())
+            assertTrue("Suffix-specific WebView profiles must be retained", suffixedWebViewMarker.exists())
         } finally {
             preferences.edit().remove(preferenceKey).commit()
             filesMarker.parentFile?.deleteRecursively()
             databaseMarker.delete()
             downloadMarker?.delete()
+            webViewMarker.delete()
+            suffixedWebViewMarker.delete()
+            suffixedWebViewMarker.parentFile?.delete()
         }
     }
 

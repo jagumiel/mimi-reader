@@ -1106,6 +1106,65 @@ hit, source/network fallback, widened timeout, CI retry, or skipped test.
   keyboard/browser acceptance remain release gates. CVE scanning, owner-approved
   8.0 changelog preparation and the final README rewrite remain deferred.
 
+## Fifteenth cleanup: shared offline documents and provider lifetime
+
+Run 34 for `f5afe2f` passes five jobs; API 29 fails mandatory SWF playback after a
+renderer exit. Review the complete artifact, not only the final Gradle error:
+native fdsan/Binder descriptor failure precedes the SWF assertion, and the old
+cache clear removes live `cache/WebView` infrastructure. The old HTML viewers
+also keep WebViews alive beyond their views and duplicate resource-loading code.
+
+Consolidate both packages' license/privacy classes in `LocalDocumentFragment`,
+preserving original attribution, source factories/arguments and the live legacy
+changelog entry point. Read UTF-8 raw documents with closed streams on existing
+Rx I/O, dispose view-scoped work and stale generations, and detach/destroy the
+WebView at view destruction. Intercept the prepared HTML at one local HTTPS URL
+with CSP/no-store; deny every other resource request, scripting/storage/file/
+content access, mixed content and automatic/subframe/unsafe-scheme navigation.
+Only explicit HTTP(S) links go through existing browser error handling. Errors
+offer Retry; renderer loss discards the affected instance and retry creates one.
+Do not change any bundled legal/privacy/changelog document, LICENSE or README.
+
+Protect `WebView` and suffix-specific directories alongside the existing live
+HTTP cache, while preserving normal media/temp/Glide clearing. Extend its test
+with owned markers, and add six real document lifecycle/rendering/navigation/
+error/cache cases. Native text assertions found a genuine blank newer-provider
+loadData implementation; replace it with the actual intercepted HTML response,
+not a weaker assertion or enabled JavaScript. The original WebView also requires
+a provider-neutral unchanged-URL assertion, not an assumed history URL.
+
+The baseline with the exact pinned 128 provider reproduces native errors in
+`libbinder_ndk` / `AParcel_writeParcelFileDescriptor`. Its test field trials
+enable experimental MojoUseBinder, despite the declared disabled default.
+For this CI-only API 29 provider, guard/verify a temporary command-line override
+selecting the nonexperimental transport; confirm native startup output before
+the full suite and restore the owned flag file even after failures. The pin/hash,
+Ruffle, fdsan, sandbox, mandatory rendering assertions and newer-device providers
+do not change. Never apply the override to the physical phone. Original-provider
+capability and the new pinned-startup preflight remain distinct from full-suite
+acceptance. The helper now uses the platform's correct Gradle launcher on Windows
+or Linux; **54 CI-helper tests** cover safety, proof, failure propagation/cleanup.
+Sources, the unsuitable/interrupted first local baseline and acceptance limits
+are documented in [LOCAL_DOCUMENTS.md](LOCAL_DOCUMENTS.md).
+
+No dependency or R8 rule changes are required: **152 components / 75 declarations**
+and Ruffle/native records remain unchanged. The live legacy license class and
+current preference viewers retain their names in release mapping; the otherwise
+unused legacy privacy wrapper remains shrinkable, not a newly rooted release
+class. Continue verified orphan-resource cleanup in a separate bounded block;
+no files are deleted merely because they are old.
+
+Final fifteenth-block acceptance on 23 October passes the actual CI helper end
+to end on local API 29: original capability, pinned startup/native flags proof,
+then **78 cases / 75 passed / three existing opt-in skips**, with flags removed.
+The Edge 20 independently passes the same full suite. Also pass 110 app/library
+unit tests, 54 CI-helper tests, lint without errors, SBOM checks, debug/test and
+release builds, actionlint and static native/JNI/SDK alignment guards. Restore
+phone stay-awake to 0 and owned emulator to 1, then shut down the emulator.
+Detailed artifact sizes, evidence and acceptance limits are recorded in
+[LOCAL_DOCUMENTS.md](LOCAL_DOCUMENTS.md#final-local-acceptance-23-october-2026).
+Fresh remote six-job acceptance remains required.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -1140,11 +1199,12 @@ The old email/logcat feedback path is also removed with its live caller.
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
 4. Runs 28–30, 32 and 33 confirm all six jobs for the ninth through thirteenth
    browser, fast-scroll, Material, Glide and PercentLayout cleanups. The
-   fourteenth updates More Info and removes its obsolete market/email workflows;
-   require its own six-job remote acceptance. Next refactor the duplicated local
-   privacy/license/changelog viewers and their lifecycle/link handling, without
-   drafting the 8.0 changelog. Continue confirmed orphan-resource review in a
-   separate bounded block. Physical Android
+   fourteenth updates More Info and removes obsolete market/email workflows.
+   Run 34 passes five jobs but fails API 29; the fifteenth consolidates local
+   viewers, protects live provider cache and corrects the pinned test runtime.
+   Require fresh six-job acceptance, not a green claim for run 34. Next audit
+   confirmed orphan resources/screens in a bounded block, without drafting the
+   8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

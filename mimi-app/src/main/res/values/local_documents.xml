@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="local_document_licenses_title">Open Source Licenses</string>
+    <string name="local_document_load_error">This bundled document could not be displayed. Try loading it again.</string>
+    <string name="local_document_retry">Retry</string>
+</resources>

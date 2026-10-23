@@ -302,6 +302,53 @@ static ELF/ZIP/JNI/SDK 16 KB zipalign guards. Restore and verify stay-awake **0*
 The local pass does not replace this commit's remote matrix or physical/human
 release acceptance. See [detailed evidence and limits](DEPENDENCIES.md#fourteenth-block-validation-23-october-2026).
 
+## Fifteenth cleanup: real document rendering and provider-safe cache clearing
+
+The ordinary suite is **78 cases**, still with three opt-in skips; the dedicated
+actual-16-KB suite remains six. Six mandatory `LocalDocumentTest` cases cover:
+
+- Actual rendered text for licenses, privacy and historical changelog, both
+  source packages, recreation, custom arguments and preserved dialog back stack.
+- Disabled script/storage/file/content access and blocked networking, the exact
+  local 200/CSP response and denied external resources; user browser links,
+  fragments, blocked schemes/subframes/automatic navigation, absent/blocked apps.
+- Bad-resource error/Retry, simulated renderer-exit disposal and a fresh retry
+  WebView, pending-read cancellation and ignored callbacks from a destroyed view.
+- Media-cache clearing after a real WebView has loaded, followed by recreation
+  and an actual text assertion. The existing cache test separately preserves
+  owned markers inside `WebView` and `WebView_*`, along with persistent data.
+
+Find text natively with JavaScript still disabled. Size/visibility/load-finished
+signals alone missed a blank document in the first Edge 20 implementation; a
+diagnostic screenshot confirmed it. Serve the HTML as an actual intercepted
+response, rather than weakening the content assertion or enabling scripting.
+An initial old-provider test also assumed getUrl equals the supplied base URL;
+the correct invariant is that external link handling leaves the local page URL
+and content unchanged. Diagnostic JavaScript/screenshot code is not shipped.
+
+The Edge 20 final suite passes **78 cases: 75 passed, three existing opt-in skips,
+zero failures/errors**, with the original stay-awake setting restored to 0.
+Local API 29 / Google APIs with the exact pinned WebView 128 also passes all 78
+by direct instrumentation. On the original WebView 74, eleven scoped document/
+cache cases and the separate original-provider capability case pass. Neither
+an interrupted baseline run nor that scoped provider check is a full ordinary
+suite pass. The physical Android 10/32-bit and human-interaction gates remain.
+
+CI run 34 passes five jobs but fails the old API 29 renderer. The helper now
+selects the nonexperimental Binder transport only for the verified disposable
+API 29/pinned provider, proves its native flags with one existing startup case
+before the full suite, retains that preflight's results, and removes its owned
+flags file in finally. No phone flags, provider hash, playback assertion, retry
+or skip policy changes. See [sources, evidence and limits](LOCAL_DOCUMENTS.md).
+The new commit still needs all six remote jobs.
+
+The final end-to-end invocation of the actual CI helper also passes locally on
+API 29: original capability (one case), pinned startup/native proof (one case),
+then all 78 ordinary cases (75 passed, three expected skips). The owned flags
+file is verified absent afterward. See [final local acceptance and artifact
+limits](LOCAL_DOCUMENTS.md#final-local-acceptance-23-october-2026); this does not
+claim the next remote run has passed.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

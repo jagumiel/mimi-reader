@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.io.IOException;
 
-/** Clears disposable app data without touching files, databases, preferences, or user downloads. */
+/** Clears disposable app data without deleting persistent data or live provider infrastructure. */
 public final class AppCacheCleaner {
     private AppCacheCleaner() {
     }
@@ -34,8 +34,8 @@ public final class AppCacheCleaner {
 
         final File liveHttpCache = new File(internalCache, HttpClientFactory.HTTP_CACHE_DIRECTORY);
         try {
-            deleteChildren(internalCache, liveHttpCache);
-            deleteChildren(externalCache, null);
+            deleteChildren(internalCache, liveHttpCache, true);
+            deleteChildren(externalCache, null, false);
         } catch (IOException exception) {
             failure = appendFailure(failure, exception);
         }
@@ -66,7 +66,8 @@ public final class AppCacheCleaner {
         return total;
     }
 
-    private static void deleteChildren(File directory, File protectedDirectory) throws IOException {
+    private static void deleteChildren(File directory, File protectedDirectory,
+                                       boolean preserveWebView) throws IOException {
         if (directory == null || !directory.exists()) {
             return;
         }
@@ -79,6 +80,11 @@ public final class AppCacheCleaner {
                 ? null
                 : protectedDirectory.getCanonicalPath();
         for (File child : children) {
+            // Chromium owns these live paths, including suffix-specific WebView profiles.
+            // Removing them behind the provider can crash a later renderer in the same process.
+            if (preserveWebView && (child.getName().equals("WebView") || child.getName().startsWith("WebView_"))) {
+                continue;
+            }
             if (protectedPath != null && protectedPath.equals(child.getCanonicalPath())) {
                 continue;
             }

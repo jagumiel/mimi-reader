@@ -5,11 +5,13 @@ their image's provider; only the API 29 image needs its unsupported JS engine re
 """
 import argparse
 import base64
+from contextlib import contextmanager
 import hashlib
 import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import time
 import urllib.request
 
@@ -21,6 +23,9 @@ URL = ("https://android.googlesource.com/platform/external/chromium-webview/+/"
 SHA256 = "deb1987501d40c4c326697be8fdd7733abdf2e0ab7fb6e028205b0ff786876e5"
 PACKAGE = "com.android.webview"
 TEST_CLASS = "com.emogoth.android.phone.mimi.view.gallery.GalleryPlaybackTest"
+FLAG_FILE = "/data/local/tmp/webview-command-line"
+PINNED_FLAGS = "_ --disable-features=MojoUseBinder --webview-verbose-logging\n"
+TEST_APP = "com.emogoth.android.phone.mimi.beta"
 
 
 def verify(apk):
@@ -89,9 +94,62 @@ def validate_emulator(serial, api=29):
 
 
 def gradle(*args, serial):
-    subprocess.run(["./gradlew", "--no-daemon", "--stacktrace",
+    wrapper = "gradlew.bat" if os.name == "nt" else "./gradlew"
+    subprocess.run([wrapper, "--no-daemon", "--stacktrace",
                     ":mimi-app:connectedDebugAndroidTest", *args], check=True,
                    env=dict(os.environ, ANDROID_SERIAL=serial))
+
+
+@contextmanager
+def pinned_runtime(serial):
+    """Keep the historical test provider off its experimental, broken Q Binder path.
+
+    Never disable fdsan, sandboxing, rendering or assertions. Refuse existing
+    developer flags instead of overwriting them. This is only for the verified
+    API 29 disposable emulator with the pinned provider, never a user's phone.
+    """
+    if not re.fullmatch(r"emulator-\d+", serial):
+        raise RuntimeError("Pinned WebView flags are allowed only on an emulator")
+    for prop, expected in (("ro.kernel.qemu", "1"), ("ro.build.version.sdk", "29"),
+                           ("ro.debuggable", "1")):
+        if adb(serial, "shell", "getprop", prop) != expected:
+            raise RuntimeError("Pinned flags require a debuggable API 29 emulator")
+    provider = adb(serial, "shell", "dumpsys", "webviewupdate")
+    active = (rf"^[ \t]*Current WebView package \(name, version\):[ \t]*"
+              rf"\({re.escape(PACKAGE)},[ \t]*{re.escape(VERSION)}\)[ \t]*\r?$")
+    if not re.search(active, provider, re.MULTILINE):
+        raise RuntimeError("Refusing flags for a provider other than the pinned WebView")
+    try:
+        adb(serial, "shell", "test", "-e", FLAG_FILE)
+    except subprocess.CalledProcessError as error:
+        if error.returncode != 1:
+            raise
+    else:
+        raise RuntimeError("Refusing to overwrite existing WebView command-line flags")
+
+    with tempfile.TemporaryDirectory(prefix="ci-webview-flags-") as directory:
+        flags = Path(directory) / "webview-command-line"
+        flags.write_bytes(PINNED_FLAGS.encode("ascii"))
+        try:
+            adb(serial, "push", str(flags), FLAG_FILE)
+            adb(serial, "shell", "chmod", "644", FLAG_FILE)
+            if adb(serial, "shell", "cat", FLAG_FILE) != PINNED_FLAGS.strip():
+                raise RuntimeError("Pinned WebView command-line verification failed")
+            adb(serial, "shell", "am", "force-stop", TEST_APP)
+            yield
+        finally:
+            try:
+                adb(serial, "shell", "am", "force-stop", TEST_APP)
+            finally:
+                adb(serial, "shell", "rm", "-f", FLAG_FILE)
+
+
+def verify_pinned_command_line(serial):
+    command_line = adb(serial, "logcat", "-d", "-s", "chromium:V",
+                       "cr_WebViewCommandLine:V", "WebViewCommandLine:V")
+    disabled = re.findall(r"WebViewCommandLine 'disable-features': '([^']*)'", command_line)
+    if not any("MojoUseBinder" in entry.split(",") for entry in disabled):
+        raise RuntimeError("The pinned WebView did not report its required runtime flags")
 
 
 def run_tests(apk, serial, api=29):
@@ -122,7 +180,13 @@ def run_tests(apk, serial, api=29):
               rf"\({re.escape(PACKAGE)},[ \t]*{re.escape(VERSION)}\)[ \t]*\r?$")
     if not re.search(active, provider, re.MULTILINE):
         raise RuntimeError(f"The active WebView does not match the pinned test version (selection response: {selected!r})")
-    gradle(serial=serial)
+    with pinned_runtime(serial):
+        # Verify native startup before the long suite can rotate the logcat buffer.
+        gradle(f"-Pandroid.testInstrumentationRunnerArguments.class={TEST_CLASS}#flashStartupErrorsAreReportedWithoutWaitingForTheDeadline",
+               serial=serial)
+        verify_pinned_command_line(serial)
+        shutil.copytree(results, "build/reports/legacy-webview/pinned-runtime", dirs_exist_ok=True)
+        gradle(serial=serial)
 
 
 def main():

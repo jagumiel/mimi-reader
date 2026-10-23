@@ -34,4 +34,24 @@
         android:indeterminate="true"
         android:id="@+id/licensesFragmentIndeterminateProgress" />
 
+    <LinearLayout
+        android:id="@+id/local_document_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/local_document_load_error" />
+        <Button
+            android:id="@+id/local_document_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/local_document_retry" />
+    </LinearLayout>
 </RelativeLayout>

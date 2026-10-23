@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 20 de octubre de 2026.
+Última revisión: 23 de octubre de 2026.
 
 ## Objetivo
 
@@ -36,9 +36,9 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 
 ### Orden de trabajo inmediato
 
-1. Cuarto bloque de limpieza registrado en `faaf5a7`; confirmar su matriz remota junto al siguiente bloque.
-2. Completar la validación de publicación y CAPTCHA: integración, resolución humana y una respuesta pública autorizada comprobadas en Android 12. Quedan Android 10, la matriz remota y casos de adjuntos/hilos nuevos con autorización específica; alcance en la fase 5 y `docs/POSTING.md`.
-3. Retomar AppCompat/Fragment y los demás bloques de dependencias y refactorización.
+1. Confirmar los seis trabajos remotos del decimoquinto bloque: la ejecución 34 superó cinco, pero falló Android 10. La corrección del proveedor fijado y los visores locales ya pasan la validación local; no dar por verde la siguiente ejecución antes de comprobarla.
+2. Continuar con una auditoría acotada de recursos/pantallas huérfanos, empezando por `board_prefs.xml`, `posting_prefs.xml` y sus cadenas. Revisar consumidores, variantes, restauración y R8 antes de retirar nada; la antigüedad de un fichero no demuestra que sobre.
+3. Conservar las puertas de aceptación pendientes en Android 10 físico/32 bits y las comprobaciones humanas de CAPTCHA, teclado y navegador. En Android 12 ya se publicó una respuesta autorizada; no repetir envíos públicos como prueba automática. Alcance en la fase 5 y `docs/POSTING.md`.
 4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 
 ### 1. Red y compatibilidad con la API
@@ -234,8 +234,14 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
         - [x] Mostrar Apache 2.0 y créditos enlazados: Eli Connelly (`@econnelly` y cuenta histórica `@MimiReader`), `@Blatzar`, `@jagumiel` y procedencia de la red `@maestro12` sin atribuirle la autoría original. Conservar LICENSE, copyright y avisos de terceros; documentar fuentes y límites en `docs/PROJECT.md`.
         - [x] Añadir cuatro pruebas instrumentadas de enlaces sin envío de datos, falta/bloqueo de navegador, recreación/Atrás y apertura/restauración de los documentos locales. Los cuatro casos pasan por separado en el Edge 20 / Android 12 tras desbloquear el teléfono; no se ejecutan correos ni navegación externa real.
         - [x] Corregir la carrera de la prueba de disco de Glide detectada al repetir la suite: excluir memoria y limitar la lectura a RESOURCE manteniendo cache-only, la aserción de origen y el plazo de diez segundos, sin modificar la caché de producción. Pasan ocho casos acotados y la suite final completa: 72 casos, 69 superados, tres optativos omitidos, cero fallos. Validar 110 unitarias, 40 auxiliares, lint sin errores, SBOM sin cambios, APK/AAB release y ELF/ZIP/JNI/zipalign; restaurar pantalla a 0 y registrar tamaños/límites.
-        - [ ] Confirmar los seis trabajos remotos de este bloque después de subir su commit.
-      - [ ] Siguiente bloque: refactorizar los visores locales de privacidad, licencias y changelog, revisando carga de recursos, ciclo de vida del WebView, errores y navegación de enlaces. Unificar código duplicado con pruebas sin redactar el changelog de 8.0 ni alterar avisos de terceros. Continuar después con recursos/pantallas huérfanos confirmados en otro bloque; no dar por terminada toda la limpieza.
+        - [ ] Confirmar la aceptación remota completa: la ejecución 34 de `f5afe2f` supera cinco trabajos, pero falla Android 10 al detenerse el renderer de SWF. El decimoquinto bloque trata el error nativo del WebView fijado y la limpieza indebida de su carpeta; exigir otra ejecución verde de los seis trabajos.
+      - [x] Decimoquinto bloque: unificar los visores de privacidad, licencias y changelog en un lector local con carga UTF-8 en I/O, cancelación por ciclo de vida de la vista, descarte de callbacks antiguos y destrucción del WebView tras retirarlo de su padre. Conservar entradas/factorías heredadas y argumentos; no redactar el changelog de 8.0 ni alterar LICENSE, avisos de terceros o los documentos HTML.
+        - [x] Servir HTML preparado mediante una respuesta local interceptada, CSP y bloqueo de recursos externos; mantener JavaScript, almacenamiento DOM y acceso a ficheros/contenido desactivados. Solo los enlaces web explícitos del usuario salen al navegador. Añadir error/reintento y reemplazo del WebView tras perder el renderer; comprobar texto realmente renderizado, no solo la apertura del diálogo.
+        - [x] Proteger `WebView` y `WebView_*` en la limpieza de caché; conservar la eliminación de multimedia/temporales y la gestión de HTTP/Glide. Extender su prueba con marcadores propios y añadir seis casos de documentos, recreación, navegación, errores, cancelación y caché después de usar el visor.
+        - [x] Investigar el artefacto de la ejecución 34 y reproducir el error nativo de descriptores con la base sin modificar y el mismo WebView 128. Desactivar únicamente su experimento Binder en el emulador API 29, con guardas de identidad/proveedor, prueba corta de arranque y comprobación nativa de flags antes de la suite completa; limpiar el archivo propio incluso tras errores. No cambiar el proveedor del teléfono, el pin/hash, Ruffle, los controles de fdsan, las aserciones ni las omisiones/reintentos. Documentar fuentes y límites en `docs/LOCAL_DOCUMENTS.md`.
+        - [x] Pasan los 78 casos completos en Edge 20 / Android 12 y por instrumentación directa en Google APIs / Android 10 con el proveedor fijado: 75 superados, tres optativos omitidos, sin fallos. Pasan también 11 casos de documentos/caché con WebView original 74 y la comprobación original de capacidad. Mantener pendiente la aceptación remota del nuevo commit y la validación física/humana del release.
+        - [ ] Confirmar los seis trabajos remotos de este bloque tras subir el commit, incluida ejecución nativa real de 16 KB.
+      - [ ] Siguiente bloque: auditar y retirar recursos/pantallas huérfanos confirmados, empezando por XML de ajustes heredados como `board_prefs.xml` y `posting_prefs.xml` y sus cadenas, con revisión de consumidores reales, restauración, variantes, R8 y pruebas. No borrar por antigüedad ni eliminar migraciones, datos o avisos legales; no dar por terminada toda la limpieza.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
     - [x] Cubrir el grafo de `release` (antes `freeRelease`) antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
