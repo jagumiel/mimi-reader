@@ -28,12 +28,17 @@
         {
             "configuration": "api",
             "project": ":chanlib",
-            "requested": "androidx.core:core-ktx:1.3.0"
+            "requested": "androidx.annotation:annotation:1.10.0"
         },
         {
             "configuration": "api",
             "project": ":chanlib",
             "requested": "com.google.code.gson:gson:2.14.0"
+        },
+        {
+            "configuration": "api",
+            "project": ":chanlib",
+            "requested": "com.squareup.okhttp3:okhttp:4.12.0"
         },
         {
             "configuration": "api",
@@ -49,11 +54,6 @@
             "configuration": "api",
             "project": ":chanlib",
             "requested": "com.squareup.retrofit2:retrofit:2.11.0"
-        },
-        {
-            "configuration": "api",
-            "project": ":chanlib",
-            "requested": "io.reactivex.rxjava2:rxandroid:2.1.1"
         },
         {
             "configuration": "api",
@@ -391,31 +391,7 @@
         "chanlibUnitTestRuntimeClasspath": [
             {
                 "direct": false,
-                "id": "androidx.annotation:annotation:1.1.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.arch.core:core-common:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.collection:collection:1.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.core:core:1.3.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.lifecycle:lifecycle-common:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.lifecycle:lifecycle-runtime:2.0.0"
-            },
-            {
-                "direct": false,
-                "id": "androidx.versionedparcelable:versionedparcelable:1.1.0"
+                "id": "androidx.annotation:annotation-jvm:1.10.0"
             },
             {
                 "direct": false,
@@ -423,15 +399,27 @@
             },
             {
                 "direct": false,
-                "id": "com.squareup.okhttp3:okhttp:3.14.9"
+                "id": "com.squareup.okio:okio-jvm:3.6.0"
             },
             {
                 "direct": false,
-                "id": "com.squareup.okio:okio:1.17.2"
+                "id": "com.squareup.okio:okio:3.6.0"
             },
             {
                 "direct": false,
                 "id": "org.hamcrest:hamcrest-core:1.3"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-common:2.3.21"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+            },
+            {
+                "direct": false,
+                "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
             },
             {
                 "direct": false,
@@ -443,11 +431,15 @@
             },
             {
                 "direct": true,
-                "id": "androidx.core:core-ktx:1.3.0"
+                "id": "androidx.annotation:annotation:1.10.0"
             },
             {
                 "direct": true,
                 "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.squareup.okhttp3:okhttp:4.12.0"
             },
             {
                 "direct": true,
@@ -460,10 +452,6 @@
             {
                 "direct": true,
                 "id": "com.squareup.retrofit2:retrofit:2.11.0"
-            },
-            {
-                "direct": true,
-                "id": "io.reactivex.rxjava2:rxandroid:2.1.1"
             },
             {
                 "direct": true,

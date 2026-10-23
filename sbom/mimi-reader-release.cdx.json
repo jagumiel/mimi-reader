@@ -5955,6 +5955,20 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
+                "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar",
+                "pkg:maven/com.squareup.okhttp3/okhttp@4.12.0?type=jar",
+                "pkg:maven/com.squareup.retrofit2/adapter-rxjava2@2.11.0?type=jar",
+                "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
+                "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
+                "pkg:maven/io.reactivex.rxjava2/rxjava@2.2.21?type=jar",
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
+                "pkg:maven/org.jsoup/jsoup@1.23.2?type=jar"
+            ],
+            "ref": "pkg:generic/mimi-reader/chanlib@1.0"
+        },
+        {
+            "dependsOn": [
+                "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
             ],
             "ref": "pkg:maven/androidx.concurrent/concurrent-futures@1.1.0?type=jar"
@@ -6159,20 +6173,6 @@
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
-                "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar",
-                "pkg:maven/com.squareup.retrofit2/adapter-rxjava2@2.11.0?type=jar",
-                "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
-                "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
-                "pkg:maven/io.reactivex.rxjava2/rxandroid@2.1.1?type=aar",
-                "pkg:maven/io.reactivex.rxjava2/rxjava@2.2.21?type=jar",
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jsoup/jsoup@1.23.2?type=jar"
-            ],
-            "ref": "pkg:generic/mimi-reader/chanlib@1.0"
         },
         {
             "dependsOn": [

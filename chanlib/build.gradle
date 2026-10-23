@@ -55,15 +55,51 @@ dependencies {
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs_nio:$desugar_jdk_libs_version"
 
     api "com.squareup.retrofit2:retrofit:$retrofit_version"
+    // Public connector/builder signatures expose OkHttp types. Do not inherit
+    // Retrofit's older minimum when this library is built/tested on its own.
+    api "com.squareup.okhttp3:okhttp:$okhttp_version"
     api "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     api "com.google.code.gson:gson:$gson_version"
 
     api "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     api "io.reactivex.rxjava2:rxjava:$rxjava_version"
-    api 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     api "org.jsoup:jsoup:$jsoup_version"
-    api 'androidx.core:core-ktx:1.3.0'
+    // ArchiveConverter exposes @NonNull, but no library code uses AndroidX
+    // Core/KTX or Android schedulers. This is the app's existing selection.
+    api 'androidx.annotation:annotation:1.10.0'
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
+
+def verifyDependencyBoundary = tasks.register('verifyDependencyBoundary') {
+    group = 'verification'
+    description = 'Check the standalone connector API/runtime graph without application dependency overrides.'
+    doLast {
+        def expected = ['com.squareup.okhttp3:okhttp': okhttp_version,
+                        'androidx.annotation:annotation': '1.10.0']
+        def forbidden = ['androidx.core:core', 'androidx.core:core-ktx',
+                         'io.reactivex.rxjava2:rxandroid'] as Set
+        def exported = configurations.api.dependencies.collect { "$it.group:$it.name".toString() } as Set
+        if (!exported.containsAll(expected.keySet()) || exported.intersect(forbidden)) {
+            throw new GradleException("Unexpected chanlib API ownership: $exported")
+        }
+        ['debugCompileClasspath', 'releaseCompileClasspath', 'debugRuntimeClasspath',
+         'releaseRuntimeClasspath', 'debugUnitTestRuntimeClasspath'].each { name ->
+            def selected = configurations.getByName(name).incoming.resolutionResult.allComponents
+                    .findAll { it.id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+                    .collectEntries { [("${it.id.group}:${it.id.module}".toString()): it.id.version] }
+            expected.each { module, version ->
+                if (selected[module] != version) {
+                    throw new GradleException("$name must select $module:$version, got ${selected[module]}")
+                }
+            }
+            def unexpected = selected.keySet().intersect(forbidden)
+            if (unexpected) throw new GradleException("$name leaks application dependencies: $unexpected")
+            logger.lifecycle("chanlib boundary verified: $name")
+        }
+    }
+}
+// Existing CI runs the library unit suite; verify the graph there as well as in check.
+tasks.withType(Test).configureEach { dependsOn verifyDependencyBoundary }
+tasks.named('check') { dependsOn verifyDependencyBoundary }

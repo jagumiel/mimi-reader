@@ -4,6 +4,7 @@ import android.webkit.MimeTypeMap
 import com.mimireader.chanlib.models.*
 import io.reactivex.Single
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -31,11 +32,11 @@ abstract class ChanConnector {
             var rb: RequestBody?
             try {
                 if (entry.value is String) {
-                    rb = RequestBody.create(MediaType.parse("text/plain"), entry.value as String)
+                    rb = RequestBody.create("text/plain".toMediaType(), entry.value as String)
                 } else if (entry.value is Int) {
-                    rb = RequestBody.create(MediaType.parse("text/plain"), entry.value.toString())
+                    rb = RequestBody.create("text/plain".toMediaType(), entry.value.toString())
                 } else if (entry.value is Long) {
-                    rb = RequestBody.create(MediaType.parse("text/plain"), entry.value.toString())
+                    rb = RequestBody.create("text/plain".toMediaType(), entry.value.toString())
                 } else if (entry.value is File) {
                     if (entry.value != null) {
                         val f = entry.value as File?
@@ -47,7 +48,7 @@ abstract class ChanConnector {
                             }
                             if (extension != null) {
                                 val type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-                                rb = RequestBody.create(MediaType.parse("application/octet-stream"), f)
+                                rb = RequestBody.create("application/octet-stream".toMediaType(), f)
                                 key = entry.key + "\"; filename=\"" + f.name
                             } else {
                                 rb = null
@@ -111,8 +112,9 @@ abstract class ChanConnector {
                         .writeTimeout(20, TimeUnit.SECONDS)
                         .readTimeout(20, TimeUnit.SECONDS)
                         .retryOnConnectionFailure(true)
-                if (cacheDir != null && cacheDir!!.exists()) {
-                    builder.cache(Cache(cacheDir, cacheSize.toLong()))
+                val directory = cacheDir
+                if (directory != null && directory.exists()) {
+                    builder.cache(Cache(directory, cacheSize.toLong()))
                 }
                 client = builder.build()
             }

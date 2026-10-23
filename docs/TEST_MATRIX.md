@@ -421,6 +421,27 @@ stay-awake 0 are verified after the suite. Restore the owned emulator's original
 uid/properties/stay-awake and stop it. No physical Android 10/32-bit or new human
 CAPTCHA/browser acceptance is inferred, and a new green remote run is required.
 
+## Nineteenth cleanup: standalone library dependencies
+
+Eleven new offline JVM cases bring `chanlib` to **19 tests** and app/library
+coverage to **121** (102 + 19). They protect connector client/default/custom
+configuration, read/post endpoints, cache directory/size, converter/Rx adapter
+availability, annotation-contract compilation, absent app-only adapters and
+multipart string/int/long/Unicode/unsupported-input behavior. The shared-client
+fixture creates lazy Rx calls but never subscribes or sends a request.
+
+The library unit task also requires its independent graph/ownership guard;
+local negative probes verify rejection of injected Core KTX/RxAndroid and old
+OkHttp. Keep these separate from the unchanged 59 CI-helper cases.
+
+On 24 October the Edge 20 / Android 12 passes **86 distinct XML/JUnit cases:
+83 passed, three existing opt-in skips, no failures/errors** in 1m41s. Ignore
+the console's inflated 89 completion events. The suite adds no public posting,
+live CAPTCHA or native-16-KB claim; restore/verify phone stay-awake **0**.
+Both JVM suites, both module lint checks, debug/test and minified release
+builds, SBOM/variant/boundary guards and static native/JNI/ZIP checks pass.
+Require fresh six-job CI and retain physical Android 10/32-bit release gates.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

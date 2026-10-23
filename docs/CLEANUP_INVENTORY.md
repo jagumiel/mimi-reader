@@ -2,8 +2,8 @@
 
 Reviewed on 24 October 2026 against `268fd5d`. This is a prioritized review of
 the remaining cleanup, not a removal list, a version-upgrade catalogue or a
-vulnerability scan. No application, dependency, resource or workflow changes
-are made in this documentation block.
+vulnerability scan. The initial inventory was documentation-only; the subsequent
+D01 implementation is recorded below and in the dependency cleanup history.
 
 ## Accepted baseline and scope
 
@@ -36,8 +36,15 @@ age, not reachability. This review does not rerun or redefine that age audit.
 
 ## Priority 1: independently review the library dependency boundary
 
-**Next implementation block: D01.** It has a concrete configuration mismatch
-and can be tested without changing UI, posting behavior or media binaries.
+**D01 implemented locally; its own six-job remote acceptance remains pending.**
+The library now owns OkHttp 4.12.0 and Annotation 1.10.0 explicitly, without Core
+KTX or RxAndroid exports. The app retains its live Core/RxAndroid declarations.
+The standalone unit graph becomes 20 entries instead of the baseline 23; release
+components and declaration totals remain 152 / 75. See the
+[nineteenth cleanup](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary)
+for code adjustments, tests, exact graph scope and limits. Next review R01;
+D02/D03 are still separate pending candidates. The table retains the original
+evidence so the implementation can be compared against its accepted baseline.
 
 | ID | Evidence at the accepted baseline | Bounded follow-up and acceptance |
 | --- | --- | --- |
@@ -45,8 +52,8 @@ and can be tested without changing UI, posting behavior or media binaries.
 | D02 | The app requests Annotation 1.1.0 but resolves 1.10.0. Retrofit/Gson/RxJava/Jsoup/Kotlin appear in both module declarations; this does not mean two versions are packaged. `ChanConnector` exposes `Single`, Retrofit `Response` and OkHttp response types. | Review ownership and `api` versus `implementation` per public type. Retain explicit direct app dependencies for actual app consumers. Do not remove exports or direct declarations just to lower the count; report graph edges and selected versions separately. |
 | D03 | App `room-ktx`, `work-runtime-ktx` and `preference-ktx` are declared. `RefreshScheduler2` uses `workDataOf` / `OneTimeWorkRequestBuilder`, `RefreshWorker` extends `RxWorker`, and DAOs return Rx types. No production `withTransaction` or `suspend fun` match was found. | Inspect the resolved AAR/JAR contents and Kotlin extension ownership before proposing removal of optional/forwarding declarations. Absence of an import is insufficient, especially with wildcard imports. Preserve `room-rxjava2`, `work-rxjava2`, runtime libraries and persisted worker names. Test migrations, scheduled refresh and resumable downloads if the graph changes. |
 
-Start with D01; D02/D03 are separate candidates, not permission for a simultaneous
-network/persistence rewrite. In particular, moving the application wholesale
+Keep D02/D03 separate, not permission for a simultaneous network/persistence
+rewrite. In particular, moving the application wholesale
 from RxJava to coroutines is not a prerequisite for the 8.0 release.
 
 ## Priority 2: remove only bounded orphan resource closures
@@ -115,18 +122,20 @@ separate warning-origin audit before any Gradle-major migration.
 
 ## Validation and completion criteria
 
-This documentation block reruns `verifySbom testSbomValidation` and
-`:mimi-app:verifyApplicationVariants`: all pass; six malformed SBOMs are rejected,
-the asset hash negative check passes and canonical output is stable. Generated
-reports equal the tracked snapshots. Source/resource searches substantiate the
-specific candidates above, not a blanket dead-code certification. Markdown
-links and `git diff --check` are checked before commit. No APK changed; the phone
-is not needed and no new device/lint suite is claimed for documentation alone.
+The initial documentation-only block ran `verifySbom testSbomValidation` and
+`:mimi-app:verifyApplicationVariants`: all passed; six malformed SBOMs were
+rejected, the asset hash negative check passed and canonical output was stable.
+Generated reports equalled the tracked snapshots. Source/resource searches
+substantiate the specific candidates above, not a blanket dead-code
+certification. Markdown links and `git diff --check` were checked before commit.
+That initial block changed no APK and claimed no new device/lint suite. The
+subsequent D01 implementation and its new build/device validation are recorded
+separately in the nineteenth cleanup linked above.
 
 For each later implementation, record the exact candidate, consumers, changes,
 graph/resource diff, tests and remaining limits in the cleanup history. Require
-that commit's own complete six-job CI. D01 comes first, then review the bounded
-R01 closure and decide D02/D03/R02/R03 independently; the live-library rows are
+that commit's own complete six-job CI. After D01, review the bounded R01 closure
+and decide D02/D03/R02/R03 independently; the live-library rows are
 not an unlimited requirement to rewrite every component before security work.
 
 After the agreed bounded cleanup and explicit disposition of remaining

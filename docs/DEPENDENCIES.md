@@ -1263,15 +1263,96 @@ Default user colors remain restored; phone stay-awake returns to 0. Restore
 emulator uid 2000, blank compatibility properties and stay-awake 1, then stop
 it. Artifact sizes and failed local attempts remain documented in the review.
 
+## Nineteenth cleanup: standalone chanlib dependency boundary
+
+Implement inventory candidate D01 only. `chanlib` has no Core KTX or RxAndroid
+consumer in production source, resources, manifest or generated outputs. Replace
+those two exported declarations with explicit `api` dependencies on Annotation
+**1.10.0** (`ArchiveConverter`'s public `@NonNull` contract) and OkHttp **4.12.0**
+(`ChanConnector`, its builder and `ResponseAndPojo` expose HTTP types). These
+versions are already selected by the application; the library no longer compiles
+and tests against Retrofit's transitive OkHttp 3.14.9 minimum. Keep the app's
+actual Core/Core KTX and RxAndroid dependencies, and do not change the remaining
+Retrofit/Gson/RxJava/Jsoup/Kotlin exports as part of the separate D02 review.
+
+The first compile against OkHttp 4.12.0 correctly fails: the old Kotlin
+`MediaType.parse` entry point is error-deprecated, and mutable `cacheDir` cannot
+be smart-cast for `Cache`. Replace only the constant MIME parsing with
+`toMediaType()` and capture the directory in a local value before checking and
+using it. Preserve method signatures, multipart keys/values/encoding, client
+selection, cache size, endpoints, timeouts, redirects and retry policy. Do not
+suppress the errors, rewrite posting, or raise either module's Android minimum:
+`chanlib` stays 21 and the app 23, with compile/target 36.
+
+`verifyDependencyBoundary`, required by the library's unit-test tasks and
+`check`, verifies explicit API ownership and actual selections in debug/release
+compile/runtime and debug unit runtime graphs. It requires the shared OkHttp
+baseline and Annotation 1.10.0 and rejects Core/Core KTX or RxAndroid leaking
+back into the standalone library. Existing CI already runs the library's unit
+suite, so this gate needs no workflow change, force rule or global exclusion.
+
+Add eleven offline unit cases: seven cover default/custom client identity,
+timeouts, redirects/retries, read/post endpoints, cache directory/size, Gson/Rx
+adapter availability, annotation-contract compilation and absence of app-only
+framework adapters; four cover protected multipart conversion of string/int/long,
+empty/Unicode text and unsupported/empty input. Lazy Rx service creation is never
+subscribed; these tests do not send network requests or solve CAPTCHA.
+
+Reviewed SBOM/inventory diff:
+
+- **All 152 release component records are identical**, including versions,
+  Package URLs, licenses, native AAR hashes and Ruffle's seven hashes. Only
+  `chanlib`'s outgoing dependency set changes: Core KTX/RxAndroid are replaced by
+  Annotation/OkHttp. Application root edges and all other component edges stay
+  unchanged. Counts remain **152 components / 75 declarations**; lowering a
+  count is not the goal of accurate dependency ownership.
+- Only `chanlibUnitTestRuntimeClasspath` changes among the seven inventoried
+  configurations: **23 to 20 entries**. Its old Core/arch/collection/lifecycle/
+  versionedparcelable/RxAndroid paths disappear. Annotation becomes 1.10.0 with
+  its JVM variant, OkHttp becomes 4.12.0 and Okio 3.6.0 with its JVM variant;
+  Kotlin common/JDK forwarding artifacts follow that resolution. App runtime,
+  app unit/instrumentation, desugaring, processor and build-tool graphs do not
+  change. Do not claim that Core/RxAndroid are removed from the application.
+
+Local validation: **121 unit tests** (102 app + 19 library, zero failures/errors),
+59 CI-helper tests, debug/test APK and minified release APK/AAB builds pass.
+App lint remains zero errors, 999 warnings and one hint, including 474 unused
+resources; the standalone library lint report has no findings. Both APKs pass
+static native checks (24 libraries/four ABIs); release also passes JNI seeds
+and SDK 16 KB zipalign. Release APK is **41,423,143 bytes** (unchanged); AAB is
+**31,141,845 bytes**, versus 31,141,796 at the baseline. Sizes are not performance
+or security measurements.
+
+Final `verifySbom testSbomValidation`, application-variant and standalone-boundary
+checks pass. Three separate local init-script probes deliberately inject
+RxAndroid, Core KTX and forced OkHttp 3.14.9; each is rejected by the expected
+boundary assertion. These are local negative checks, not three new CI-helper
+tests. The probe and logs remain under ignored `build/`, not production inputs;
+the final normal invocation passes with no injected declarations or force rule.
+
+The Edge 20 / Android 12 suite passes **86 distinct JUnit cases: 83 passed,
+three existing opt-in skips, zero failures/errors** (1m41s). Gradle's console
+prints an inflated 89 completion events; the XML reports 86 unique cases, not
+89 tests. Restore and verify the original phone stay-awake value **0**. No public
+message or live CAPTCHA test is performed. No fresh API 36 ps16k runtime run is
+claimed for this non-native dependency-ownership change; unchanged native
+artifact hashes and the static guards do not replace the next remote six-job
+workflow. Physical Android 10/32-bit acceptance is still pending.
+
+No UI/resource cleanup, native/WASM update, R8-rule, application identity,
+version, legal, README or release-changelog change is included. Next review the
+bounded R01 rating-resource closure; leave D02/D03 and the deferred CVE/GHSA
+scanner separate. Physical Android 10/32-bit and human posting/browser checks
+remain release gates; these local JVM/build checks do not replace them.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
 reviewed after green six-job run 38 for `268fd5d`. It distinguishes the library's
 standalone dependency graph from the application's selected versions, bounded
-orphan resource closures and live legacy consumers. Start with D01 (`chanlib`
-dependency ownership/standalone network baseline), not a bulk lint deletion or
-the deferred vulnerability scan. This documentation block changes no inputs
-to the SBOM or application.
+orphan resource closures and live legacy consumers. D01 (`chanlib` dependency
+ownership/standalone network baseline) is implemented in the nineteenth block;
+next review R01, not a bulk lint deletion or the deferred vulnerability scan.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
@@ -1316,8 +1397,9 @@ The old email/logcat feedback path is also removed with its live caller.
    with theme/geometry tests. The eighteenth modernizes the live color editor
    and verifies bounded adbd root reconnection. Run 38 for `268fd5d` confirms
    all six jobs for these changes. The remaining cleanup is now consolidated
-   in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md): next inspect D01, then the
-   bounded resource candidates, without drafting the 8.0 changelog. Physical Android
+   in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md). The nineteenth implements D01
+   and needs its own green workflow; next review the bounded R01 resource
+   closure, without drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

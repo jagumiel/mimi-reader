@@ -4,6 +4,23 @@ The workflow builds debug/release artifacts, validates the release SBOM, and
 runs instrumentation on Android 10, 12, 14 and 16 (API 29/31/34/36). A passing
 build job alone is not a passing workflow: every instrumentation job must pass.
 
+## Standalone library dependency gate (24 October 2026)
+
+The existing `:chanlib:testDebugUnitTest` step now also requires
+`:chanlib:verifyDependencyBoundary`. It checks actual debug/release compile and
+runtime selections plus the library unit runtime, independently of the app:
+explicit API ownership of OkHttp/Annotation, the shared OkHttp version and no
+Core/Core KTX or RxAndroid leakage. No workflow step, emulator gate or retry is
+removed. The app retains its own live framework dependencies.
+
+There are now **121 app/library unit cases** (102 + 19); the 59 CI-helper tests,
+86 ordinary instrumentation cases (three existing opt-in skips) and six
+separate native cases are unchanged. Three local negative init-script probes
+confirm rejection of RxAndroid, Core KTX and forced OkHttp 3.14.9; these are not
+additional CI-helper cases. See the [D01 evidence and validation limits](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary).
+The change requires its own complete six-job remote acceptance; green run 38
+accepts the earlier `268fd5d`, not this implementation.
+
 ## Run 25: download cleanup ordering (21 October 2026)
 
 [Run 25](https://github.com/jagumiel/mimi-reader/actions/runs/39573428637)

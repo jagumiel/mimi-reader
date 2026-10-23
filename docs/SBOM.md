@@ -121,6 +121,15 @@ record and every retained edge outside that node is unchanged, including Ruffle
 and native media. See [the filter-row replacement and validation](DEPENDENCIES.md#thirteenth-cleanup-remove-percentlayout-from-filter-rows).
 No replacement dependency, version drift or global exclusion is introduced.
 
+The nineteenth cleanup replaces only `chanlib`'s unused Core KTX/RxAndroid
+exports with its actual Annotation/OkHttp API dependencies. Totals stay **152
+components / 75 declarations**. Every release component record/hash and every
+edge outside `chanlib`'s outgoing set is unchanged. The separate library unit
+graph changes from 23 to 20 entries and now selects OkHttp 4.12.0 instead of
+3.14.9; application/test/build graphs outside that library configuration are
+unchanged. See [the standalone library boundary and tests](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary).
+This remains inventory validation, not a vulnerability scan.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh
