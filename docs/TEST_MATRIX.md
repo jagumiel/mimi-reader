@@ -261,6 +261,47 @@ SBOM, minified release APK/AAB and static native checks. The phone stay-awake
 setting is restored to 0. This does not pre-approve the new commit's remote
 matrix or replace physical/human acceptance.
 
+## Fourteenth cleanup: More Info links, credits and navigation
+
+[Run 33 for `3dd4c9d`](https://github.com/jagumiel/mimi-reader/actions/runs/39852907707)
+confirms all six jobs for the filter-row cleanup. Four new mandatory
+`MoreInfoPrefsTest` cases increase the ordinary suite to **72 cases**; the three
+opt-in skips and six dedicated 16 KB cases are unchanged.
+
+- Open the real More Info entry from Settings, with no automatic browser launch.
+  Check removal of rating/email rows, independent-fork status, Apache-2.0 label,
+  credit roles and current version. Intercept each of the seven links and check
+  exact HTTPS URLs, ACTION_VIEW, no extras/diagnostics and no new-task flag.
+- Simulate both ActivityNotFoundException and SecurityException on every link:
+  no crash, email/market fallback, additional launch or preference modification.
+- Recreate More Info, repeat link callbacks, then use the Back dispatcher to
+  return to the root settings screen with its original saved preferences.
+- Open each bundled privacy/licenses/historical-changelog dialog, recreate the
+  activity and dismiss it, retaining the underlying More Info back stack.
+
+All external intents are intercepted; no real email, browsing or public posting
+is performed. The first physical attempt was interrupted by phone lock/dozing,
+not accepted as passing. Correct the fixture's monitor registration before
+cleanup, rather than allowing cleanup to mask that failure. After the user
+unlocked the phone, all four cases passed separately on the Edge 20 / Android 12.
+This is not manual physical Android 10 acceptance or the new commit's remote
+six-job acceptance. Notice contents/view lifecycle remain a separate refactor.
+
+The repeat whole-suite run exposed an existing Glide fixture race: readback
+returned MEMORY_CACHE despite the preceding clearMemory call. The test now
+explicitly bypasses memory and reads only the RESOURCE disk cache, retaining
+cache-only retrieval, exact disk-source/pixel assertions and the original total
+ten-second encoding deadline. Production caching, CI retries/skips and timeouts
+are unchanged. Keep the failed run as evidence, not a passing acceptance result.
+
+Final acceptance on 23 October: all eight scoped Glide/More Info cases pass,
+then the full Edge 20 / Android 12 suite passes **72 cases: 69 passed, three
+existing opt-in skips, zero failures/errors**. Pass 102 app + eight library unit
+tests, 40 CI-helper tests, lint without errors, SBOM checks, release APK/AAB and
+static ELF/ZIP/JNI/SDK 16 KB zipalign guards. Restore and verify stay-awake **0**.
+The local pass does not replace this commit's remote matrix or physical/human
+release acceptance. See [detailed evidence and limits](DEPENDENCIES.md#fourteenth-block-validation-23-october-2026).
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

@@ -374,12 +374,10 @@
     <string name="long_press_to_batch_download">Long press a thumbnail to start batch download mode</string>
     <string name="long_press_to_manage_boards">Long press an item on the list to manage the boards</string>
     <string name="dont_show_again">Do not show this again</string>
-    <string name="feedback">Feedback</string>
 
     <!-- Rating -->
     <string name="please_rate">Please take a moment to rate Mimi!</string>
     <string name="never">Never</string>
-    <string name="rate">Rate</string>
     <string name="later">Later</string>
 
     <!-- Image Info -->

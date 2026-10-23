@@ -242,6 +242,42 @@ builds, native ELF/ZIP/JNI guards, SDK 16 KB zipalign and actionlint. The releas
 mapping contains no PercentLayout classes. The original phone stay-awake setting
 (0) is restored. The new commit's complete remote workflow remains pending.
 
+## Run 33 confirmed; fourteenth cleanup More Info link review
+
+[Run 33 for `3dd4c9d`](https://github.com/jagumiel/mimi-reader/actions/runs/39852907707)
+passes all six jobs, closing the filter-row PercentLayout cleanup. More Info's
+new four-case offline instrumentation is discovered by the existing ordinary
+matrix: **72 cases**, three unchanged opt-in skips; the dedicated actual-16-KB
+job remains six cases. No workflow skips, retries or timeouts are changed.
+
+`MoreInfoPrefsTest` intercepts every outgoing project/license/profile intent;
+the matrix does not email a maintainer, contact a real support channel or open
+a real browser for these cases. It verifies destinations/identity/no diagnostic
+payload, absent/blocked handlers, saved preferences, recreation/Back and the
+existing three local notice dialogs. All four cases passed separately on the
+unlocked Edge 20 after correcting the fixture's monitor cleanup; the initial
+locked/dozing attempt is not accepted. The current repository has no Issues or
+Discussions enabled; repository navigation does not promise a support service.
+
+Dependencies and SBOM snapshots remain unchanged at 152 components and 75
+declarations. Require all six jobs again for this commit, including native 16 KB;
+local Android 12 does not replace the remote matrix or pending physical/human
+release checks. CVE scanning and the owner-gated changelog remain deferred.
+
+A repeated full physical run exposed the existing Glide disk-cache fixture
+receiving MEMORY_CACHE after clearMemory. Its readback now explicitly bypasses
+memory and restricts disk retrieval to RESOURCE, retaining cache-only loading,
+the exact resource-disk-source assertion and ten-second total deadline. This is
+a fixture correction, not a production cache change, relaxed assertion, retry
+or new skip. Retain the failed local validation log for diagnosis.
+
+Final local acceptance passes on 23 October: eight scoped Glide/More Info cases,
+followed by **72 full Edge 20 / Android 12 cases: 69 passed, three existing skips,
+zero failures/errors**. Also pass 102 app + eight library unit tests, 40 CI-helper
+tests, actionlint, lint without errors, variant IDs, SBOM checks, minified release
+APK/AAB and ELF/ZIP/JNI/SDK zipalign guards. Stay-awake is restored and verified
+as 0. The new commit's six-job remote acceptance remains pending until push.
+
 ## Failures investigated on 19 October 2026
 
 Runs [11](https://github.com/jagumiel/mimi-reader/actions/runs/39071074251),

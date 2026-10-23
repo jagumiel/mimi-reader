@@ -1011,6 +1011,101 @@ the owner-gated 8.0 changelog or the final README rewrite.
   own complete remote six-job matrix, including actual 16 KB native execution;
   the physical Android 10/32-bit and human-interaction gates remain pending.
 
+## Fourteenth cleanup: More Info project identity and obsolete destinations
+
+[Run 33 for `3dd4c9d`](https://github.com/jagumiel/mimi-reader/actions/runs/39852907707)
+passes all six jobs, closing the thirteenth filter-row block, including actual
+16 KB native runtime coverage. This new block still requires its own remote run.
+
+The real More Info callers were checked before removal. Remove the rating row
+and `MimiUtil.openMarketLink` together, including Amazon/market/Play fallbacks;
+remove the feedback row and `sendLogcatMail` together, including the unused logcat
+process/attachment path and legacy recipient/device-report construction. Their
+two now-unused key resources are removed, but existing stored values are neither
+read nor deleted. No app data or persisted setting is migrated in this block.
+
+Reuse the existing `website_pref` key for the current project repository and
+label it accordingly, not as the old website. Add the independent/free fork
+status, explicit project Apache-2.0 link, and five credit/profile links using
+`BrowserNavigator`'s plain ACTION_VIEW and missing/blocked-browser handling.
+No browser is launched merely by opening settings. Profile links credit
+Eli Connelly/@econnelly, the historical @MimiReader account, @Blatzar and
+@jagumiel; @maestro12 is explicitly fork-network provenance, not original
+authorship. See [identity, evidence and attribution limits](PROJECT.md).
+
+The current repository has no Issues or Discussions enabled. Do not point
+feedback/privacy at `/issues` or invent a new mailbox. Remove the old email
+workflow and link to the repository without promising a support channel;
+correct the bundled privacy policy accordingly. Navigation intents contain
+only the requested URL, with no diagnostics, attachments or device metadata.
+Preserve the original LICENSE and copyright, third-party notices and historical
+changelog; do not claim all bundled software has the application's license.
+
+Four mandatory `MoreInfoPrefsTest` cases exercise the actual screen's seven
+link callbacks with intercepted outgoing intents, failure handling for absent
+and blocked browsers, unchanged saved preferences, recreation/Back navigation,
+and opening/restoring all three existing local document dialogs. They make no
+real browser requests, send emails or publish messages. The first fixture build
+needed explicit nullable-summary assertions. An initial locked/dozing phone run
+could not transact fragments and also exposed a cleanup error for a monitor
+that had not yet been registered; register it before entering the guarded test
+body so cleanup cannot mask the original failure. No production lifecycle guard,
+retry or skip is relaxed. After the user unlocked the phone, all four cases pass
+separately on the Edge 20 / Android 12. The ordinary suite grows from 68 to **72
+cases**, retaining the same three opt-in cases and separate six-case 16 KB job.
+
+No Gradle dependency, component version, R8 rule, package/SDK/version setting,
+SBOM snapshot or dependency inventory is changed. Keep 152 runtime components,
+75 dependency declarations, Ruffle hashes and native artifacts. UI/layout
+resources are changed deliberately, not solely because of their age. Legacy
+`board_prefs.xml`/`posting_prefs.xml` still require a separate orphan audit before
+deletion. The next bounded refactor is the duplicated local privacy/license/
+changelog viewers: resource loading, view lifecycle, failures and link handling,
+without writing an 8.0 changelog or changing legal notices.
+
+The repeated whole-suite validation exposed an unrelated existing Glide fixture
+race: `transformedImageCanBeReadFromDiskAfterMemoryIsCleared` received
+`MEMORY_CACHE` instead of `RESOURCE_DISK_CACHE`. Preserve the failed report/log,
+not just a successful rerun. Glide 5.0.7's
+[`Engine`](https://github.com/bumptech/glide/blob/v5.0.7/library/src/main/java/com/bumptech/glide/load/engine/Engine.java#L279)
+checks active/memory resources unless memory caching is bypassed, and a late
+resource release can populate memory after the fixture clears it. Its
+[`DecodeJob`](https://github.com/bumptech/glide/blob/v5.0.7/library/src/main/java/com/bumptech/glide/load/engine/DecodeJob.java#L488)
+notifies before deferred encoding completes. Make the readback fixture bypass
+memory with `skipMemoryCache(true)` and use `DiskCacheStrategy.RESOURCE`, retaining
+`onlyRetrieveFromCache(true)`, the exact RESOURCE_DISK_CACHE assertion and the
+original total ten-second write deadline. This also rules out a raw DATA-cache
+decode. The warm-up and production caching stay unchanged: no accepting a memory
+hit, source/network fallback, widened timeout, CI retry, or skipped test.
+
+### Fourteenth-block validation (23 October 2026)
+
+- All eight scoped Glide/More Info cases pass after the fixture correction.
+  Final whole-suite acceptance on the Edge 20 / Android 12 passes: **72 cases,
+  69 passed, three existing opt-in skips**, zero failures/errors. All four new
+  screen cases and the corrected disk-cache assertion pass in that full run.
+  No email, external profile browsing or public posting is performed. Restore
+  and verify the phone's original stay-awake value **0** after the suite.
+- **102 app + eight chanlib unit tests**, **40 CI-helper tests**, actionlint,
+  application-variant checks, debug/test APKs, SBOM freshness/hash/canonical/six
+  negative cases, minified release APK/AAB and vital lint pass. The final combined
+  Gradle log is `build/more-info-verified.log`; the locked-phone and later cache
+  fixture failures remain in their separate local logs, not accepted as passing.
+- Lint has **zero errors, 1,012 warnings, one hint**, and **482 UnusedResources**
+  findings. Remove the two newly orphaned rating/feedback labels as well as their
+  preference keys; do not introduce a suppression, baseline or new fixture warning.
+- Both APKs pass ELF/ZIP checks (24 libraries / four ABIs), release JNI seeds
+  and SDK 16 KB zipalign. No market/email methods remain in release mapping.
+  Package IDs, **230 / 7.0.1**, minSdk **23**, target **36**, 152 SBOM components,
+  75 declarations, Ruffle, LICENSE and third-party/changelog documents are unchanged.
+  Compared with the preceding local build, APK changes from **41,412,351 to
+  41,425,051 bytes** and AAB from **31,150,815 to 31,143,978 bytes**. No startup,
+  memory or rendering improvement is inferred from these sizes.
+- Require this commit's own green six-job remote workflow, including actual
+  16 KB execution, after pushing. Physical Android 10/32-bit and human CAPTCHA/
+  keyboard/browser acceptance remain release gates. CVE scanning, owner-approved
+  8.0 changelog preparation and the final README rewrite remain deferred.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -1027,10 +1122,10 @@ licenses and CAPTCHA paths until their actual consumers and upgrade requirements
 have been checked. The two `chanlib` test templates have now been replaced or
 removed with meaningful unit/device coverage, as described above.
 
-The remaining `openMarketLink` method is not an orphan: the More Info rating
-preference still calls it. Its legacy Amazon/Play Store routes need a separate
-settings/link review given the app's withdrawal from Play Store; do not delete
-only the method and leave a live caller behind. This block does not change that UI.
+The `openMarketLink` method was not an orphan when audited: the More Info rating
+preference still called it. The fourteenth block removes both together after
+reviewing the obsolete Amazon/Play destinations, not just the method in isolation.
+The old email/logcat feedback path is also removed with its live caller.
 
 ## Sequence for subsequent iterations
 
@@ -1043,12 +1138,13 @@ only the method and leave a live caller behind. This block does not change that 
 3. Runs 22–24 confirm the preceding UI cleanup. Run 27 confirms all **six** jobs
    for `fed11d2`, including six native cases on actual 16 KB pages without
    backcompat. Every subsequent cleanup needs its own green six-job workflow.
-4. Runs 28–30 and 32 confirm all six jobs for the ninth through twelfth browser,
-   fast-scroll, Material and Glide cleanups. The thirteenth removes PercentLayout
-   from filter rows; require its own remote matrix next. Next review More Info's
-   obsolete market/rating flow, old website and feedback destinations together
-   with their real callers, before changing or removing them. Continue remaining
-   UI/link dependency and orphan review in bounded blocks. Physical Android
+4. Runs 28–30, 32 and 33 confirm all six jobs for the ninth through thirteenth
+   browser, fast-scroll, Material, Glide and PercentLayout cleanups. The
+   fourteenth updates More Info and removes its obsolete market/email workflows;
+   require its own six-job remote acceptance. Next refactor the duplicated local
+   privacy/license/changelog viewers and their lifecycle/link handling, without
+   drafting the 8.0 changelog. Continue confirmed orphan-resource review in a
+   separate bounded block. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

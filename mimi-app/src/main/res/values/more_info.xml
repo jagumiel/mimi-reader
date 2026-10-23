@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="project_repository_title">Project repository</string>
+    <string name="project_repository_summary">Source code and project updates on GitHub</string>
+    <string name="project_status">Independent, free and open-source continuation. Mimi is no longer available on Google Play and the original website is no longer operational.</string>
+    <string name="project_license_title">Project license</string>
+    <string name="project_license_summary">Apache License 2.0 — view LICENSE in the repository</string>
+    <string name="project_credits_title">Credits and provenance</string>
+    <string name="credit_eli_title" translatable="false">Eli Connelly (@econnelly)</string>
+    <string name="credit_eli_summary">Original application author</string>
+    <string name="credit_original_account_title" translatable="false">@MimiReader</string>
+    <string name="credit_original_account_summary">Eli Connelly’s historical GitHub account</string>
+    <string name="credit_blatzar_title" translatable="false">@Blatzar</string>
+    <string name="credit_blatzar_summary">Inherited fork and centered-replies contribution</string>
+    <string name="credit_maintainer_title" translatable="false">@jagumiel</string>
+    <string name="credit_maintainer_summary">Current fork maintenance and modernization</string>
+    <string name="credit_provenance_title" translatable="false">@maestro12</string>
+    <string name="credit_provenance_summary">Source of the GitHub fork network; not an attribution of original authorship</string>
+    <string name="third_party_licenses_summary">Licenses and notices for bundled third-party components</string>
+
+    <string name="project_status_pref" translatable="false">project_status_pref</string>
+    <string name="project_license_pref" translatable="false">project_license_pref</string>
+    <string name="project_credits_pref" translatable="false">project_credits_pref</string>
+    <string name="credit_eli_pref" translatable="false">credit_eli_pref</string>
+    <string name="credit_original_account_pref" translatable="false">credit_original_account_pref</string>
+    <string name="credit_blatzar_pref" translatable="false">credit_blatzar_pref</string>
+    <string name="credit_maintainer_pref" translatable="false">credit_maintainer_pref</string>
+    <string name="credit_provenance_pref" translatable="false">credit_provenance_pref</string>
+
+    <string name="project_repository_url" translatable="false">https://github.com/jagumiel/mimi-reader</string>
+    <string name="project_license_url" translatable="false">https://github.com/jagumiel/mimi-reader/blob/master/LICENSE</string>
+    <string name="credit_eli_url" translatable="false">https://github.com/econnelly</string>
+    <string name="credit_original_account_url" translatable="false">https://github.com/MimiReader</string>
+    <string name="credit_blatzar_url" translatable="false">https://github.com/Blatzar</string>
+    <string name="credit_maintainer_url" translatable="false">https://github.com/jagumiel</string>
+    <string name="credit_provenance_url" translatable="false">https://github.com/maestro12</string>
+</resources>

@@ -194,7 +194,10 @@ class GlideCompatibilityTest {
             scenario.onActivity { Glide.get(context).clearMemory() }
             val source = AtomicReference<DataSource>()
             val request = manager.asBitmap().load(file).override(16, 16)
-                .diskCacheStrategy(DiskCacheStrategy.ALL).disallowHardwareConfig().onlyRetrieveFromCache(true)
+                // A late release from the warm-up can repopulate memory after clearMemory().
+                // Prove RESOURCE disk reuse, not an active/memory hit or raw DATA cache decode.
+                .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .disallowHardwareConfig().onlyRetrieveFromCache(true)
                 .listener(object : RequestListener<Bitmap> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>, first: Boolean) = false
                     override fun onResourceReady(resource: Bitmap, model: Any, target: Target<Bitmap>?, dataSource: DataSource, first: Boolean): Boolean {

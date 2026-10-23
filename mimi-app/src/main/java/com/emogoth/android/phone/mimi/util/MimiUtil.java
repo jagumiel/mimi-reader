@@ -18,10 +18,8 @@ package com.emogoth.android.phone.mimi.util;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -594,27 +592,6 @@ public class MimiUtil {
         }
 
         return -1;
-    }
-
-    public void openMarketLink(final Context context) {
-        final String applicationName = context.getPackageName();
-        if (applicationName != null) {
-            if (applicationName.toLowerCase().contains("amazon")) {
-                try {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.amazon.com/EmoGoth-Mimi-Reader/dp/B00EGIPHC8/")));
-                } catch (ActivityNotFoundException e) {
-                    Log.e(LOG_TAG, "Could not open market link to Amazon", e);
-                }
-            } else {
-                try {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + applicationName)));
-                } catch (ActivityNotFoundException e) {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + applicationName)));
-                }
-            }
-        }
-
-        Log.i(LOG_TAG, "Using package: name=" + applicationName);
     }
 
     public static String humanReadableByteCount(long bytes, boolean si) {

@@ -193,8 +193,6 @@
     <string name="history_prune_time_pref">history_prune_time_pref</string>
     <string name="full_board_list_enabled">full_board_list_enabled</string>
     <string name="about_pref">about_pref</string>
-    <string name="feedback_pref">feedback_pref</string>
-    <string name="rate_pref">rate_pref</string>
     <string name="website_pref">website_pref</string>
     <string name="privacy_pref">privacy_pref</string>
     <string name="licenses_pref">licenses_pref</string>

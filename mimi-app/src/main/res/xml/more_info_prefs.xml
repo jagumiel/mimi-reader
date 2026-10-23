@@ -14,34 +14,33 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         app:key="@string/general_preference_category"
         app:title="@string/more_info_title">
 
-        <!-- About -->
-        <!--<Preference-->
-        <!--app:title="@string/more_info_about"-->
-        <!--app:key="@string/about_pref"-->
-        <!--/>-->
-
         <Preference
             app:iconSpaceReserved="false"
-            app:key="@string/feedback_pref"
-            app:title="@string/feedback" />
+            app:key="@string/project_status_pref"
+            app:persistent="false"
+            app:selectable="false"
+            app:summary="@string/project_status"
+            app:title="@string/more_info_about" />
 
-        <Preference
-            app:iconSpaceReserved="false"
-            app:key="@string/rate_pref"
-            app:title="@string/rate" />
-
-        <!-- Website -->
         <Preference
             app:iconSpaceReserved="false"
             app:key="@string/website_pref"
-            app:title="@string/more_info_website" />
+            app:persistent="false"
+            app:summary="@string/project_repository_summary"
+            app:title="@string/project_repository_title" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/project_license_pref"
+            app:persistent="false"
+            app:summary="@string/project_license_summary"
+            app:title="@string/project_license_title" />
 
         <!-- Privacy Policy -->
         <Preference
@@ -53,6 +52,7 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="@string/licenses_pref"
+            app:summary="@string/third_party_licenses_summary"
             app:title="@string/more_info_licences" />
 
         <Preference
@@ -64,6 +64,42 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="@string/version_pref"
+            app:selectable="false"
             app:title="Mimi Reader" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="@string/project_credits_pref"
+        app:title="@string/project_credits_title">
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/credit_eli_pref"
+            app:persistent="false"
+            app:title="@string/credit_eli_title"
+            app:summary="@string/credit_eli_summary" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/credit_original_account_pref"
+            app:persistent="false"
+            app:title="@string/credit_original_account_title"
+            app:summary="@string/credit_original_account_summary" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/credit_blatzar_pref"
+            app:persistent="false"
+            app:title="@string/credit_blatzar_title"
+            app:summary="@string/credit_blatzar_summary" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/credit_maintainer_pref"
+            app:persistent="false"
+            app:title="@string/credit_maintainer_title"
+            app:summary="@string/credit_maintainer_summary" />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/credit_provenance_pref"
+            app:persistent="false"
+            app:title="@string/credit_provenance_title"
+            app:summary="@string/credit_provenance_summary" />
     </PreferenceCategory>
 </PreferenceScreen>
