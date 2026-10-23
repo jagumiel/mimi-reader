@@ -3,29 +3,62 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import struct
 import subprocess
+import time
 import zipfile
 
 PAGE = 16384
 ABIS = {"arm64-v8a": (2, 183), "x86_64": (2, 62), "armeabi-v7a": (1, 40), "x86": (1, 3)}
 
 
-def adb(serial, *args):
-    return subprocess.check_output(["adb", "-s", serial, *args], text=True, timeout=30).strip()
+def adb(serial, *args, timeout=30):
+    return subprocess.check_output(["adb", "-s", serial, *args], text=True,
+                                   stderr=subprocess.STDOUT, timeout=timeout).strip()
+
+
+def wait_for_root(serial, timeout=45):
+    """adbd may disconnect while switching uid; never retry Gradle or assume root."""
+    deadline = time.monotonic() + timeout
+    last = "not connected"
+    while time.monotonic() < deadline:
+        try:
+            uid = adb(serial, "shell", "id", "-u", timeout=5)
+            boot = adb(serial, "shell", "getprop", "sys.boot_completed", timeout=5)
+            last = f"uid={uid!r}, boot_completed={boot!r}"
+            if uid == "0" and boot == "1":
+                return
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+            last = str(error)
+        time.sleep(1)
+    raise ValueError(f"adbd did not reconnect as root within {timeout}s: {last}")
 
 
 def run_16k(serial):
     # Never change compatibility properties on a physical phone or an ordinary 4 KB emulator.
-    if not serial.startswith("emulator-"):
+    if not re.fullmatch(r"emulator-\d+", serial):
         raise ValueError("16 KB tests require an explicitly selected emulator")
     if (adb(serial, "shell", "getprop", "ro.kernel.qemu") != "1" or
             adb(serial, "shell", "getprop", "ro.build.version.sdk") != "36" or
             adb(serial, "shell", "getconf", "PAGE_SIZE") != str(PAGE)):
         raise ValueError("Expected an API 36 emulator actually running with 16384-byte pages")
-    adb(serial, "root")
-    adb(serial, "wait-for-device")
+    try:
+        adb(serial, "root")
+    except subprocess.CalledProcessError as error:
+        # adb can return 1 after sending the root request because adbd closes
+        # its transport to restart. Accept only that ambiguity, never a denial.
+        output = error.output or ""
+        if error.returncode != 1 or not any(message in output for message in (
+                "unable to connect for root: closed", "device offline", "connection closed")):
+            raise
+        print(f"adbd disconnected during root request: {output.strip()}", flush=True)
+    wait_for_root(serial)
+    if (adb(serial, "shell", "getprop", "ro.kernel.qemu") != "1" or
+            adb(serial, "shell", "getprop", "ro.build.version.sdk") != "36" or
+            adb(serial, "shell", "getconf", "PAGE_SIZE") != str(PAGE)):
+        raise ValueError("Emulator identity/page size changed after adbd restart")
     for key, value in (("bionic.linker.16kb.app_compat.enabled", "false"),
                        ("pm.16kb.app_compat.disabled", "true")):
         adb(serial, "shell", "setprop", key, value)
@@ -33,7 +66,8 @@ def run_16k(serial):
             raise ValueError(f"Could not disable emulator compatibility mode: {key}")
     directory = Path("build/reports/native-16k")
     directory.mkdir(parents=True, exist_ok=True)
-    (directory / "device.txt").write_text(f"{serial}\nAPI=36\nPAGE_SIZE={PAGE}\nbackcompat=false\n", encoding="utf-8")
+    (directory / "device.txt").write_text(
+        f"{serial}\nAPI=36\nPAGE_SIZE={PAGE}\nadbd_uid=0\nbackcompat=false\n", encoding="utf-8")
     wrapper = "gradlew.bat" if os.name == "nt" else "./gradlew"
     subprocess.run([wrapper, "--no-daemon", "--stacktrace", ":mimi-app:connectedDebugAndroidTest",
                     "-Pandroid.testInstrumentationRunnerArguments.class=com.emogoth.android.phone.mimi.view.gallery.NativeMediaCompatibilityTest",

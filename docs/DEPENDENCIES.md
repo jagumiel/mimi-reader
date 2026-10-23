@@ -1229,6 +1229,40 @@ remain. Restore phone stay-awake to 0; leave the emulator's observed boot value
 3 unchanged and stop it. See the audit for sizes and acceptance limits. Fresh
 remote six-job acceptance remains pending.
 
+## Eighteenth cleanup: live color editor and swatches
+
+Run 37 passes five jobs, but the native job stops at the adbd root handshake
+before tests. Correct only bounded verified reconnection; retain actual page
+size, root, compatibility and native-rendering assertions. CI-helper coverage
+becomes 59 tests, without test retries or changed workflow gates.
+
+Remove the color editor's redundant Rx scheduling/stop-time persistence, supply
+valid mutable demo data, and retain slot/draft/target state using a DialogFragment
+and results. Save only palette/OK edits. Disable navigation from fabricated
+preview content and replace its dead sample URL. Fix ColorImageView's draw-time
+drawable replacement loop and color-resource defaults. Keep the color picker,
+layouts, stored keys, version settings, dependencies, SBOM and R8 rules unchanged.
+
+Five mandatory cases bring ordinary coverage to **86 cases**, same three opt-in
+skips and six separate native cases. Use a debug-only isolated-storage host for
+editing and a separate real production read-only case; the fixture must not
+ship in release. The first unsafe local fixture crashed before teardown; the
+user explicitly authorized restoration of defaults, and all other preferences
+were verified unchanged. Detailed failure/recovery evidence and limits are in
+[COLOR_EDITOR.md](COLOR_EDITOR.md). Fresh six-job remote acceptance is required.
+
+Final local acceptance on 24 October: **86 Edge 20 / Android 12 cases, 83 passed,
+three existing opt-in skips, zero failures/errors**; five editor cases also pass
+separately. The actual API 36 ps16k helper passes all six native cases with uid 0,
+16384-byte pages and backcompat disabled. Pass 110 app/library unit tests,
+59 CI-helper tests, SBOM/variant checks, actionlint, debug/test and minified
+release builds and static ELF/ZIP/JNI/SDK guards. Lint has zero errors, 999
+warnings and one hint; unused resources remain 474. Verify the fixture is
+absent from release manifest/DEX and the restorable picker name is retained.
+Default user colors remain restored; phone stay-awake returns to 0. Restore
+emulator uid 2000, blank compatibility properties and stay-awake 1, then stop
+it. Artifact sizes and failed local attempts remain documented in the review.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in

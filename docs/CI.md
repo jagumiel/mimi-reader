@@ -278,6 +278,35 @@ tests, actionlint, lint without errors, variant IDs, SBOM checks, minified relea
 APK/AAB and ELF/ZIP/JNI/SDK zipalign guards. Stay-awake is restored and verified
 as 0. The new commit's six-job remote acceptance remains pending until push.
 
+## Run 37: adbd root transport closes before native tests
+
+[Run 37](https://github.com/jagumiel/mimi-reader/actions/runs/40026744999) passes
+five jobs; the 16 KB job fails at `adb root` with `unable to connect for root:
+closed`, before Gradle or any native case. Preserve that distinction: no PDF/GIF
+assertion failed and the previous layout cleanup is not fully accepted yet.
+
+Use bounded reconnection/uid-0/boot verification after the known closed/offline
+root-request ambiguity, recheck identity/API/page size, then retain strict
+compatibility-property and native assertions. Root denial, nonroot timeout and
+changed pages fail; no test retry, host ADB restart or physical-device write.
+Evidence includes `adbd_uid=0`; five new helper regressions bring coverage to
+59 tests. Workflow YAML and its six-job gates stay unchanged.
+
+The same block refactors the live color editor and swatch drawing, adding five
+mandatory cases (ordinary **86**, same three opt-in skips; native six). See
+[diagnosis, recovery, isolation and acceptance limits](COLOR_EDITOR.md).
+Require a fresh full remote workflow after push.
+
+Local verification on 24 October passes the actual updated helper on API 36
+ps16k: six native cases, no skips/failures/errors, with page size 16384, uid 0
+and compatibility disabled. This is not only a simulated transport regression.
+The Edge 20 full suite passes 86 JUnit cases (83 passed, three existing skips).
+Also pass 110 app/library unit tests, 59 CI-helper tests, lint without errors,
+SBOM/variant checks, debug/test and minified release builds, actionlint and
+static native/JNI/SDK guards. The debug-only fixture is non-exported and absent
+from release manifest/DEX. Restore phone settings, restore emulator uid/properties
+and stop it. The new remote six-job run remains required.
+
 ## Run 36 confirmed; seventeenth cleanup of an unused settings layout
 
 [Run 36 for `53379f4`](https://github.com/jagumiel/mimi-reader/actions/runs/39936759280)

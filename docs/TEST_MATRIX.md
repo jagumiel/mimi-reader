@@ -395,6 +395,32 @@ migration cases pass on the API 29 emulator without skips. Restore phone
 stay-awake to 0, preserve the emulator's observed value 3 and stop the emulator.
 Do not count these as physical Android 10, cold-install or remote acceptance.
 
+## Eighteenth cleanup: actual color editor lifecycle
+
+Five new mandatory `ThemeSettingsActivityTest` cases cover real preview text/span
+colors, stable swatch drawables/pixels, selection/restoration/read-only lifecycle,
+palette slot isolation, picker draft/target restoration and explicit OK, cancel/
+rapid duplicates/invalid results, and real production-activity read-only values.
+Editing uses a debug-only non-exported host with its own preferences, not a
+snapshot/teardown scheme that fails if the process crashes. Verify the fixture
+is absent from release. Ordinary instrumentation becomes **86 cases**, with
+three existing opt-in skips; the native 16 KB suite remains six.
+
+Run 37 supplies five green jobs, but **no native test result**: adbd closes at
+the root request. Five helper cases test bounded reconnection, actual root/boot,
+denial, deadline and post-restart identity/page size (59 CI-helper tests total).
+See [the diagnosis and isolated-test recovery](COLOR_EDITOR.md); local results
+do not replace the new commit's six remote jobs or physical release gates.
+
+Final local acceptance on 24 October passes **86 distinct Edge 20 / Android 12
+JUnit cases: 83 passed, three existing opt-in skips, zero failures/errors**.
+The five editor cases also pass separately. The actual updated native helper
+passes all six cases on API 36 ps16k with page size 16384, verified uid 0 and
+backcompat disabled. The personal phone is not rooted; defaults and original
+stay-awake 0 are verified after the suite. Restore the owned emulator's original
+uid/properties/stay-awake and stop it. No physical Android 10/32-bit or new human
+CAPTCHA/browser acceptance is inferred, and a new green remote run is required.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

@@ -18,10 +18,11 @@ package com.emogoth.android.phone.mimi.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 
@@ -35,6 +36,8 @@ public class ColorImageView extends AppCompatImageView {
     private int mColor;
     private int mBorderColor;
     private int mBorderColorSelected;
+    private Drawable fill;
+    private Drawable border;
 
     public ColorImageView(Context context) {
         super(context);
@@ -49,24 +52,28 @@ public class ColorImageView extends AppCompatImageView {
                 R.styleable.ColorPickerImageView,
                 0, 0);
         try {
-            setBorderColor(a.getInteger(R.styleable.ColorPickerImageView_imageBorderColor, R.color.border));
-            setBorderColorSelected(a.getInteger(R.styleable.ColorPickerImageView_imageBorderColorSelected, R.color.border_selected));
-            setBackgroundColor(a.getInteger(R.styleable.ColorPickerImageView_imageBackgroundColor, R.color.border_selected));
+            setBorderColor(a.getColor(R.styleable.ColorPickerImageView_imageBorderColor, mBorderColor));
+            setBorderColorSelected(a.getColor(R.styleable.ColorPickerImageView_imageBorderColorSelected, mBorderColorSelected));
+            setBackgroundColor(a.getColor(R.styleable.ColorPickerImageView_imageBackgroundColor, mColor));
         } finally {
             a.recycle();
         }
     }
 
     private void init() {
-        mBorderColor = getResources().getColor(R.color.border);
-        mBorderColorSelected = getResources().getColor(R.color.border_selected);
-        mColor = getResources().getColor(R.color.circle);
-        setBackground(getResources().getDrawable(R.drawable.circle_border));
-        setImageDrawable(getResources().getDrawable(R.drawable.circle));
+        mBorderColor = ResourcesCompat.getColor(getResources(), R.color.border, getContext().getTheme());
+        mBorderColorSelected = ResourcesCompat.getColor(getResources(), R.color.border_selected, getContext().getTheme());
+        mColor = ResourcesCompat.getColor(getResources(), R.color.circle, getContext().getTheme());
+        fill = DrawableCompat.wrap(AppCompatResources.getDrawable(getContext(), R.drawable.circle)).mutate();
+        border = DrawableCompat.wrap(AppCompatResources.getDrawable(getContext(), R.drawable.circle_border)).mutate();
+        setImageDrawable(fill);
+        setBackground(border);
+        updateColors();
     }
 
     public void setBackgroundColor(int color) {
         mColor = color;
+        updateColors();
     }
 
     public int getBackgroundColor() {
@@ -75,28 +82,23 @@ public class ColorImageView extends AppCompatImageView {
 
     public void setBorderColor(int color) {
         mBorderColor = color;
+        updateColors();
     }
 
     public void setBorderColorSelected(int color) {
         mBorderColorSelected = color;
+        updateColors();
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        Drawable drawableBackground = getResources().getDrawable(R.drawable.circle);
-        drawableBackground = DrawableCompat.wrap(drawableBackground);
-        drawableBackground.mutate().setColorFilter(mColor, PorterDuff.Mode.SRC_IN);
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        updateColors();
+    }
 
-        setImageDrawable(drawableBackground);
-
-        Drawable drawableBorder = getResources().getDrawable(R.drawable.circle_border);
-        drawableBorder = DrawableCompat.wrap(drawableBorder);
-        int borderColor = mBorderColor;
-        if (isSelected()) {
-            borderColor = mBorderColorSelected;
-        }
-        drawableBorder.mutate().setColorFilter(borderColor, PorterDuff.Mode.SRC_IN);
-        setBackground(drawableBorder);
+    private void updateColors() {
+        // View's constructor can invoke overridden setters before initialization.
+        if (fill != null) fill.setColorFilter(mColor, PorterDuff.Mode.SRC_IN);
+        if (border != null) border.setColorFilter(isSelected() ? mBorderColorSelected : mBorderColor, PorterDuff.Mode.SRC_IN);
     }
 }

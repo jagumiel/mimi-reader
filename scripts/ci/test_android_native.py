@@ -1,4 +1,5 @@
 import struct
+import subprocess
 import tempfile
 from pathlib import Path
 import unittest
@@ -128,7 +129,7 @@ class RuntimeSafetyTest(unittest.TestCase):
             self.assertFalse(any("setprop" in call.args for call in adb.call_args_list))
 
     def test_16kb_run_verifies_properties_and_scopes_gradle(self):
-        responses = ["1", "36", "16384", "", "", "", "false", "", "true"]
+        responses = ["1", "36", "16384", "", "0", "1", "1", "36", "16384", "", "false", "", "true"]
         with tempfile.TemporaryDirectory() as directory, mock.patch.object(native, "adb", side_effect=responses), \
                 mock.patch.object(native.subprocess, "run") as run, \
                 mock.patch.object(native, "Path", return_value=Path(directory)):
@@ -138,6 +139,49 @@ class RuntimeSafetyTest(unittest.TestCase):
             self.assertIn(":mimi-app:connectedDebugAndroidTest", command)
             self.assertEqual("emulator-5554", run.call_args.kwargs["env"]["ANDROID_SERIAL"])
             self.assertTrue(run.call_args.kwargs["check"])
+
+    def test_closed_root_transport_recovers_only_after_verified_root(self):
+        closed = subprocess.CalledProcessError(1, ["adb", "root"],
+            output="adb: unable to connect for root: closed")
+        responses = ["1", "36", "16384", closed, "0", "1", "1", "36", "16384", "", "false", "", "true"]
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(native, "adb", side_effect=responses), \
+                mock.patch.object(native.subprocess, "run") as run, \
+                mock.patch.object(native, "Path", return_value=Path(directory)):
+            native.run_16k("emulator-5554")
+            run.assert_called_once()
+            self.assertIn("adbd_uid=0", (Path(directory) / "device.txt").read_text())
+
+    def test_root_denial_never_runs_gradle_or_writes_properties(self):
+        denied = subprocess.CalledProcessError(1, ["adb", "root"], output="adbd cannot run as root in production builds")
+        with mock.patch.object(native, "adb", side_effect=["1", "36", "16384", denied]) as adb, \
+                mock.patch.object(native.subprocess, "run") as run:
+            with self.assertRaises(subprocess.CalledProcessError):
+                native.run_16k("emulator-5554")
+            run.assert_not_called()
+            self.assertFalse(any("setprop" in call.args for call in adb.call_args_list))
+
+    def test_reconnection_polls_transport_and_boot_before_accepting_uid(self):
+        offline = subprocess.CalledProcessError(1, ["adb"], output="device offline")
+        with mock.patch.object(native, "adb", side_effect=[offline, "2000", "1", "0", "", "0", "1"]) as adb, \
+                mock.patch.object(native.time, "sleep"):
+            native.wait_for_root("emulator-5554")
+            self.assertEqual(7, adb.call_count)
+
+    def test_nonroot_reconnection_has_a_bounded_deadline(self):
+        with mock.patch.object(native, "adb", side_effect=["2000", "1"]), \
+                mock.patch.object(native.time, "monotonic", side_effect=[0, 0, 46]), \
+                mock.patch.object(native.time, "sleep"):
+            with self.assertRaisesRegex(ValueError, "did not reconnect as root"):
+                native.wait_for_root("emulator-5554")
+
+    def test_changed_page_size_after_root_prevents_gradle_and_writes(self):
+        responses = ["1", "36", "16384", "", "0", "1", "1", "36", "4096"]
+        with mock.patch.object(native, "adb", side_effect=responses) as adb, \
+                mock.patch.object(native.subprocess, "run") as run:
+            with self.assertRaisesRegex(ValueError, "changed after"):
+                native.run_16k("emulator-5554")
+            run.assert_not_called()
+            self.assertFalse(any("setprop" in call.args for call in adb.call_args_list))
 
     def test_workflow_keeps_release_uploads_in_build_and_adds_dedicated_16k_job(self):
         workflow = (Path(__file__).resolve().parents[2] / ".github/workflows/android-ci.yml").read_text()

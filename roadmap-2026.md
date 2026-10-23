@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 23 de octubre de 2026.
+Última revisión: 24 de octubre de 2026.
 
 ## Objetivo
 
@@ -36,8 +36,8 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 
 ### Orden de trabajo inmediato
 
-1. Las ejecuciones 35 y 36 confirman los seis trabajos del decimoquinto y decimosexto bloques, incluidos Android 10 y 16 KB. Exigir otra ejecución verde para el decimoséptimo bloque de layouts/bindings, sin trasladar automáticamente la aceptación entre commits.
-2. Revisar el editor de colores vigente (`ThemeSettingsActivity`): ciclo de vida de la previsualización, selección/restauración y enlace de ejemplo obsoleto, con pruebas que no alteren los colores guardados del usuario. La auditoría de layouts ya distingue los dos utilizados del contenedor huérfano retirado; no eliminar la dependencia del selector de color que sigue en uso.
+1. La ejecución 37 supera cinco trabajos, pero el nativo falla antes de iniciar pruebas al cerrarse la conexión de `adb root`. El decimoctavo bloque añade reconexión acotada y verificación real de root/arranque/API/página; exigir otra ejecución verde de los seis trabajos, sin omitir ni reintentar aserciones.
+2. Tras confirmar el CI, consolidar la auditoría restante de dependencias/recursos en un inventario priorizado antes del escaneo CVE/GHSA. El editor de colores ya tiene ciclo de vida/restauración y pruebas aisladas; conservar su selector activo y no borrar todos los avisos de lint ni dar por terminada la limpieza.
 3. Conservar las puertas de aceptación pendientes en Android 10 físico/32 bits y las comprobaciones humanas de CAPTCHA, teclado y navegador. En Android 12 ya se publicó una respuesta autorizada; no repetir envíos públicos como prueba automática. Alcance en la fase 5 y `docs/POSTING.md`.
 4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 
@@ -250,7 +250,13 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
         - [x] Añadir comprobaciones del binding/toolbar real antes/después de recrear y un caso de inflación de ambos layouts conservados en tres temas, dos anchuras y LTR/RTL, con controles de color y preferencias sin cambios. Suite ordinaria de 81 casos, mismas tres exclusiones optativas y seis casos nativos separados; no confundir inflación aislada con aceptación interactiva del editor.
         - [ ] Confirmar los seis trabajos remotos del nuevo commit; la ejecución 36 solo acepta el bloque anterior.
         - [x] Validación local: suite completa en Edge 20/Android 12 con 81 casos distintos (78 aprobados, tres exclusiones optativas, cero fallos/errores), seis casos específicos en API 29 sin exclusiones y 110 pruebas unitarias/54 del CI. Lint sin errores y 474 recursos sin uso; builds, SBOM, tablas APK/DEX, R8 y controles nativos correctos. Restaurar pantalla del móvil a 0, conservar el valor observado 3 del emulador y cerrarlo; mantener pendiente la aceptación remota/física del release.
-      - [ ] Siguiente bloque: refactorizar y probar el ciclo de vida de la previsualización y la restauración del editor de colores real, con preferencias aisladas/restauradas y sin retirar su selector vigente. Conservar las pruebas físicas pendientes y no dar por terminada toda la limpieza.
+      - [x] Decimoctavo bloque: eliminar la suscripción redundante y el guardado automático al salir del editor de colores; usar datos de muestra válidos y mutables, conservar selección/borrador/objetivo con DialogFragment y guardar solo al pulsar una muestra o confirmar OK. Actualizar el enlace de ejemplo y desactivar su navegación; conservar el selector vigente y las claves guardadas.
+        - [x] Corregir ColorImageView: no reemplazar drawables durante cada dibujo; crearlos una vez y tintarlos al cambiar color/selección, resolviendo los valores XML como colores reales.
+        - [x] Añadir cinco casos del editor (suite ordinaria de 86 casos, mismas tres exclusiones). Tras fallar el primer fixture, el usuario autoriza restaurar colores predeterminados; se verifica el resto de preferencias sin cambios y se sustituyen las pruebas de edición por un host debug no exportado y almacenamiento independiente, ausente de release. Detalles y fallos conservados en `docs/COLOR_EDITOR.md`.
+        - [x] Analizar la ejecución 37: ningún caso nativo se inició. Recuperar únicamente el cierre/offline ambiguo al pedir root, verificar uid 0/arranque y repetir guardas de identidad/API/página antes de escribir propiedades. Añadir cinco pruebas del helper (59 en total); mantener seis casos nativos, sin relajar aserciones, reintentar suites ni tocar el teléfono con root.
+        - [ ] Confirmar los seis trabajos remotos del nuevo commit; la ejecución 37 no acepta el bloque anterior completo ni este arreglo.
+        - [x] Validación local: 86 casos distintos en Edge 20/Android 12 (83 aprobados, tres exclusiones optativas, cero fallos/errores), cinco del editor por separado y los seis nativos en API 36 con página real de 16384 bytes, uid 0 y backcompat desactivado mediante el helper corregido. Pasan 110 pruebas unitarias, 59 del CI, lint sin errores, SBOM, builds release y controles ELF/ZIP/JNI/SDK. Verificar fixture ausente de release y colores predeterminados conservados; restaurar pantalla del móvil a 0 y los valores originales del emulador antes de cerrarlo. Falta la nueva matriz remota.
+      - [ ] Siguiente bloque: consolidar el inventario pendiente de limpieza con consumidores reales y prioridades antes del escaneo CVE/GHSA, sin borrados por antigüedad ni supresión masiva de lint. Conservar las pruebas físicas pendientes y consultar antes del changelog 8.0.
   - [x] Generar y versionar en el repositorio un SBOM que incluya las dependencias de Gradle y los componentes empaquetados manualmente, como Ruffle.
     - [x] Cubrir el grafo de `release` (antes `freeRelease`) antes de R8 mediante CycloneDX 1.6: 152 componentes Maven tras la primera limpieza, `chanlib`, Ruffle y las huellas SHA-256 de sus siete archivos.
     - [x] Añadir `generateSbom`, `updateSbom`, `verifySbom` y pruebas negativas del verificador; comprobar esquema, referencias, cobertura, hashes y frescura de los snapshots en GitHub Actions y conservar los informes durante 14 días.
