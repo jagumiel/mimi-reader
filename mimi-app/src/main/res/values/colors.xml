@@ -165,7 +165,6 @@
     <!-- Rating Bar -->
     <color name="rating_background">#448833</color>
     <color name="rating_text">#121212</color>
-    <color name="rating_button_selected">#66AA55</color>
     <color name="actionbar_text">#CCCCCC</color>
 
     <color name="solid_black">#ff000000</color>

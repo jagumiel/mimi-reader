@@ -1345,6 +1345,34 @@ bounded R01 rating-resource closure; leave D02/D03 and the deferred CVE/GHSA
 scanner separate. Physical Android 10/32-bit and human posting/browser checks
 remain release gates; these local JVM/build checks do not replace them.
 
+## Twentieth cleanup: remove the closed rating-resource subtree
+
+Implement inventory candidate R01 only: remove three orphan rating-selector XML
+files and `rating_button_selected`. All references to these four resources are
+confined to that set; no live code, qualified resource, theme, manifest, binding or R8 consumer
+is found. The obsolete rating preference/helper were removed together earlier.
+Keep the unrelated rating colors, current More Info/credits/legal documents,
+all three themes, preference keys, posting and CAPTCHA behavior. Deletions are
+recoverable from Git; no user data is removed. See the
+[bounded resource audit](SETTINGS_RESOURCE_AUDIT.md#twentieth-block-orphan-rating-selector-closure-r01)
+for artifact checks, acceptance and limits.
+
+No dependency, version, R8 or SBOM input changes: snapshots remain exactly
+unchanged at **152 components / 75 declarations**. Reuse the existing settings/
+More Info regression tests; do not add test-only lookups to production code or
+claim new test cases. The next small candidate is R02's two reply-option arrays,
+subject to its own consumer and posting/preference-preservation review.
+
+Build/unit/SBOM/variant/boundary checks and 59 CI-helper tests pass. Lint has
+zero errors, 995 warnings and one hint, with 470 unused resources (four fewer).
+Actual debug/release resource tables omit the deleted names and retain live
+settings/More Info/legal resources. The final unlocked Edge 20 / Android 12
+suite passes 86 distinct cases: 83 passed, three existing opt-in skips, no
+failures/errors. An earlier locked/sleeping attempt failed and is preserved,
+not counted as passing. Both attempts restore phone stay-awake to 0. Details,
+artifact sizes, static native checks and remote/physical acceptance limits are
+in the resource audit; require the new commit's own six-job CI.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1352,7 +1380,8 @@ reviewed after green six-job run 38 for `268fd5d`. It distinguishes the library'
 standalone dependency graph from the application's selected versions, bounded
 orphan resource closures and live legacy consumers. D01 (`chanlib` dependency
 ownership/standalone network baseline) is implemented in the nineteenth block;
-next review R01, not a bulk lint deletion or the deferred vulnerability scan.
+the twentieth removes the closed R01 resource set. Next review R02, not a bulk
+lint deletion or the deferred vulnerability scan.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
@@ -1398,8 +1427,10 @@ The old email/logcat feedback path is also removed with its live caller.
    and verifies bounded adbd root reconnection. Run 38 for `268fd5d` confirms
    all six jobs for these changes. The remaining cleanup is now consolidated
    in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md). The nineteenth implements D01
-   and needs its own green workflow; next review the bounded R01 resource
-   closure, without drafting the 8.0 changelog. Physical Android
+   and needs its own green workflow. Run 39 confirms the preceding documentation
+   commit `b28bce6`, not the unpushed D01 implementation. The twentieth removes
+   only R01's four orphan resources; next review R02's reply-option arrays,
+   without drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

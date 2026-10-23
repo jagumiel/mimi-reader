@@ -3,7 +3,7 @@
 Reviewed on 24 October 2026 against `268fd5d`. This is a prioritized review of
 the remaining cleanup, not a removal list, a version-upgrade catalogue or a
 vulnerability scan. The initial inventory was documentation-only; the subsequent
-D01 implementation is recorded below and in the dependency cleanup history.
+D01 and R01 implementations are recorded below and in the cleanup history.
 
 ## Accepted baseline and scope
 
@@ -42,8 +42,8 @@ KTX or RxAndroid exports. The app retains its live Core/RxAndroid declarations.
 The standalone unit graph becomes 20 entries instead of the baseline 23; release
 components and declaration totals remain 152 / 75. See the
 [nineteenth cleanup](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary)
-for code adjustments, tests, exact graph scope and limits. Next review R01;
-D02/D03 are still separate pending candidates. The table retains the original
+for code adjustments, tests, exact graph scope and limits. R01 is implemented
+below; D02/D03 are still separate pending candidates. The table retains the original
 evidence so the implementation can be compared against its accepted baseline.
 
 | ID | Evidence at the accepted baseline | Bounded follow-up and acceptance |
@@ -57,6 +57,15 @@ rewrite. In particular, moving the application wholesale
 from RxJava to coroutines is not a prerequisite for the 8.0 release.
 
 ## Priority 2: remove only bounded orphan resource closures
+
+**R01 implemented locally in the twentieth block; remote acceptance pending.**
+Remove only the three rating-selector XML files and `rating_button_selected`
+after confirming their closed internal edges and no outside consumer. Keep
+other rating colors and all live themes/More Info behavior. See the
+[resource audit](SETTINGS_RESOURCE_AUDIT.md#twentieth-block-orphan-rating-selector-closure-r01)
+for searches, compiled-artifact checks and validation. Next review R02's two
+reply-option arrays, preserving posting behavior and stored preference keys;
+D02/D03/R03 remain separate decisions, not approved bulk removals.
 
 | ID | Evidence and caution | Required proof before deletion |
 | --- | --- | --- |
@@ -134,8 +143,8 @@ separately in the nineteenth cleanup linked above.
 
 For each later implementation, record the exact candidate, consumers, changes,
 graph/resource diff, tests and remaining limits in the cleanup history. Require
-that commit's own complete six-job CI. After D01, review the bounded R01 closure
-and decide D02/D03/R02/R03 independently; the live-library rows are
+that commit's own complete six-job CI. After D01/R01, review R02 and decide
+D02/D03/R03 independently; the live-library rows are
 not an unlimited requirement to rewrite every component before security work.
 
 After the agreed bounded cleanup and explicit disposition of remaining

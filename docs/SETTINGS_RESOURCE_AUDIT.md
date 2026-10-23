@@ -199,3 +199,80 @@ declarations**, with unchanged native/Ruffle artifacts, dependencies, versions
 and legal contents. Compared with `53379f4`, release APK changes from
 **41,423,679 to 41,423,143 bytes** and AAB from **31,142,992 to 31,142,409 bytes**.
 Do not infer memory or startup performance from these small size changes.
+
+## Twentieth block: orphan rating-selector closure (R01)
+
+Review the four-node resource closure before removal:
+
+| Resource | All source edges found before removal |
+| --- | --- |
+| `drawable/app_rating_selector` | Definition only; no external caller. |
+| `drawable/app_rating_selector_normal` | Only referenced by `app_rating_selector`; an empty selector. |
+| `drawable/app_rating_selector_pressed` | Only referenced by `app_rating_selector`. |
+| `color/rating_button_selected` | Only referenced by the pressed selector. |
+
+Search both modules' main/debug/test source sets, qualified resources, theme/style
+XML, manifests, build scripts, generated binding source and explicit R8 files.
+No production `getIdentifier` or reflective class lookup is present. Generated
+resource-symbol declarations and old lint reports are not callers: ignore stale
+`freeDebug` outputs left by previous flavors and inspect newly built debug/release
+artifacts instead. No binding is generated for these drawable selectors.
+
+Delete the three XML files and the single color entry as one closed set.
+The actual market/rating preference and helper were already removed together
+in the fourteenth block. Keep `rating_background` and `rating_text`: they are
+outside this reviewed closure, not implicitly approved for removal. Leave all
+other themes, arrays, layouts, preference keys, attribution, bundled license
+notices and CAPTCHA paths unchanged. Deleted resource sources are recoverable
+from Git; no user cache, downloads, preferences or database data is removed.
+
+Reuse existing regression coverage rather than adding test-only production
+lookups: `SettingsNavigationTest` covers both retained layouts in light/dark/black,
+two widths and RTL/LTR, plus all six real settings categories; `MoreInfoPrefsTest`
+covers absent rating/email entries, current credits/links, local notices,
+recreation and Back. External intents are intercepted. Theme-layout inflation
+is not a claim that the real More Info screen runs in all three themes, and
+debug instrumentation is not minified-release UI execution.
+
+The remotely observable green run at the start of this block is
+[run 39](https://github.com/jagumiel/mimi-reader/actions/runs/40034700649), all six
+jobs for `b28bce6`. Local Git reports `3c22d4d` one commit ahead of origin and
+the API returns no workflow for that SHA; do not transfer run 39's status to
+D01 or this resource cleanup. Neither a push nor a remote CI success is claimed.
+The new commits still need their own complete six-job workflow.
+
+### R01 build and artifact checks
+
+Pass 121 app/library unit cases (102 + 19; the unchanged library suite is
+up-to-date), 59 CI-helper tests, SBOM freshness and six malformed-input checks,
+variant IDs and the standalone library dependency boundary. Debug/test APKs
+and minified release APK/AAB build successfully in 1m32s. Lint has zero errors,
+995 warnings and one hint, with 470 `UnusedResources` findings: exactly four
+fewer than the preceding 999 / 474 baseline, without suppressions or baselines.
+
+Inspect actual debug and release APK resource tables: all four removed names
+are absent. Both settings layouts, More Info XML and privacy/license/historical
+changelog resources remain. Both APKs pass static ELF/ZIP checks (24 libraries /
+four ABIs); release also passes JNI seed checks and SDK 16 KB zipalign.
+Release APK is **41,422,919 bytes**, versus 41,423,143; AAB is **31,141,766
+bytes**, versus 31,141,845. These tiny changes are not performance measurements.
+SBOM snapshots, dependencies, minSdk/target, IDs, versions and R8 rules do not
+change. No fresh actual-16-KB runtime or minified-release UI run is claimed.
+
+The first phone attempt is **failed/interrupted, not accepted**: Android enters
+sleep due to timeout before instrumentation starts; subsequent preference and
+activity tests fail on saved/stopped state, then the phone is confirmed Dozing
+with keyguard locked despite stay-awake 7. Stop only the debug app/test runner,
+preserve logs/XML under ignored `build/` and restore/verify stay-awake 0. After
+the owner unlocks the phone, require Awake/unlocked before a fresh complete
+suite. Do not change assertions, introduce retries or suppress lifecycle errors
+to convert that run into a pass.
+
+After the owner unlocks the Edge 20 / Android 12, the fresh complete suite passes
+in **1m30s: 86 distinct XML/JUnit cases, 83 passed, three existing opt-in skips,
+zero failures/errors**. All six existing More Info/settings cases are present
+and pass, including the detached three-theme layout case. The console's 89
+completion events are not 89 unique cases. Preserve the failed and successful
+reports separately; restore and verify stay-awake **0** after both attempts.
+No public post, live CAPTCHA, physical Android 10/32-bit or remote acceptance is
+inferred from this result.
