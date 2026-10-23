@@ -36,8 +36,8 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 
 ### Orden de trabajo inmediato
 
-1. La ejecución 37 supera cinco trabajos, pero el nativo falla antes de iniciar pruebas al cerrarse la conexión de `adb root`. El decimoctavo bloque añade reconexión acotada y verificación real de root/arranque/API/página; exigir otra ejecución verde de los seis trabajos, sin omitir ni reintentar aserciones.
-2. Tras confirmar el CI, consolidar la auditoría restante de dependencias/recursos en un inventario priorizado antes del escaneo CVE/GHSA. El editor de colores ya tiene ciclo de vida/restauración y pruebas aisladas; conservar su selector activo y no borrar todos los avisos de lint ni dar por terminada la limpieza.
+1. La [ejecución 38](https://github.com/jagumiel/mimi-reader/actions/runs/40032230880) de `268fd5d` supera los seis trabajos: compilación, pruebas ordinarias en API 29/31/34/36 y pruebas nativas con páginas reales de 16 KB. Quedan confirmados el editor de colores con pruebas aisladas y la reconexión acotada de `adb root`; cada cambio posterior necesitará su propia ejecución verde.
+2. Auditoría restante consolidada en [docs/CLEANUP_INVENTORY.md](docs/CLEANUP_INVENTORY.md). Próximo bloque: D01, revisar las dependencias exportadas por `chanlib` y su resolución independiente (OkHttp 3.14.9/Core 1.3.0 frente a 4.12.0/1.18.0 en la app), conservando los contratos públicos y los mínimos Android de cada módulo. Después, revisar el pequeño conjunto huérfano de recursos de valoración R01 y decidir por separado el resto de candidatos. No borrar en bloque los 474 avisos de recursos ni retirar bibliotecas con consumidores activos.
 3. Conservar las puertas de aceptación pendientes en Android 10 físico/32 bits y las comprobaciones humanas de CAPTCHA, teclado y navegador. En Android 12 ya se publicó una respuesta autorizada; no repetir envíos públicos como prueba automática. Alcance en la fase 5 y `docs/POSTING.md`.
 4. Incorporar el escaneo CVE/GHSA después de los bloques acordados; el changelog 8.0 sigue requiriendo consulta previa y el README completo queda para el final.
 

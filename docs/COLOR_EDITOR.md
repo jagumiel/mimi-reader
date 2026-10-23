@@ -126,3 +126,9 @@ After remote confirmation, consolidate the remaining dependency/resource audit
 into a prioritized inventory before enabling the deferred CVE/GHSA scan. Do not
 bulk-delete the remaining lint findings or declare all cleanup complete. The
 8.0 changelog requires consultation and the full README rewrite remains last.
+
+Remote confirmation: [run 38](https://github.com/jagumiel/mimi-reader/actions/runs/40032230880)
+for `268fd5d` passes all six jobs, including native 16 KB and ordinary API
+29/31/34/36. The subsequent documentation-only review consolidates remaining
+work in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md); it does not claim new device
+acceptance or change the isolated editor test storage.

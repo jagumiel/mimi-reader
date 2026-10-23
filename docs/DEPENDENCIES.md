@@ -1265,6 +1265,14 @@ it. Artifact sizes and failed local attempts remain documented in the review.
 
 ## Remaining legacy-file review
 
+The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
+reviewed after green six-job run 38 for `268fd5d`. It distinguishes the library's
+standalone dependency graph from the application's selected versions, bounded
+orphan resource closures and live legacy consumers. Start with D01 (`chanlib`
+dependency ownership/standalone network baseline), not a bulk lint deletion or
+the deferred vulnerability scan. This documentation block changes no inputs
+to the SBOM or application.
+
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
 `CodeSpan`, `DelegatingSocketFactory`, `BetterViewAnimator` and `RequestQueueUtil`
@@ -1305,9 +1313,11 @@ The old email/logcat feedback path is also removed with its live caller.
    and tests all six live categories and legacy-value preservation; run 36
    confirms all six jobs. The seventeenth removes only the abandoned settings
    shell after reviewing generated bindings and protects both retained layouts
-   with theme/geometry tests. Require its own green workflow. Next review the
-   live color editor's preview lifecycle and state restoration, without
-   drafting the 8.0 changelog. Physical Android
+   with theme/geometry tests. The eighteenth modernizes the live color editor
+   and verifies bounded adbd root reconnection. Run 38 for `268fd5d` confirms
+   all six jobs for these changes. The remaining cleanup is now consolidated
+   in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md): next inspect D01, then the
+   bounded resource candidates, without drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
