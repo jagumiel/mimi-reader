@@ -1373,6 +1373,32 @@ not counted as passing. Both attempts restore phone stay-awake to 0. Details,
 artifact sizes, static native checks and remote/physical acceptance limits are
 in the resource audit; require the new commit's own six-job CI.
 
+## Twenty-first cleanup: retire unused reply-option arrays
+
+Run 40 for `62c24c3` passes all six jobs, accepting the preceding D01 library
+boundary and R01 resource cleanup. Implement R02 only: remove `arrays.xml`, whose
+two reply-option arrays have no production consumers. Live reply/quote callbacks,
+posting fields, CAPTCHA handling, preference keys and migration schema do not
+change. All other resource arrays, dependency declarations, SBOM snapshots,
+versions, IDs, R8 rules and legal documents remain unchanged.
+
+Extend the existing isolated legacy/unknown-preference preservation case with
+synthetic keys matching the retired resource names and both former option
+values; migration must preserve them and remain idempotent. This is not a claim
+about historical key names, a migration of those keys or a new test case.
+See the [R02 audit and validation](SETTINGS_RESOURCE_AUDIT.md#twenty-first-block-unused-reply-option-arrays-r02).
+Next review D02's remaining declaration ownership/selection mismatches; retain
+all direct and exported dependencies with real consumers. D03/R03 and CVE/GHSA
+activation remain separately scoped, not included in this resource cleanup.
+
+Local validation passes both build types/test APK, 121 app/library unit cases,
+59 CI-helper cases, SBOM/variant/boundary guards and static native/JNI/ZIP checks.
+Lint has zero errors, 993 warnings and one hint, with 468 unused resources (two
+fewer). Four scoped device migration cases pass, including the expanded fixture.
+The full UI suite does not start because the awake/unlocked preflight fails;
+restore stay-awake 0 and leave that acceptance pending user unlock/new CI.
+Do not reuse run 40 or the previous device suite as this commit's validation.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1380,7 +1406,8 @@ reviewed after green six-job run 38 for `268fd5d`. It distinguishes the library'
 standalone dependency graph from the application's selected versions, bounded
 orphan resource closures and live legacy consumers. D01 (`chanlib` dependency
 ownership/standalone network baseline) is implemented in the nineteenth block;
-the twentieth removes the closed R01 resource set. Next review R02, not a bulk
+the twentieth removes the closed R01 resource set. Run 40 accepts both. The
+twenty-first removes only R02's unused reply arrays; next review D02, not a bulk
 lint deletion or the deferred vulnerability scan.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -1427,10 +1454,10 @@ The old email/logcat feedback path is also removed with its live caller.
    and verifies bounded adbd root reconnection. Run 38 for `268fd5d` confirms
    all six jobs for these changes. The remaining cleanup is now consolidated
    in [CLEANUP_INVENTORY.md](CLEANUP_INVENTORY.md). The nineteenth implements D01
-   and needs its own green workflow. Run 39 confirms the preceding documentation
-   commit `b28bce6`, not the unpushed D01 implementation. The twentieth removes
-   only R01's four orphan resources; next review R02's reply-option arrays,
-   without drafting the 8.0 changelog. Physical Android
+   and the twentieth removes R01's four orphan resources. Run 40 for `62c24c3`
+   confirms all six jobs for both. The twenty-first removes only R02's unused
+   reply arrays and extends isolated value-preservation coverage; require its
+   own workflow. Next review D02, without drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

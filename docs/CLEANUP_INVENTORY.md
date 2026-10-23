@@ -3,7 +3,7 @@
 Reviewed on 24 October 2026 against `268fd5d`. This is a prioritized review of
 the remaining cleanup, not a removal list, a version-upgrade catalogue or a
 vulnerability scan. The initial inventory was documentation-only; the subsequent
-D01 and R01 implementations are recorded below and in the cleanup history.
+D01, R01 and R02 implementations are recorded below and in the cleanup history.
 
 ## Accepted baseline and scope
 
@@ -36,7 +36,7 @@ age, not reachability. This review does not rerun or redefine that age audit.
 
 ## Priority 1: independently review the library dependency boundary
 
-**D01 implemented locally; its own six-job remote acceptance remains pending.**
+**D01 accepted by all six jobs in run 40 for `62c24c3`.**
 The library now owns OkHttp 4.12.0 and Annotation 1.10.0 explicitly, without Core
 KTX or RxAndroid exports. The app retains its live Core/RxAndroid declarations.
 The standalone unit graph becomes 20 entries instead of the baseline 23; release
@@ -58,14 +58,21 @@ from RxJava to coroutines is not a prerequisite for the 8.0 release.
 
 ## Priority 2: remove only bounded orphan resource closures
 
-**R01 implemented locally in the twentieth block; remote acceptance pending.**
+**R01 accepted by [run 40](https://github.com/jagumiel/mimi-reader/actions/runs/40038285565), all six jobs for `62c24c3`.**
 Remove only the three rating-selector XML files and `rating_button_selected`
 after confirming their closed internal edges and no outside consumer. Keep
 other rating colors and all live themes/More Info behavior. See the
 [resource audit](SETTINGS_RESOURCE_AUDIT.md#twentieth-block-orphan-rating-selector-closure-r01)
-for searches, compiled-artifact checks and validation. Next review R02's two
-reply-option arrays, preserving posting behavior and stored preference keys;
-D02/D03/R03 remain separate decisions, not approved bulk removals.
+for searches, compiled-artifact checks and validation.
+
+**R02 implemented locally in the twenty-first block; remote acceptance pending.**
+Remove only the unreferenced `reply_entries` / `reply_values` definitions and
+their otherwise-empty XML file. Extend the isolated migration-preservation
+fixture without changing production posting, stored values or migration schema.
+See the [reply-array audit](SETTINGS_RESOURCE_AUDIT.md#twenty-first-block-unused-reply-option-arrays-r02).
+Next review D02's declaration ownership and selected versions, keeping actual
+public/direct consumers. D03/R03 remain separate pending decisions, not approved
+bulk removals or a prerequisite to rewrite every live library.
 
 | ID | Evidence and caution | Required proof before deletion |
 | --- | --- | --- |
@@ -143,8 +150,8 @@ separately in the nineteenth cleanup linked above.
 
 For each later implementation, record the exact candidate, consumers, changes,
 graph/resource diff, tests and remaining limits in the cleanup history. Require
-that commit's own complete six-job CI. After D01/R01, review R02 and decide
-D02/D03/R03 independently; the live-library rows are
+that commit's own complete six-job CI. After D01/R01/R02, review D02 and decide
+D03/R03 independently; the live-library rows are
 not an unlimited requirement to rewrite every component before security work.
 
 After the agreed bounded cleanup and explicit disposition of remaining

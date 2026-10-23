@@ -96,6 +96,10 @@ class PreferenceMigrationTest {
             .putString("about_pref", "legacy-about")
             .putBoolean("posting_pref", true)
             .putInt("board_pref", 2)
+            // Synthetic unknown keys matching retired resource names: their removal
+            // must not authorize deleting stored values or old reply-choice strings.
+            .putString("reply_entries", "reply")
+            .putString("reply_values", "reply_all")
             .putStringSet("unrelated_custom_value", setOf("keep", "unknown"))
             .commit())
         val original = preferences.all.toMap()

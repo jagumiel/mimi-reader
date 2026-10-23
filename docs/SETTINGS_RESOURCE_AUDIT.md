@@ -276,3 +276,68 @@ completion events are not 89 unique cases. Preserve the failed and successful
 reports separately; restore and verify stay-awake **0** after both attempts.
 No public post, live CAPTCHA, physical Android 10/32-bit or remote acceptance is
 inferred from this result.
+
+## Twenty-first block: unused reply-option arrays (R02)
+
+[Run 40](https://github.com/jagumiel/mimi-reader/actions/runs/40038285565) passes
+all six jobs for `62c24c3`, accepting both D01 and R01, including the independent
+library boundary, API 29/31/34/36 instrumentation and native 16 KB gate. This
+supersedes the twentieth block's pending remote status, not the requirement for
+the next commit's own workflow.
+
+`res/values/arrays.xml` contains only `reply_entries` (`Reply`, `Reply to all`)
+and `reply_values` (`reply`, `reply_all`). Both were reported unused by baseline
+lint. Before deletion, the only production matches are these definitions; no
+code, preference `entries`/`entryValues`, qualified XML, manifest, binding or R8
+rule references them. Neither main source tree has a name-based resource or
+reflective class lookup. Keep all other arrays: settings, board catalogs,
+gallery options, theme colors and link menus have actual consumers.
+
+Delete that single file and its two definitions, not a feature or a preference
+migration. The live `ThreadDetailFragment` reply/quote/selection callbacks
+construct `replyComment` and pass it with `Extras.EXTRAS_POST_REPLY`; they do not
+load these arrays. Leave reply handlers, posting forms, CAPTCHA/submission,
+stored keys, migration versions and unrelated reply strings unchanged. The
+removed file remains recoverable in Git; no user data is deleted.
+
+Extend the existing isolated preference-preservation case with synthetic
+unknown keys named `reply_entries` and `reply_values`, holding `reply` and
+`reply_all`. Verify every seeded value survives migration and a second migration
+is idempotent. These are defensive test inputs, not evidence that historical
+installations used the resource names as real preference keys. No user-default
+preferences are edited by this fixture and no new test-case count is claimed.
+Reuse the existing offline posting/CAPTCHA, settings and migration suites;
+never enable the live CAPTCHA opt-in or publish a message for this cleanup.
+
+### R02 local acceptance and limits
+
+Debug/test APKs and minified release APK/AAB build in 1m17s. Pass 121 app/library
+unit cases (102 + 19; unchanged library cases are up-to-date), including offline
+posting protocol contracts, 59 CI-helper cases, SBOM freshness/negative checks,
+variant IDs and the independent library boundary. Lint has zero errors, 993
+warnings and one hint, including **468 unused resources**, exactly two fewer
+than the preceding 995 / 470 baseline. No suppression or dependency changes.
+
+Both actual APK resource tables omit the two retired array names and retain
+live board/theme/gallery/bookmark arrays, settings XML and local legal notices.
+Both APKs pass static ELF/ZIP checks (24 libraries / four ABIs); release also
+passes JNI seed checks and SDK 16 KB zipalign. APK size is **41,422,903 bytes**
+(previously 41,422,919); AAB is **31,141,726 bytes** (previously 31,141,766).
+These sizes do not establish performance improvements. SBOM snapshots remain
+unchanged at 152 components / 75 declarations.
+
+The phone becomes Dozing/locked during compilation despite temporary stay-awake
+7. The preflight refuses to start UI instrumentation and restores/verifies the
+original value **0**. This is not a failed or passing UI suite: it never starts.
+The separately scoped `PreferenceMigrationTest` then runs without activities
+behind the keyguard: **four passed, no skips/failures/errors**, including the
+expanded isolated preservation/idempotence case (19s). No unlock bypass or
+default-preference changes are used. The fresh complete UI/posting suite remains
+pending user unlock; the previous block's 86-case result must not be transferred
+to this change. Overall case counts remain 86 ordinary and six separate native.
+
+No public posting, live CAPTCHA, fresh actual-16-KB runtime, minified-release UI
+or physical Android 10/32-bit acceptance is claimed. Require the new commit's
+own six-job workflow. Next review D02's dependency declaration ownership;
+leave D03/R03, CVE/GHSA activation, owner-approved 8.0 changelog and final README
+work separately scoped.
