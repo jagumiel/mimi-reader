@@ -1199,6 +1199,36 @@ fragment names. Restore phone stay-awake to 0 and owned emulator to 1, then stop
 the emulator. Detailed size comparisons and the initial Windows file-lock build
 failure are retained in the audit; fresh six-job remote acceptance is pending.
 
+## Seventeenth cleanup: unused settings shell and binding consumers
+
+[Run 36 for `53379f4`](https://github.com/jagumiel/mimi-reader/actions/runs/39936759280)
+passes all six jobs, including API 29 and native 16 KB, accepting the previous
+resource cleanup. Audit the three settings-named layouts: keep the two used by
+SettingsActivity/ThemeSettingsActivity, and remove only `mimi_settings_activity`
+and its exclusive `settings_container` ID. Its automatically generated binding
+has no consumers and is already removed by release R8; do not treat generated
+output as an independent source caller or manually edit it.
+
+Extend real settings navigation with binding/toolbar checks and add one case
+covering detached binding inflation of both live layouts across three themes,
+two widths and both layout directions, including color controls and unchanged
+preferences. The ordinary suite becomes **81 cases**, retaining three opt-in
+skips and six separate native cases. This does not execute the color editor's
+interactive lifecycle or change production settings logic. Dependencies, SBOM,
+R8, versions and legal content stay unchanged. See the
+[settings layout audit](SETTINGS_RESOURCE_AUDIT.md#seventeenth-block-settings-layouts-and-generated-bindings).
+
+Local seventeenth-block acceptance passes **81 Edge 20 / Android 12 cases:
+78 passed, three existing opt-in skips, no failures/errors**, plus six scoped
+API 29 cases without skips. Also pass 110 app/library unit tests, 54 CI-helper
+tests, SBOM/variant checks, debug/test and minified release builds, actionlint
+and static ELF/ZIP/JNI/SDK guards. Lint has zero errors, 1,004 warnings and one
+hint, with 474 unused resources. APK resource tables and DEX confirm the old
+layout/ID/binding are gone; retained resources and restored fragment names
+remain. Restore phone stay-awake to 0; leave the emulator's observed boot value
+3 unchanged and stop it. See the audit for sizes and acceptance limits. Fresh
+remote six-job acceptance remains pending.
+
 ## Remaining legacy-file review
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
@@ -1238,9 +1268,12 @@ The old email/logcat feedback path is also removed with its live caller.
    viewers, protects live provider cache and corrects the pinned test runtime.
    Run 35 confirms all six jobs for the fifteenth block, including API 29 and
    native 16 KB. The sixteenth removes confirmed orphan settings XML/strings
-   and tests all six live categories and legacy-value preservation. Require its
-   own green workflow. Next audit legacy settings layouts and generated binding
-   consumers, without drafting the 8.0 changelog. Physical Android
+   and tests all six live categories and legacy-value preservation; run 36
+   confirms all six jobs. The seventeenth removes only the abandoned settings
+   shell after reviewing generated bindings and protects both retained layouts
+   with theme/geometry tests. Require its own green workflow. Next review the
+   live color editor's preview lifecycle and state restoration, without
+   drafting the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

@@ -278,6 +278,29 @@ tests, actionlint, lint without errors, variant IDs, SBOM checks, minified relea
 APK/AAB and ELF/ZIP/JNI/SDK zipalign guards. Stay-awake is restored and verified
 as 0. The new commit's six-job remote acceptance remains pending until push.
 
+## Run 36 confirmed; seventeenth cleanup of an unused settings layout
+
+[Run 36 for `53379f4`](https://github.com/jagumiel/mimi-reader/actions/runs/39936759280)
+passes all six jobs, including API 29 and the dedicated native 16 KB job. The
+next bounded cleanup removes one unused settings shell, not either of the two
+live settings layouts. Confirm generated binding consumers before removal;
+release already shrinks that unused binding.
+
+Extend actual settings navigation with binding/toolbar assertions and add one
+mandatory detached-binding case across themes, widths and layout directions.
+The ordinary suite becomes **81 cases**, still with three opt-in skips and
+six separate native cases. No workflow/dependency/R8/production activity logic
+changes. See [the audit](SETTINGS_RESOURCE_AUDIT.md#seventeenth-block-settings-layouts-and-generated-bindings).
+This block still requires its own complete remote workflow after push.
+
+Local acceptance passes 110 app/library unit tests, 54 CI-helper tests, lint
+without errors (one fewer unused-resource finding), SBOM/variant checks,
+debug/test and minified release builds, actionlint and static native guards.
+The Edge 20 full suite has 81 distinct JUnit cases (78 passed, three existing
+skips); API 29 passes six scoped settings/migration cases without skips. APK
+resource/DEX checks confirm removal, and device settings are left restored.
+Details and limits are recorded in the audit; this is not remote acceptance.
+
 ## Run 35 confirmed; sixteenth cleanup of orphan settings resources
 
 [Run 35 for `f1b63df`](https://github.com/jagumiel/mimi-reader/actions/runs/39930834599)

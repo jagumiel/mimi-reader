@@ -372,6 +372,29 @@ settings/migration cases without skips. Restore stay-awake to 0 on the phone
 and 1 on the owned emulator, then shut down the emulator. This is not a new
 physical Android 10, cold-install, minified-release UI or remote-matrix pass.
 
+## Seventeenth cleanup: settings layout and generated bindings
+
+[Run 36](https://github.com/jagumiel/mimi-reader/actions/runs/39936759280) passes
+all six jobs for the previous block. Add one mandatory detached-layout case:
+bind both live settings layouts in light/dark/black, at 320/480 dp, LTR/RTL;
+check toolbar/container geometry, swatches/spinner/preview and unchanged saved
+preferences. Extend real six-category navigation with actual binding/toolbar
+checks around recreation. No real color editor or destructive control is
+invoked; its interactive lifecycle is not accepted by detached inflation.
+
+The ordinary suite becomes **81 cases**, with the same three opt-in skips;
+the dedicated native 16 KB job remains six. The deleted shell and its generated
+binding have no consumers; both live layouts remain. See the
+[audit](SETTINGS_RESOURCE_AUDIT.md#seventeenth-block-settings-layouts-and-generated-bindings)
+for evidence and acceptance boundaries. Require a new six-job remote run.
+
+Final local acceptance on 23 October passes all **81 distinct Edge 20 / Android
+12 JUnit cases: 78 passed, three existing opt-in skips, no failures/errors**.
+The two settings cases also pass separately there, and all six scoped settings/
+migration cases pass on the API 29 emulator without skips. Restore phone
+stay-awake to 0, preserve the emulator's observed value 3 and stop the emulator.
+Do not count these as physical Android 10, cold-install or remote acceptance.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:
