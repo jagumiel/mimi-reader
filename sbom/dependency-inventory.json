@@ -178,22 +178,12 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.preference:preference-ktx:1.2.1"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
             "requested": "androidx.preference:preference:1.2.1"
         },
         {
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "androidx.recyclerview:recyclerview:1.4.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
-            "requested": "androidx.room:room-ktx:2.8.5"
         },
         {
             "configuration": "implementation",
@@ -224,11 +214,6 @@
             "configuration": "implementation",
             "project": ":mimi-app",
             "requested": "androidx.webkit:webkit:1.15.0"
-        },
-        {
-            "configuration": "implementation",
-            "project": ":mimi-app",
-            "requested": "androidx.work:work-runtime-ktx:2.10.5"
         },
         {
             "configuration": "implementation",
@@ -856,6 +841,10 @@
             },
             {
                 "direct": false,
+                "id": "androidx.room:room-ktx:2.8.5"
+            },
+            {
+                "direct": false,
                 "id": "androidx.room:room-migration-jvm:2.8.5"
             },
             {
@@ -1136,19 +1125,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference-ktx:1.2.1"
-            },
-            {
-                "direct": true,
                 "id": "androidx.preference:preference:1.2.1"
             },
             {
                 "direct": true,
                 "id": "androidx.recyclerview:recyclerview:1.4.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.room:room-ktx:2.8.5"
             },
             {
                 "direct": true,
@@ -1177,10 +1158,6 @@
             {
                 "direct": true,
                 "id": "androidx.webkit:webkit:1.15.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.work:work-runtime-ktx:2.10.5"
             },
             {
                 "direct": true,
@@ -1640,6 +1617,10 @@
             },
             {
                 "direct": false,
+                "id": "androidx.room:room-ktx:2.8.5"
+            },
+            {
+                "direct": false,
                 "id": "androidx.room:room-runtime-android:2.8.5"
             },
             {
@@ -1896,19 +1877,11 @@
             },
             {
                 "direct": true,
-                "id": "androidx.preference:preference-ktx:1.2.1"
-            },
-            {
-                "direct": true,
                 "id": "androidx.preference:preference:1.2.1"
             },
             {
                 "direct": true,
                 "id": "androidx.recyclerview:recyclerview:1.4.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.room:room-ktx:2.8.5"
             },
             {
                 "direct": true,
@@ -1933,10 +1906,6 @@
             {
                 "direct": true,
                 "id": "androidx.webkit:webkit:1.15.0"
-            },
-            {
-                "direct": true,
-                "id": "androidx.work:work-runtime-ktx:2.10.5"
             },
             {
                 "direct": true,

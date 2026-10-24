@@ -442,6 +442,24 @@ Both JVM suites, both module lint checks, debug/test and minified release
 builds, SBOM/variant/boundary guards and static native/JNI/ZIP checks pass.
 Require fresh six-job CI and retain physical Android 10/32-bit release gates.
 
+## Twenty-third cleanup: optional KTX API ownership
+
+Two mandatory `OptionalKtxCompatibilityTest` cases bring ordinary coverage to
+**88**, retaining three existing opt-in skips and six separate native cases.
+They build Work data/a typed `RefreshWorker` request without enqueueing, preserve
+Rx worker inheritance/Room runtime extension availability, reject the unused
+Preference KTX facade and exercise core preference operations in three themes
+with a detached write-rejecting data store. No activity, user preferences, remote
+request or worker execution is needed for the new cases. Existing migration,
+settings, media and download coverage remains enabled. Unit/helper counts stay
+121 / 59. See the [artifact audit and validation limits](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
+
+Local Edge 20 / Android 12 acceptance passes **88 unique JUnit cases: 85 passed,
+three existing opt-in skips, zero failures/errors** in 1m46s; both new cases
+pass. Use XML counts, not 91 console events. Restore/verify stay-awake 0.
+Previous remote CI is deliberately not inspected; new remote matrix and physical
+Android 10/32-bit release acceptance remain separate requirements.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

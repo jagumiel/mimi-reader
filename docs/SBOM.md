@@ -141,6 +141,16 @@ version-request corrections are still recorded in direct declarations. See
 [D02 ownership and tests](DEPENDENCIES.md#twenty-second-cleanup-explicit-dependency-ownership-d02).
 Do not describe this as removing Jsoup from the app or completing CVE scanning.
 
+The twenty-third cleanup removes three redundant/unused direct KTX declarations.
+Totals become **150 components / 71 declarations**: only Preference KTX and
+Work KTX disappear from the runtime component set. Room KTX 2.8.5 has no runtime
+classes but stays reachable through WorkManager; its direct app edge is removed,
+not its transitive node. Every retained record/version/hash and every other
+retained edge is identical. Only the release/app-unit selected inventories change
+(two removed nodes and Room KTX's direct flag). See the
+[D03 artifact/consumer review](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
+Runtime/Rx/coroutine support and the separate build/test inventory remain.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

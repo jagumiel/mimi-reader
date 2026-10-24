@@ -15,10 +15,10 @@ The eleventh updates Material Components and its required ConstraintLayout basel
 The twelfth updates Glide and removes first-party use of its deprecated generated API.
 The thirteenth replaces PercentLayout's sole consumer with a platform weighted row.
 
-The canonical release SBOM has **152 top-level components**: 150 Maven components,
+The canonical release SBOM has **150 top-level components**: 148 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **74 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 74 distinct libraries.
+files. The inventory records **71 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 71 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -1473,6 +1473,78 @@ versions, R8 rules, native binaries, posting behavior and legal notices stay
 unchanged; static ownership review is not an external published-library ABI test
 or physical Android 10/32-bit acceptance. Require the new commit's own six-job CI.
 
+## Twenty-third cleanup: optional KTX artifacts and actual API owners (D03)
+
+Per the owner's request, do not inspect the previous interrupted/rerunning
+remote CI. This block uses local source/artifact/graph inspection and validation;
+no remote workflow result is claimed or changed.
+
+Inspect the actual resolved AARs and their nested `classes.jar`, not just names
+or source imports. No embedded `libs/` or native payload is found in the three
+reviewed KTX artifacts:
+
+| Declaration | Resolved contents and consumers | Decision |
+| --- | --- | --- |
+| `room-ktx:2.8.5` | Zero runtime classes. `RoomDatabaseKt` and coroutine/transaction implementation are in `room-runtime-android:2.8.5`. WorkManager still has an incoming dependency on `room-ktx`. | Remove only the direct app declaration. Keep the transitively required empty 2.8.5 node; do not exclude or downgrade it. Keep Room runtime, compiler, Rx adapter, schemas and migrations. |
+| `work-runtime-ktx:2.10.5` | Zero runtime classes. `DataKt` (`workDataOf`) and `OneTimeWorkRequestKt` are in `work-runtime:2.10.5`, used by `RefreshScheduler2`. | Remove the redundant direct declaration and now-unreachable node; retain runtime and `work-rxjava2`, including the real `RxWorker`. |
+| `preference-ktx:1.2.1` | Three `PreferenceGroupKt`/iterator/children classes. No production, XML, generated-code or test consumer of these extensions; the existing settings code uses core Java methods. | Remove the unused declaration and node, not `preference` itself or unrelated Core KTX. |
+
+No production Kotlin/Java, Room schema, preference key, worker name, scheduling
+policy, retry/notification/download behavior or R8 rule changes. Do not replace
+Rx integrations with coroutines or remove transitive coroutine libraries that
+the retained runtime components still use.
+
+Add two mandatory offline `OptionalKtxCompatibilityTest` cases. One constructs
+`workDataOf` and a typed `RefreshWorker` request, checks data/tags/Rx inheritance
+and loads the Room runtime extension facade; it never enqueues work or executes
+a worker. The other requires the unused Preference KTX facade to be absent and
+uses core preference add/find/remove methods in all three theme contexts on the
+main thread. Its detached manager uses a write-rejecting data store and
+nonpersistent items, never user-default preferences. Existing migration,
+settings and WorkManager/download suites remain enabled. Ordinary coverage
+becomes **88 cases**, with the same three opt-in skips and six separate native
+cases; unit/CI-helper totals remain 121 / 59.
+
+Reviewed graph: **152 -> 150 components, 74 -> 71 declarations**. Only Preference
+KTX and Work KTX component records disappear. Every retained component's version,
+license, Package URL/hash, native input and Ruffle file stays identical. The app
+root loses three direct edges; only the two removed nodes' outgoing sets are
+deleted. WorkManager's existing edge keeps Room KTX **2.8.5** reachable, now marked
+transitive instead of direct. No global exclusions or version forces are added.
+Only release and app-unit selected inventories change: those two removed nodes
+and Room KTX's direct flag. Library unit, instrumentation additions, processors,
+desugaring and build-tool inventories stay identical. Do not misreport retained
+Room KTX as a failed cleanup or claim Kotlin/coroutines support was removed.
+
+Local acceptance on 24 October: **121 unit cases** (102 app + 19 unchanged
+library cases, latter up-to-date), 59 CI-helper cases, both module lint checks,
+SBOM freshness/six malformed-input/hash tests, application variants and the
+library dependency boundary pass. Debug/test APKs and minified release APK/AAB
+build in 2m34s. App lint stays at zero errors, 993 warnings and one hint, with
+468 unused resources; no new baseline, suppression or retry is introduced.
+
+The full Edge 20 / Android 12 suite passes in **1m46s: 88 distinct XML/JUnit
+cases, 85 passed, three existing opt-in skips, no failures/errors**, including
+both new mandatory cases. Do not treat the console's 91 completion events as
+unique tests. Preserve the result XML; restore and verify original stay-awake
+**0**. No public post, live CAPTCHA or user-default preference edit is performed.
+
+Both APKs pass static ELF/ZIP checks (24 libraries / four ABIs); release also
+passes JNI seeds and SDK 16 KB zipalign. Release APK is **41,422,537 bytes**
+(previously 41,422,903); AAB is **31,149,408 bytes** (previously 31,141,716).
+Report the AAB increase as well as the small APK reduction; packaging-size
+variation is not a speed/memory/security benchmark. No fresh actual-16-KB runtime
+or minified-release UI acceptance is inferred from unchanged native inputs.
+The new test class and fixture tag are absent from release DEX.
+
+Next review R03's bounded theme/resource subtrees, with style inheritance and
+qualified-resource proof before any deletion; live card backgrounds are not
+approved for removal. Remaining live-library updates can be retained/deferred
+with evidence; they do not require a wholesale rewrite before security work.
+CVE/GHSA activation, the owner-approved 8.0 changelog and final README remain
+separately scoped. Require this commit's own complete six-job remote workflow;
+local checks do not replace physical Android 10/32-bit release acceptance.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1482,8 +1554,9 @@ orphan resource closures and live legacy consumers. D01 (`chanlib` dependency
 ownership/standalone network baseline) is implemented in the nineteenth block;
 the twentieth removes the closed R01 resource set. Run 40 accepts both. The
 twenty-first removes only R02's unused reply arrays. The twenty-second implements
-D02 ownership and requests the already-selected Annotation baseline; next review
-D03, not a bulk lint deletion or the deferred vulnerability scan.
+D02 ownership and requests the already-selected Annotation baseline. The twenty-third
+implements D03 without removing the transitively required Room KTX node;
+next inspect the bounded R03 theme/resource candidates.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
@@ -1533,8 +1606,10 @@ The old email/logcat feedback path is also removed with its live caller.
    confirms all six jobs for both. The twenty-first removes only R02's unused
    reply arrays and extends isolated value-preservation coverage; require its
    own workflow. The twenty-second implements D02's consumer-owned declarations
-   without selected release-version changes; next review D03, without drafting
-   the 8.0 changelog. Physical Android
+   without selected release-version changes or drafting the 8.0 changelog.
+   The twenty-third reviews actual KTX artifact contents,
+   removes redundant declarations and adds two mandatory runtime-owner cases;
+   next inspect R03 without reviewing the owner's rerunning CI. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

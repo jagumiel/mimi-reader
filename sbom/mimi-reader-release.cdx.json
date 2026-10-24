@@ -2421,41 +2421,6 @@
             "version": "1.0.0"
         },
         {
-            "bom-ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
-            "description": "Kotlin extensions for preferences",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
-                }
-            ],
-            "group": "androidx.preference",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "872a5e3e07c0b8d21cb77769ab2f468b209ab6ec08231874401aecfea304a81c"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "preference-ktx",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "purl": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
-            "type": "library",
-            "version": "1.2.1"
-        },
-        {
             "bom-ref": "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
             "description": "AndroidX Preference",
             "externalReferences": [
@@ -3524,42 +3489,6 @@
             "purl": "pkg:maven/androidx.window/window@1.0.0?type=aar",
             "type": "library",
             "version": "1.0.0"
-        },
-        {
-            "bom-ref": "pkg:maven/androidx.work/work-runtime-ktx@2.10.5?type=aar",
-            "description": "Android WorkManager Kotlin Extensions",
-            "externalReferences": [
-                {
-                    "type": "vcs",
-                    "url": "https://cs.android.com/androidx/platform/frameworks/support"
-                }
-            ],
-            "group": "androidx.work",
-            "hashes": [
-                {
-                    "alg": "SHA-256",
-                    "content": "229f2c58cc511766519cadfa2ede5b000f8f7f4e14eaa19d483a15c5d210d461"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0"
-                    }
-                }
-            ],
-            "modified": false,
-            "name": "work-runtime-ktx",
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "publisher": "The Android Open Source Project",
-            "purl": "pkg:maven/androidx.work/work-runtime-ktx@2.10.5?type=aar",
-            "type": "library",
-            "version": "2.10.5"
         },
         {
             "bom-ref": "pkg:maven/androidx.work/work-runtime@2.10.5?type=aar",
@@ -5351,17 +5280,14 @@
                 "pkg:maven/androidx.lifecycle/lifecycle-viewmodel@2.11.0?type=aar",
                 "pkg:maven/androidx.media3/media3-exoplayer@1.10.1?type=aar",
                 "pkg:maven/androidx.media3/media3-ui@1.10.1?type=aar",
-                "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar",
                 "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
                 "pkg:maven/androidx.recyclerview/recyclerview@1.4.0?type=aar",
-                "pkg:maven/androidx.room/room-ktx@2.8.5?type=aar",
                 "pkg:maven/androidx.room/room-runtime@2.8.5?type=pom",
                 "pkg:maven/androidx.room/room-rxjava2@2.8.5?type=aar",
                 "pkg:maven/androidx.slidingpanelayout/slidingpanelayout@1.2.0?type=aar",
                 "pkg:maven/androidx.swiperefreshlayout/swiperefreshlayout@1.0.0?type=aar",
                 "pkg:maven/androidx.viewpager2/viewpager2@1.1.0?type=aar",
                 "pkg:maven/androidx.webkit/webkit@1.15.0?type=aar",
-                "pkg:maven/androidx.work/work-runtime-ktx@2.10.5?type=aar",
                 "pkg:maven/androidx.work/work-runtime@2.10.5?type=aar",
                 "pkg:maven/androidx.work/work-rxjava2@2.10.5?type=aar",
                 "pkg:maven/com.android.tools/desugar_jdk_libs_nio@2.1.5?type=jar",
@@ -6167,15 +6093,6 @@
         {
             "dependsOn": [
                 "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
-                "pkg:maven/androidx.fragment/fragment-ktx@1.9.1?type=aar",
-                "pkg:maven/androidx.preference/preference@1.2.1?type=aar",
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
-            ],
-            "ref": "pkg:maven/androidx.preference/preference-ktx@1.2.1?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.core/core-ktx@1.18.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.customview/customview-poolingcontainer@1.0.0?type=aar"
@@ -6328,12 +6245,6 @@
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:maven/androidx.tracing/tracing-ktx@2.0.0?type=aar"
-        },
-        {
-            "dependsOn": [
-                "pkg:maven/androidx.work/work-runtime@2.10.5?type=aar"
-            ],
-            "ref": "pkg:maven/androidx.work/work-runtime-ktx@2.10.5?type=aar"
         },
         {
             "dependsOn": [

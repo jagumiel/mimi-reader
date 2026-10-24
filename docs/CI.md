@@ -29,6 +29,13 @@ stay unchanged. Existing CI invokes the task through library unit tests; no
 workflow step, matrix assertion, retry or opt-in changes. The release graph
 remains 152 components, with 74 declarations. See the [D02 scope](DEPENDENCIES.md#twenty-second-cleanup-explicit-dependency-ownership-d02).
 
+The twenty-third cleanup adds two mandatory offline runtime-owner/preference
+cases: ordinary instrumentation becomes **88**, with the same three opt-in
+skips and six separate native cases; unit/helper counts remain 121 / 59.
+Snapshots now contain 150 components / 71 declarations. No workflow, retry or
+skip changes are made, and the preceding remote CI is deliberately not queried
+at the owner's request. See [D03](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
+
 ## Run 25: download cleanup ordering (21 October 2026)
 
 [Run 25](https://github.com/jagumiel/mimi-reader/actions/runs/39573428637)
