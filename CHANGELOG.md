@@ -68,7 +68,7 @@ Version code: `231`. Release preparation only: no public release date, tag, dist
 - Vulnerability scans report known findings at scan time, not proof of safety. Native/WASM provenance, generic/GitHub components and build tooling have explicit coverage limits.
 - Preserve existing app data and saved media. Updates require a compatible signing certificate; the internal public test key is not a distribution identity. No uninstall/data-clear workaround is part of this release preparation.
 - Version upgrades retain inherited maintenance that clears media cache and normal/archived cached post tables. This is different from manual cache clearing: do not expect every offline post to survive an update. The user's saved Pictures/Mimi media folder is not a cache-cleaning target.
-- Expanded watched-thread and quote notifications are post-8.0 proposals, not new features delivered by this release. The final README rewrite is still pending.
+- Expanded watched-thread and quote notifications are post-8.0 proposals, not new features delivered by this release. The README explains release APK installation, safe updates and building from source.
 
 ### Credits and license
 

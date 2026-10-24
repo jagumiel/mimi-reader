@@ -92,6 +92,12 @@ Do not delete or rename the owner's `Pictures/Mimi` folder for release checks.
   a release-version SBOM as described in [the SBOM guide](SBOM.md).
 - Confirm the version code and version name in the built artifact.
 - Verify the APK signature and record a SHA-256 checksum.
+- Before publication, approve the distribution key (not the public internal test
+  key) and provide the signed installable APK, checksum, certificate fingerprint
+  and update/signature caveats with the release. Never label an unsigned CI APK
+  as an installable download. Keep the [README installation guide](../README.md#download-and-install)
+  aligned with the actual asset; replace its preparation notice only when the
+  release is really published. Unknown-source permission does not bypass signing.
 - Smoke-test startup, tabs, gallery playback, cache clearing, and a SAF download.
 - Test an in-place update to confirm that preferences and the Room database remain intact.
 - Archive the APK/AAB, `mapping.txt`, checksum, matching SBOM, changelog, and signing-key backup securely.

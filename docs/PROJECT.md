@@ -68,5 +68,6 @@ No PR, issue, mention, or message has been sent as part of this cleanup.
 
 The owner approved the English 8.0 changelog scope/format on 25 October 2026,
 covering modernization since the inherited 7.0.1 baseline. See the
-[history audit](CHANGELOG_AUDIT.md). The main README rewrite remains the last
-documentation task; no public release/tag or production signing change is made.
+[history audit](CHANGELOG_AUDIT.md). The [README](../README.md) now explains the
+app and release APK installation in English, completing the planned final
+documentation rewrite; no public release/tag or production signing change is made.
