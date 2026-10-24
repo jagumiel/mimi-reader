@@ -1395,9 +1395,12 @@ Local validation passes both build types/test APK, 121 app/library unit cases,
 59 CI-helper cases, SBOM/variant/boundary guards and static native/JNI/ZIP checks.
 Lint has zero errors, 993 warnings and one hint, with 468 unused resources (two
 fewer). Four scoped device migration cases pass, including the expanded fixture.
-The full UI suite does not start because the awake/unlocked preflight fails;
-restore stay-awake 0 and leave that acceptance pending user unlock/new CI.
-Do not reuse run 40 or the previous device suite as this commit's validation.
+The initial full UI preflight refuses to start behind keyguard and restores
+stay-awake 0. After the owner unlocks the phone, a fresh full suite for `f741d0b`
+passes in 1m31s: 86 distinct cases, 83 passed and three existing opt-in skips,
+zero failures/errors; restore/verify stay-awake 0 again. This documentation-only
+follow-up closes local UI acceptance, not the new commit's own six-job CI or
+physical Android 10/32-bit gates. Do not reuse run 40 as remote validation.
 
 ## Remaining legacy-file review
 

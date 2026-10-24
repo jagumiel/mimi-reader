@@ -332,9 +332,19 @@ original value **0**. This is not a failed or passing UI suite: it never starts.
 The separately scoped `PreferenceMigrationTest` then runs without activities
 behind the keyguard: **four passed, no skips/failures/errors**, including the
 expanded isolated preservation/idempotence case (19s). No unlock bypass or
-default-preference changes are used. The fresh complete UI/posting suite remains
-pending user unlock; the previous block's 86-case result must not be transferred
-to this change. Overall case counts remain 86 ordinary and six separate native.
+default-preference changes are used. The full UI suite is initially pending user
+unlock; the previous block's 86-case result must not be transferred to this change.
+
+After the owner unlocks the phone on 24 October, the fresh complete suite for
+`f741d0b` passes in **1m31s: 86 distinct XML/JUnit cases, 83 passed, three existing
+opt-in skips, zero failures/errors**. This includes the expanded preference
+fixture and existing offline posting/settings regressions; live CAPTCHA stays
+opt-in and no message is published. Preserve the scoped migration and full-suite
+reports separately. Restore and verify the original stay-awake value **0**.
+Use the 86 unique XML cases, not the console's inflated 89 completion events.
+Overall case counts remain 86 ordinary and six separate native. This closes
+the local full-suite gate, not the new commit's remote matrix or physical
+Android 10/32-bit release acceptance. The follow-up changes documentation only.
 
 No public posting, live CAPTCHA, fresh actual-16-KB runtime, minified-release UI
 or physical Android 10/32-bit acceptance is claimed. Require the new commit's
