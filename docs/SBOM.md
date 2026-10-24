@@ -159,6 +159,16 @@ The remaining live-library candidates are retained with consumers documented in
 the cleanup inventory. CVE/GHSA scanning is the next separately scoped block,
 not a claim made by these freshness checks. Gradle updates are deferred to 8.0.1.
 
+The subsequent [Commons Lang security update](COMMONS_LANG.md) selects **3.20.0**
+after 3.21.0 fails an existing-behavior Unicode numeric contract. Totals stay
+**150 components / 71 declarations**. Only Commons Lang's version/hash/upstream
+metadata, its node/root reference and its release/app-unit selections change;
+the other 149 component records and normalized dependency edges are identical.
+Ruffle, native AARs and build tools remain unchanged. Real local Trivy scanning
+recognizes 148/148 Maven packages with zero known findings and no exceptions;
+unassessed component/native/WASM coverage limitations still apply. Previous
+security run 1 accepts the scanner integration, not this updated snapshot.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

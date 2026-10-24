@@ -1583,6 +1583,34 @@ or CRITICAL findings and no exceptions. Next perform the existing bounded Common
 Lang consumer/compatibility review and correct that finding; do not silently waive
 it or describe the remaining live dependencies as vulnerability-free.
 
+## Commons Lang security update: retain numeric/UTF-16 contracts
+
+[Android run 45](https://github.com/jagumiel/mimi-reader/actions/runs/40133142211)
+accepts all six jobs for `c76cef8`, including the D01–D03/R01–R03 changes;
+[SBOM security run 1](https://github.com/jagumiel/mimi-reader/actions/runs/40133142178)
+accepts the scanner and completed SARIF ingestion. Update only Commons Lang
+**3.11 -> 3.20.0** to fix CVE-2025-48924. Candidate 3.21.0 fails an unchanged
+numeric/surrogate contract and could send unsupported digits into Long parsing;
+do not modify the production parser or weaken the six baseline unit assertions
+to select it. See [exact consumers, upstream evidence and rejected baseline](COMMONS_LANG.md).
+
+Totals remain **150 components / 71 declarations**; every other component record
+and normalized edge is identical, as are native/Ruffle/tooling inputs. Only the
+release/app-unit Commons Lang selections change. Actual local Trivy scans go
+from one MEDIUM finding to **zero known findings**, with 148/148 Maven coverage
+and no exceptions; non-Maven/native/WASM limits remain. Seven new unit cases
+bring app/library coverage to **128 (109 + 19)**; two real-consumer cases bring
+ordinary device coverage to **91**. Full Edge 20 acceptance passes (88 passed,
+three existing opt-in skips, zero failures/errors); helpers stay 96.
+
+Build debug/test and minified release APK/AAB, lint without errors, SBOM negative/
+freshness guards, library boundary, static ELF/ZIP/JNI and SDK zipalign pass.
+Document exact sizes, 3.21.0 rejection, corrected immutable-list fixture, restored
+phone setting and unexecuted physical/remote release gates in the linked audit.
+Gradle stays deferred to 8.0.1. Next require the new Android/security workflows,
+then close physical/human acceptance and consult the owner before drafting the
+8.0 changelog; README remains last. No blanket live-library rewrite is required.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1649,13 +1677,18 @@ The old email/logcat feedback path is also removed with its live caller.
    without selected release-version changes or drafting the 8.0 changelog.
    The twenty-third reviews actual KTX artifact contents,
    removes redundant declarations and adds two mandatory runtime-owner cases;
-   next inspect R03 without reviewing the owner's rerunning CI. Physical Android
+   the twenty-fourth removes only R03's closed resource subtrees. Run 45 accepts
+   all six jobs for the completed bounded cleanup and security run 1 confirms
+   the scanner/publication integration. The subsequent Commons Lang 3.20.0
+   security update requires its own Android/security workflows. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
-5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the
-   cleaned SBOM to GitHub Actions, with scheduled runs, SARIF output and reviewed
-   time-limited exceptions. Do not treat the scanner as the automatic next task
-   while these cleanup blocks remain outstanding.
+5. CVE/GHSA scanning of the cleaned SBOM is implemented with scheduled runs,
+   SARIF and reviewed expiring exceptions; run 1 confirms remote ingestion.
+   Its Commons Lang finding is fixed locally with selected 3.20.0, preserving
+   the numeric contract that rejects 3.21.0. Require the new revision's remote
+   acceptance and remaining physical/human release checks; do not widen this
+   into an unlimited prerequisite to update every retained live library.
 
 The 8.0 changelog still requires agreement with the project owner; the main
 README remains the final documentation task.

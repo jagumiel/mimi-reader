@@ -308,7 +308,7 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "org.apache.commons:commons-lang3:3.11"
+            "requested": "org.apache.commons:commons-lang3:3.20.0"
         },
         {
             "configuration": "implementation",
@@ -1241,7 +1241,7 @@
             },
             {
                 "direct": true,
-                "id": "org.apache.commons:commons-lang3:3.11"
+                "id": "org.apache.commons:commons-lang3:3.20.0"
             },
             {
                 "direct": true,
@@ -1981,7 +1981,7 @@
             },
             {
                 "direct": true,
-                "id": "org.apache.commons:commons-lang3:3.11"
+                "id": "org.apache.commons:commons-lang3:3.20.0"
             },
             {
                 "direct": true,

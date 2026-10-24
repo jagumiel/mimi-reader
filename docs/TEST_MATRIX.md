@@ -479,16 +479,32 @@ case passes. Preserve XML rather than using 92 console completion events as the
 case count. Original stay-awake 0 is restored/verified. No fresh remote matrix,
 physical Android 10/32-bit or actual-16-KB runtime result is claimed.
 
-## Local device validation
+## SBOM security policy tests
 
-The subsequent security integration adds **37 standard-library Python cases**,
-bringing CI-helper coverage to **96** without changing the 121 app/library unit
-or 89 ordinary/six separate native cases. Both the existing Android build job
-and the independent SBOM-security scanner run the helpers. They exercise blocking,
-report visibility, exact/expiring exceptions, coverage, scanner failures, database
-freshness, tampering and SARIF source attribution. Real local Trivy CLI acceptance
-and the pending remote/SARIF gates are in [VULNERABILITY_SCANNING.md](VULNERABILITY_SCANNING.md).
-No new device run is claimed for this tooling-only change.
+The security integration adds **37 standard-library Python cases**, bringing
+CI-helper coverage to **96**. At that point app/library unit and ordinary/native
+coverage stayed 121 / 89 / six. Both the existing Android build job and the
+independent SBOM-security scanner run the helpers. They exercise blocking,
+report visibility, exact/expiring exceptions, coverage, scanner failures,
+database freshness, tampering and SARIF source attribution. Real local Trivy
+CLI acceptance and subsequent remote/SARIF confirmation are recorded in
+[VULNERABILITY_SCANNING.md](VULNERABILITY_SCANNING.md). No new device run was
+claimed for that tooling-only change.
+
+## Commons Lang security compatibility
+
+The Commons Lang security update adds **seven app unit cases** (six original
+behavior contracts plus one patched-lookup case): **128 app/library cases**
+(109 + 19). Two mandatory `CommonsLangCompatibilityTest` cases exercise the real
+option filter and comment parser using only synthetic data. Ordinary coverage
+becomes **91**; CI-helper/native counts stay 96 / six. Selected 3.20.0 passes the
+unchanged contracts that reject 3.21.0's supplementary-digit classification.
+The final full Edge 20 suite passes **91 unique XML cases: 88 passed, three
+existing opt-in skips, no failures/errors**, in 1m47s; both new cases pass,
+including the supplementary-digit reference. Original stay-awake 0 is restored.
+See [baseline failures, fixes and remaining remote/physical gates](COMMONS_LANG.md).
+
+## Local device validation
 
 Connect exactly one authorized device or emulator and run:
 

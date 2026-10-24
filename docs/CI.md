@@ -6,6 +6,16 @@ build job alone is not a passing workflow: every instrumentation job must pass.
 
 ## Standalone library dependency gate (24 October 2026)
 
+Latest reviewed remote acceptance: [Android run 45](https://github.com/jagumiel/mimi-reader/actions/runs/40133142211)
+passes all six jobs for `c76cef8`; [SBOM security run 1](https://github.com/jagumiel/mimi-reader/actions/runs/40133142178)
+passes both jobs and completes SARIF ingestion. The following Commons Lang
+security update retains those workflows, adds seven app unit cases (128 total
+with the library) and two mandatory device cases (91 ordinary; three existing
+opt-in skips). CI-helper/native counts remain 96 / six. Version 3.21.0 is
+rejected by the old numeric contract; selected 3.20.0 clears the real local scan
+without exceptions. See [comparison, failures and acceptance limits](COMMONS_LANG.md).
+The prior green workflows do not accept this new dependency snapshot.
+
 The separate [SBOM security workflow](../.github/workflows/sbom-security.yml)
 now adds a read-only scanner/policy job and a narrowly privileged SARIF publisher,
 without changing the six Android jobs. It runs on pushes, PRs, dispatch and

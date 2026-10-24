@@ -46,7 +46,7 @@ for code adjustments, tests, exact graph scope and limits. R01 is implemented
 below; D03's subsequent artifact review is recorded below. The table retains the original
 evidence so the implementation can be compared against its accepted baseline.
 
-**D02 implemented locally in the twenty-second block; remote acceptance pending.**
+**D02 implemented in the twenty-second block; accepted by Android run 45 for `c76cef8`.**
 Remove the library's unused Jsoup declaration, keep its actual app consumer, make library factories
 internal implementation details and retain real public API dependencies. Share
 Annotation's already-selected 1.10.0 baseline and make the app's local-module
@@ -56,7 +56,7 @@ become 74 and the standalone library unit graph 19. See the
 The subsequent D03 review inspects actual artifact/extension consumers, not a
 whole-Rx migration or automatic scanner activation.
 
-**D03 implemented locally in the twenty-third block; remote acceptance pending.**
+**D03 implemented in the twenty-third block; accepted by Android run 45 for `c76cef8`.**
 Remove direct Room/Work/Preference KTX declarations after inspecting resolved
 AARs and actual extension owners. Work/Room bridges have no runtime classes;
 Preference extensions are unused. WorkManager still requires empty Room KTX
@@ -85,7 +85,7 @@ other rating colors and all live themes/More Info behavior. See the
 [resource audit](SETTINGS_RESOURCE_AUDIT.md#twentieth-block-orphan-rating-selector-closure-r01)
 for searches, compiled-artifact checks and validation.
 
-**R02 implemented locally in the twenty-first block; remote acceptance pending.**
+**R02 implemented in the twenty-first block; accepted by Android run 45 for `c76cef8`.**
 Remove only the unreferenced `reply_entries` / `reply_values` definitions and
 their otherwise-empty XML file. Extend the isolated migration-preservation
 fixture without changing production posting, stored values or migration schema.
@@ -94,7 +94,7 @@ The D02/D03 reviews are recorded above. R03 is implemented in the twenty-fourth
 block below; this is not approval for bulk removals or a requirement to rewrite
 every live library.
 
-**R03 implemented locally; this commit's remote acceptance remains required.**
+**R03 implemented and accepted by Android run 45 for `c76cef8`. New changes require their own workflows.**
 Remove only three unused old card selectors, their six focused/pressed XMLs,
 three textured action-bar wrappers and eight qualified tile PNGs: 20 files / 14
 resource names. Preserve the three shared default card backgrounds, live catalog
@@ -123,7 +123,7 @@ These are retained consumers, not orphan declarations:
 
 | Family | Concrete consumers | Decision / later review |
 | --- | --- | --- |
-| Commons Lang 3.11 | `PostOptionAdapter` uses `StringUtils.containsIgnoreCase`; `FourChanCommentParser` uses `isNumericSpace`. | Review separately with null, Unicode digit/space, case and quote-parsing contracts before an update or equivalent replacement. Do not assume standard Java helpers preserve these semantics. |
+| Commons Lang, now 3.20.0 | `PostOptionAdapter` uses `StringUtils.containsIgnoreCase`; `FourChanCommentParser` uses `isNumericSpace`. | [Bounded security update implemented](COMMONS_LANG.md): six baseline contracts reject 3.21.0's supplementary-digit change; selected 3.20.0 clears CVE-2025-48924 without changing production consumers. Seven unit and two device cases added; require the new revision's workflows. Review any future 3.21+ migration separately with numeric/case/parser contracts. |
 | RxJava / RxAndroid / RxKotlin | `ChanConnector` API, `ChanDataSource` (`combineLatest`, `zipWith`), UI schedulers, DAOs and `RefreshWorker`. | Keep. Any later lifecycle refactor must retain cancellation, error delivery, scheduling and Room/Work integration. The obsolete color-editor subscription was removed, not the application's Rx consumers. |
 | PersistentCookieJar 1.0.1 | `HttpClientFactory` constructs the jar with a persistent cookie store. | Keep posting/login persistence. Review upstream maintenance/provenance separately; automated checks must not publish posts or solve CAPTCHA. |
 | HSV color picker 3.0.1 | `ThemeColorPickerDialog` creates `ColorPickerView`. | Keep the just-tested live editor; test editing only in isolated fixture storage. |
@@ -192,9 +192,13 @@ is inferred from this inventory.
 After the agreed bounded cleanup and explicit disposition of remaining
 candidates, [CVE/GHSA scanning](VULNERABILITY_SCANNING.md) is now implemented over
 the existing SBOM with scheduled runs, reviewed expiring exceptions and SARIF.
-Its first real scan reports a MEDIUM Commons Lang CVE without waiving it; next
-review that live consumer/update with null/Unicode/case/parser contracts, not
-another mass dependency rewrite. Native/WASM provenance
+Its first real scan reported a MEDIUM Commons Lang CVE without waiving it.
+The subsequent [3.20.0 update](COMMONS_LANG.md) preserves the tested contracts
+and clears the local scan; 3.21.0 is rejected on compatibility evidence. Android
+run 45 and security run 1 accept the previous cleanup/integration, including
+completed SARIF ingestion, not the updated dependency. Next confirm both new
+workflows and close physical/human release checks, not another mass dependency
+rewrite. Native/WASM provenance
 gaps must remain visible even if a scanner reports no findings. Consult the
 owner before defining the 8.0 changelog from fork baseline 7.0.1; leave the full
 README rewrite until the end.
