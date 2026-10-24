@@ -197,9 +197,13 @@ overrides and archive the JSON alongside its APK/AAB and R8 mapping:
 ./gradlew generateSbom -PmimiVersionName=VERSION -PmimiVersionCode=CODE
 ```
 
-Known-vulnerability scanning, SARIF reporting and expiring exceptions remain
-deferred until posting recovery and the agreed dependency cleanup. Schema/freshness
-checks do **not** constitute a CVE scan. The posting CAPTCHA loads external provider
+Known-vulnerability scanning now runs separately through
+[SBOM security](../.github/workflows/sbom-security.yml), after the agreed bounded
+cleanup. It uses pinned Trivy, complete Maven coverage checks, HIGH/CRITICAL
+blocking, reviewed expiring exceptions, SARIF and scheduled rescans. See
+[the policy, trust boundaries, limitations and initial finding](VULNERABILITY_SCANNING.md).
+Schema/freshness checks alone still do **not** constitute a CVE scan.
+The posting CAPTCHA loads external provider
 scripts at runtime; these are not bundled assets or Gradle components, so this
 integration does not change the packaged-component snapshot. See
 [the posting boundaries](POSTING.md),

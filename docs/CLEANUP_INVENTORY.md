@@ -190,8 +190,11 @@ proof, physical-device release acceptance or complete vulnerability clearance
 is inferred from this inventory.
 
 After the agreed bounded cleanup and explicit disposition of remaining
-candidates, enable CVE/GHSA scanning of the existing SBOM with scheduled runs,
-reviewed expiring exceptions and appropriate reporting. Native/WASM provenance
+candidates, [CVE/GHSA scanning](VULNERABILITY_SCANNING.md) is now implemented over
+the existing SBOM with scheduled runs, reviewed expiring exceptions and SARIF.
+Its first real scan reports a MEDIUM Commons Lang CVE without waiving it; next
+review that live consumer/update with null/Unicode/case/parser contracts, not
+another mass dependency rewrite. Native/WASM provenance
 gaps must remain visible even if a scanner reports no findings. Consult the
 owner before defining the 8.0 changelog from fork baseline 7.0.1; leave the full
 README rewrite until the end.

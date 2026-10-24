@@ -1571,6 +1571,18 @@ native/WASM provenance limitations, physical-device release gates and the
 owner-approved changelog/final README ordering. No remote CI is inspected in
 this block; require this commit's own complete six-job acceptance.
 
+## Security follow-up: release SBOM CVE/GHSA policy
+
+After the agreed bounded cleanup, [SBOM vulnerability scanning](VULNERABILITY_SCANNING.md)
+is implemented in an independent workflow. Keep the actual native/WASM and
+build-tool coverage limitations visible. This changes no application dependency
+or artifact: snapshots remain 150 components / 71 declarations, and Gradle is
+still deferred to 8.0.1. The initial real scan recognizes all 148 Maven packages
+and reports one MEDIUM finding, Commons Lang 3.11 / CVE-2025-48924, with no HIGH
+or CRITICAL findings and no exceptions. Next perform the existing bounded Commons
+Lang consumer/compatibility review and correct that finding; do not silently waive
+it or describe the remaining live dependencies as vulnerability-free.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1583,8 +1595,8 @@ twenty-first removes only R02's unused reply arrays. The twenty-second implement
 D02 ownership and requests the already-selected Annotation baseline. The twenty-third
 implements D03 without removing the transitively required Room KTX node;
 the twenty-fourth completes the bounded R03 resource closures, retaining live
-theme consumers. Next integrate vulnerability scanning; retained library and
-repository-origin reviews remain separately scoped.
+theme consumers. Vulnerability scanning is now integrated as described above;
+retained library and repository-origin reviews remain separately scoped.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,

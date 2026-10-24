@@ -1,0 +1,103 @@
+name: SBOM security
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbom-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Release SBOM CVE and GHSA policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      report-ready: ${{ steps.scan.outcome == 'success' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Test CI and vulnerability policy helpers
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
+
+      - name: Install reviewed Trivy binary
+        shell: bash
+        env:
+          TRIVY_VERSION: '0.76.1'
+          TRIVY_SHA256: c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trivy"
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 180 \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+            --output "$RUNNER_TEMP/trivy/archive.tar.gz"
+          printf '%s  %s\n' "$TRIVY_SHA256" "$RUNNER_TEMP/trivy/archive.tar.gz" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/trivy/archive.tar.gz" -C "$RUNNER_TEMP/trivy" trivy
+
+      # Android CI independently regenerates/schema-validates the SBOM. This light
+      # workflow scans the committed snapshot, including on schedules without SDKs.
+      - name: Scan release SBOM and verify package coverage
+        id: scan
+        run: >-
+          python3 scripts/ci/sbom_vulnerabilities.py scan
+          --trivy "$RUNNER_TEMP/trivy/trivy"
+          --cache "$RUNNER_TEMP/trivy-cache"
+
+      - name: Enforce reviewed vulnerability policy
+        run: python3 scripts/ci/sbom_vulnerabilities.py evaluate
+
+      - name: Preserve scan evidence even when the policy blocks
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sbom-security-${{ github.sha }}
+          path: |
+            build/reports/vulnerabilities/
+            sbom/mimi-reader-release.cdx.json
+            sbom/manual-components.json
+            sbom/vulnerability-exceptions.json
+          if-no-files-found: error
+          retention-days: 14
+
+  upload-sarif:
+    name: Publish SBOM findings to code scanning
+    needs: scan
+    # Fork/Dependabot PRs keep the scan, blocking policy and downloadable SARIF,
+    # without requesting write credentials or using pull_request_target.
+    if: >-
+      always() && needs.scan.outputs.report-ready == 'true' &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Check out for SARIF source locations
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Download this run's scan evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: sbom-security-${{ github.sha }}
+          path: evidence
+
+      - name: Upload all severities, including reviewed exceptions
+        uses: github/codeql-action/upload-sarif@793b778da9c9275a0f276522b27cb5fc14bba279 # v4
+        with:
+          sarif_file: evidence/build/reports/vulnerabilities/trivy.sarif
+          category: mimi-release-sbom

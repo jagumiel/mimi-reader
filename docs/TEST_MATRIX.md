@@ -481,6 +481,15 @@ physical Android 10/32-bit or actual-16-KB runtime result is claimed.
 
 ## Local device validation
 
+The subsequent security integration adds **37 standard-library Python cases**,
+bringing CI-helper coverage to **96** without changing the 121 app/library unit
+or 89 ordinary/six separate native cases. Both the existing Android build job
+and the independent SBOM-security scanner run the helpers. They exercise blocking,
+report visibility, exact/expiring exceptions, coverage, scanner failures, database
+freshness, tampering and SARIF source attribution. Real local Trivy CLI acceptance
+and the pending remote/SARIF gates are in [VULNERABILITY_SCANNING.md](VULNERABILITY_SCANNING.md).
+No new device run is claimed for this tooling-only change.
+
 Connect exactly one authorized device or emulator and run:
 
 ```powershell

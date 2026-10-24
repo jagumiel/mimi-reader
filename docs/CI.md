@@ -6,6 +6,20 @@ build job alone is not a passing workflow: every instrumentation job must pass.
 
 ## Standalone library dependency gate (24 October 2026)
 
+The separate [SBOM security workflow](../.github/workflows/sbom-security.yml)
+now adds a read-only scanner/policy job and a narrowly privileged SARIF publisher,
+without changing the six Android jobs. It runs on pushes, PRs, dispatch and
+Monday schedules, including scans without APK changes. Fork/Dependabot PRs keep
+scan enforcement and report artifacts without the publisher's write token.
+All 96 CI-helper tests (59 existing + 37 new security tests) run in both the
+existing build job and the new scanner job. Maven coverage must be complete;
+HIGH/CRITICAL findings, invalid/expired exceptions, bad reports or stale DBs
+fail. SARIF/artifacts remain available on policy failure. See the
+[complete policy and local/remote acceptance limits](VULNERABILITY_SCANNING.md).
+The first real local scan has 148/148 Maven packages, one visible MEDIUM Commons
+Lang finding and zero HIGH/CRITICAL findings; no exception is added. Remote
+ingestion and branch-protection required-check configuration are not claimed.
+
 The existing `:chanlib:testDebugUnitTest` step now also requires
 `:chanlib:verifyDependencyBoundary`. It checks actual debug/release compile and
 runtime selections plus the library unit runtime, independently of the app:
