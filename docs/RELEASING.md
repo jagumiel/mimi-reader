@@ -16,13 +16,25 @@ Use an in-place update with the same certificate; do not clear application data.
 
 ## Versioning
 
-The source defaults are `versionCode 230` and `versionName 7.0.1`. Override both values for a release without editing the build file:
+The approved 8.0 preparation uses `versionCode 231` and `versionName 8.0`.
+Both defaults live in root `gradle.properties` and are read by the app and SBOM
+without separate fallbacks. This identity is not a publication or tag. Build it
+with the defaults, or override both properties together when deliberately
+preparing a different artifact identity:
 
 ```powershell
-.\gradlew.bat :mimi-app:assembleRelease :mimi-app:bundleRelease -PmimiVersionCode=231 -PmimiVersionName=7.0.2
+.\gradlew.bat :mimi-app:assembleRelease :mimi-app:bundleRelease
+# Equivalent explicit identity (use these same properties for generateSbom):
+.\gradlew.bat generateSbom '-PmimiVersionCode=231' '-PmimiVersionName=8.0'
 ```
 
-`mimiVersionCode` must be a positive integer and must increase for every published update. `mimiVersionName` is the user-facing release number.
+`mimiVersionCode` must be a positive integer and must increase for every published update. `231` exceeds the inherited `230`; no greater code appears in the reviewed fork history. `mimiVersionName` is the user-facing release number. Publication must also account for any independently distributed artifact not represented by this repository.
+
+The owner approved the English [CHANGELOG.md](../CHANGELOG.md) and matching
+in-app HTML on 25 October 2026, covering all modernization since the inherited
+7.0.1 baseline. Both say **Unreleased**. See the [history audit](CHANGELOG_AUDIT.md).
+CI's offline helper tests compare their sections, shared identity and tracked
+SBOM, while document instrumentation checks current and historical notes.
 
 ## Unsigned artifacts
 
@@ -51,16 +63,28 @@ Install the signed APK as an update on a device that already contains the previo
 
 ## Next release gate
 
-The next public version is **8.0**, reflecting the unusually large scope of the modernization. Its changelog must cover the complete history since **7.0.1**, where this fork began. Do not start drafting that changelog until the project owner has been consulted and has agreed its scope and format.
+The archived internal 7.0.1 / 230 test package and per-device checklist are in
+[RELEASE_ACCEPTANCE.md](RELEASE_ACCEPTANCE.md). It passed fresh installation and
+cold start on Android 12, preserving the existing `Pictures/Mimi` folder, but
+does not validate the new 8.0 / 231 artifacts or a signed in-place update. The
+owner has deferred physical Android 10 testing, not marked it passed. Keep
+visual/manual release and update/migration checks explicit.
+
+No public signing key has been configured or approved by this versioning task.
+The internal public test key is not a distribution identity. Unsigned output
+must retain its own exact mapping/SBOM; signing requires an explicit key choice
+and certificate-compatible installation without uninstalling or clearing data.
+Do not delete or rename the owner's `Pictures/Mimi` folder for release checks.
 
 ## Release checklist
 
-- Agree and complete the 8.0 changelog before preparing public artifacts.
+- Review the approved 8.0 changelog against any further changes before publication; assign an actual release date only when publishing.
 - Run unit tests, lint, and both release artifact tasks.
 - Require native ELF/APK checks and the dedicated six-case API 36 ps16k job to
   pass from the release commit, with actual 16384-byte pages and backcompat disabled.
-  Local rebuilt PDF/GIF artifacts pass static alignment checks, but runtime 16 KB
-  acceptance remains pending; an ordinary API 36 job or ZIP check is insufficient.
+  For application source `c3824a7`, Android CI run 46 passes the dedicated
+  six-case 16 KB job. Require the same gate again for the eventual release commit;
+  an ordinary API 36 job or ZIP check is insufficient.
   Retain physical Android 10/12 and 32-bit acceptance checks; the four current
   Android ABIs remain packaged (the replacement no longer ships obsolete MIPS).
   See [the native-media audit and limits](DEPENDENCIES.md#eighth-cleanup-pdfgif-native-replacement-and-resource-lifecycle).

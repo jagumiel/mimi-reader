@@ -5,8 +5,9 @@
 The current repository is [jagumiel/mimi-reader](https://github.com/jagumiel/mimi-reader),
 maintained by [@jagumiel](https://github.com/jagumiel). It is a free, independent
 continuation, not a release endorsed by the original author or previous forks.
-There is no separate paid edition. The planned release is 8.0, but the build
-remains 7.0.1 / versionCode 230 until release preparation is agreed.
+There is no separate paid edition. The owner-approved release preparation now
+uses **8.0 / versionCode 231**; the [changelog](../CHANGELOG.md) remains marked
+**Unreleased**. Setting a build version is not publication or upstream endorsement.
 
 Mimi is no longer available on Google Play. The original `mimireader.com`
 website is not operational; this does not establish when it closed or whether
@@ -65,5 +66,7 @@ hold this independent release indefinitely. Notifying Eli is a courtesy, with
 clear independent-fork wording; no current private contact has been verified.
 No PR, issue, mention, or message has been sent as part of this cleanup.
 
-The 8.0 changelog scope/format still requires the owner's approval, and the main
-README rewrite remains the last documentation task.
+The owner approved the English 8.0 changelog scope/format on 25 October 2026,
+covering modernization since the inherited 7.0.1 baseline. See the
+[history audit](CHANGELOG_AUDIT.md). The main README rewrite remains the last
+documentation task; no public release/tag or production signing change is made.

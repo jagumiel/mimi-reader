@@ -525,7 +525,25 @@ On October 17, 2026, all 25 instrumented tests passed on a physical Motorola Edg
 
 ## Release acceptance
 
+On 25 October, the owner approves the 8.0 / 231 preparation and defers physical
+Android 10. The [changelog audit](CHANGELOG_AUDIT.md) records 128 unit tests,
+104 CI-helper tests, lint without errors, debug/test/release APK and AAB builds,
+SBOM identity-only changes, static native alignment and a fresh complete-Maven
+scan without findings. Markdown and packaged HTML match exactly. The updated
+`LocalDocumentTest` compiles and retains both current/historical-text assertions;
+it is not run on the owner's beta in this block. Require new remote acceptance,
+and do not transfer the archived 7.0.1 APK's device results to 8.0.
+
 Before publishing a release:
+
+Use [RELEASE_ACCEPTANCE.md](RELEASE_ACCEPTANCE.md) to record the exact signed
+minified APK, device/API/ABI, certificate and human outcomes. Android CI 46 and
+security run 2 accept source `c3824a7`, including all six Android jobs and
+completed SARIF processing. The exact internal signed APK now passes fresh
+installation and cold start on the physical Edge 20 / Android 12; the original
+`Pictures/Mimi` folder retains all 607 file paths and SHA-256 hashes. Update,
+visual and remaining human acceptance are still pending, as is physical Android
+10/32-bit validation; neither debug instrumentation nor inventory fills them.
 
 - Require a green instrumented-test job for API 29, 31, 34, and 36 from the release commit.
 - Repeat startup, tab restoration, gallery MP4/WebM playback, autoplay, cache clearing, and a SAF download on the available physical Android 10 and Android 12 devices.

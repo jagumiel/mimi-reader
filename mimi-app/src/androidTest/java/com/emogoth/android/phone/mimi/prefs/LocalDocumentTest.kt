@@ -98,8 +98,8 @@ class LocalDocumentTest {
         val fixtures = listOf(
             LicensesFragment.newInstance(R.raw.licenses) to "Adam Speakman",
             PrivacyPolicyFragment.newInstance() to "Mimi Reader privacy policy",
-            LicensesFragment.newInstance(R.raw.changelog, "Historical changes") to "Mimi 7.0.1",
-            com.emogoth.android.phone.mimi.fragment.LicensesFragment.newInstance(R.raw.changelog, "Legacy changes") to "Mimi 7.0.1",
+            LicensesFragment.newInstance(R.raw.changelog, "Historical changes") to "Mimi 8.0",
+            com.emogoth.android.phone.mimi.fragment.LicensesFragment.newInstance(R.raw.changelog, "Legacy changes") to "Mimi 8.0",
             com.emogoth.android.phone.mimi.fragment.PrivacyPolicyFragment.newInstance() to "Mimi Reader privacy policy"
         )
         for ((fragment, text) in fixtures) {
@@ -107,6 +107,10 @@ class LocalDocumentTest {
             try {
                 show(scenario, fragment)
                 contains(ready(scenario), text)
+                if (fragment.arguments?.getInt("raw_res_extra") == R.raw.changelog) {
+                    contains(ready(scenario), "Mimi 7.0.1")
+                    contains(ready(scenario), "Mimi 7.0.0")
+                }
                 scenario.recreate()
                 contains(ready(scenario), text)
                 scenario.onActivity { activity ->

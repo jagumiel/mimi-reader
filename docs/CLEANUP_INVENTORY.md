@@ -195,10 +195,10 @@ the existing SBOM with scheduled runs, reviewed expiring exceptions and SARIF.
 Its first real scan reported a MEDIUM Commons Lang CVE without waiving it.
 The subsequent [3.20.0 update](COMMONS_LANG.md) preserves the tested contracts
 and clears the local scan; 3.21.0 is rejected on compatibility evidence. Android
-run 45 and security run 1 accept the previous cleanup/integration, including
-completed SARIF ingestion, not the updated dependency. Next confirm both new
-workflows and close physical/human release checks, not another mass dependency
-rewrite. Native/WASM provenance
-gaps must remain visible even if a scanner reports no findings. Consult the
-owner before defining the 8.0 changelog from fork baseline 7.0.1; leave the full
-README rewrite until the end.
+run 46 and security run 2 subsequently accept the correction and complete SARIF
+ingestion. Native/WASM provenance gaps remain visible even with no known findings.
+The owner approves English 8.0 release notes/versioning on 25 October, explicitly
+deferring physical Android 10 rather than marking it passed. The reviewed
+[changelog](../CHANGELOG.md) and [history audit](CHANGELOG_AUDIT.md) preserve
+remaining release gates; this is not another mass dependency rewrite or public
+release. Leave the full README rewrite until the end.

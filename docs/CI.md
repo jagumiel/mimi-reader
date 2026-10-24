@@ -4,7 +4,30 @@ The workflow builds debug/release artifacts, validates the release SBOM, and
 runs instrumentation on Android 10, 12, 14 and 16 (API 29/31/34/36). A passing
 build job alone is not a passing workflow: every instrumentation job must pass.
 
+## 8.0 version and changelog preparation (25 October 2026)
+
+The owner-approved 8.0 / 231 identity is shared by app and SBOM through root
+`gradle.properties`; notes remain **Unreleased**, with no tag or public signing
+change. Eight new offline helper tests compare Markdown/in-app text and version
+metadata, bringing discovery to **104 tests**. Existing workflow discovery picks
+them up without changing permissions or job definitions. The document test now
+requires visible 8.0 text as well as retained 7.0.1/7.0.0 notes.
+
+Local unit/lint/build/SBOM/native-static/security checks pass as recorded in
+[CHANGELOG_AUDIT.md](CHANGELOG_AUDIT.md). The new device test is compiled, not
+claimed as locally executed. This revision needs its own remote workflows;
+run 46/security run 2 below accept only the preceding source. The owner defers
+physical Android 10, not its compatibility requirements or a fictitious pass.
+The final README rewrite is next; public signing/acceptance remain separate.
+
 ## Standalone library dependency gate (24 October 2026)
+
+On 25 October the remaining remote gate is confirmed for the Commons Lang
+update `c3824a7`: [Android run 46](https://github.com/jagumiel/mimi-reader/actions/runs/40137617724)
+passes all six jobs and [security run 2](https://github.com/jagumiel/mimi-reader/actions/runs/40137617737)
+passes both jobs with completed SARIF processing and no known Maven findings.
+The following older pending status is superseded for that revision, not for
+future commits. Next prepare/execute the [signed minified APK physical checklist](RELEASE_ACCEPTANCE.md).
 
 Latest reviewed remote acceptance: [Android run 45](https://github.com/jagumiel/mimi-reader/actions/runs/40133142211)
 passes all six jobs for `c76cef8`; [SBOM security run 1](https://github.com/jagumiel/mimi-reader/actions/runs/40133142178)

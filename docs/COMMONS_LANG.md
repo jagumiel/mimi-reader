@@ -141,3 +141,14 @@ human CAPTCHA/keyboard/browser and minified-release UI acceptance remain release
 gates; the 8.0 changelog needs consultation before drafting and the full README
 rewrite stays last. A future 3.21+ numeric-parser migration is a separate review,
 not an additional prerequisite to fix this CVE or ship the agreed cleanup.
+
+## Remote acceptance confirmed on 25 October 2026
+
+[Android CI 46](https://github.com/jagumiel/mimi-reader/actions/runs/40137617724)
+passes all six jobs for `c3824a7`, including API 29/31/34/36 and the separate
+six-case native 16 KB job. [SBOM security 2](https://github.com/jagumiel/mimi-reader/actions/runs/40137617737)
+passes both jobs; its logs report 148/148 Maven packages, no known findings and
+completed SARIF processing. These supersede the pending remote gates above,
+not physical-device release acceptance or required-check configuration.
+The next step is the [signed minified APK physical checklist](RELEASE_ACCEPTANCE.md),
+with an explicit signing choice and no replacement/clearing of the user's beta.

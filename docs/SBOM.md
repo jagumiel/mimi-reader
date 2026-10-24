@@ -199,7 +199,11 @@ Android CI runs `verifySbom testSbomValidation` before building the application.
 A stale snapshot or failed validation blocks that job. Generated JSON and the
 manual manifest are uploaded for 14 days, including on failure for diagnosis.
 
-The tracked SBOM uses the build's default version, currently 7.0.1. For an actual
+The tracked SBOM uses the build's default version, currently **8.0 / code 231**.
+Both the application and SBOM read the identity from root `gradle.properties`,
+with no independent fallback defaults. The 8.0 regeneration changes application
+identity/root references only, not the 150 dependency components, artifact hashes,
+71 declarations, tooling or manual component manifest. For an actual
 release built with version overrides, generate an artifact SBOM using those same
 overrides and archive the JSON alongside its APK/AAB and R8 mapping:
 

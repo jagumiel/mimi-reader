@@ -5318,7 +5318,7 @@
                 "pkg:maven/org.jsoup/jsoup@1.23.2?type=jar",
                 "pkg:maven/pl.droidsonroids.gif/android-gif-drawable@1.2.32?type=aar"
             ],
-            "ref": "pkg:generic/mimi-reader@7.0.1?variant=release"
+            "ref": "pkg:generic/mimi-reader@8.0?variant=release"
         },
         {
             "dependsOn": [
@@ -6604,7 +6604,7 @@
     ],
     "metadata": {
         "component": {
-            "bom-ref": "pkg:generic/mimi-reader@7.0.1?variant=release",
+            "bom-ref": "pkg:generic/mimi-reader@8.0?variant=release",
             "licenses": [
                 {
                     "license": {
@@ -6624,12 +6624,12 @@
                 },
                 {
                     "name": "mimi:versionCode",
-                    "value": "230"
+                    "value": "231"
                 }
             ],
-            "purl": "pkg:generic/mimi-reader@7.0.1?variant=release",
+            "purl": "pkg:generic/mimi-reader@8.0?variant=release",
             "type": "application",
-            "version": "7.0.1"
+            "version": "8.0"
         },
         "tools": {
             "components": [

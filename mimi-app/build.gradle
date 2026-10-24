@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-def appVersionCode = providers.gradleProperty('mimiVersionCode').getOrElse('230').toInteger()
-def appVersionName = providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+def appVersionCode = providers.gradleProperty('mimiVersionCode').get().toInteger()
+def appVersionName = providers.gradleProperty('mimiVersionName').get()
 if (appVersionCode < 1 || appVersionName.trim().isEmpty()) {
     throw new GradleException('mimiVersionCode must be positive and mimiVersionName must not be empty.')
 }

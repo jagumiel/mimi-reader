@@ -23,7 +23,7 @@ allprojects {
         // Plugin 3.5.1 defaults to CycloneDX 1.6; validation also requires 1.6.
         componentName = project.name == rootProject.name ? 'mimi-reader' : project.name
         componentVersion = project.name == 'chanlib' ? '1.0' :
-                providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+                providers.gradleProperty('mimiVersionName').get()
         xmlOutput.convention((RegularFile) null)
         enabled = project.path == ':mimi-app'
         // The same artifact set can have different direct/transitive edges.
@@ -82,7 +82,7 @@ def verifyManualFiles = { Map manifest ->
 
 def normalizeBom = { Map input, Map manifest ->
     def bom = deepCopy(input)
-    def version = providers.gradleProperty('mimiVersionName').getOrElse('7.0.1')
+    def version = providers.gradleProperty('mimiVersionName').get()
     def appRef = "pkg:generic/mimi-reader@$version?variant=release".toString()
     def replacements = [(bom.metadata.component['bom-ref']): appRef]
     bom.components.findAll { it.purl?.contains('project_path=') }.each { component ->
@@ -103,7 +103,7 @@ def normalizeBom = { Map input, Map manifest ->
             'bom-ref': appRef, purl: appRef,
             licenses: [[license: [id: 'Apache-2.0']]],
             properties: [[name: 'mimi:variant', value: 'release'],
-                         [name: 'mimi:versionCode', value: providers.gradleProperty('mimiVersionCode').getOrElse('230')],
+                         [name: 'mimi:versionCode', value: providers.gradleProperty('mimiVersionCode').get()],
                          [name: 'mimi:coverage', value: 'resolved-runtime-and-desugaring-before-R8']]
     ]
     bom.components.each { component ->
