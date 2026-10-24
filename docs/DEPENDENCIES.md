@@ -1545,6 +1545,32 @@ CVE/GHSA activation, the owner-approved 8.0 changelog and final README remain
 separately scoped. Require this commit's own complete six-job remote workflow;
 local checks do not replace physical Android 10/32-bit release acceptance.
 
+## Twenty-fourth cleanup: closed legacy theme-resource groups (R03)
+
+Remove the two unreferenced resource closures, not dependencies or active theme
+styles: three old basic-card selectors plus six state drawables, three textured
+action-bar wrappers plus eight tile PNG variants. This removes 20 files / 14
+resource names. Keep shared default backgrounds, grid resources, live catalog
+color selectors, transparent/solid action bars, colors and attribution. See the
+[complete reachability audit and local validation](SETTINGS_RESOURCE_AUDIT.md#twenty-fourth-block-closed-legacy-theme-resource-subtrees-r03).
+
+One mandatory instrumentation case resolves/draws retained resources and inflates
+real post layouts in three themes, two widths, both directions, before and after
+host recreation. Ordinary coverage becomes 89 cases, with three existing opt-in
+skips and six separate native cases; unit/helper counts remain 121 / 59.
+No dependency versions, runtime inputs, R8/JNI rules or persisted values change.
+The SBOM and declaration snapshots remain identical at 150 components / 71
+declarations. Gradle remains 8.13; its controlled update is deferred to 8.0.1.
+
+This closes the agreed D01–D03 / R01–R03 candidate set. Retain the documented
+live libraries with their actual consumers, rather than removing them by age or
+requiring a wholesale rewrite before security work. Clean-cache repository
+provenance and individual library updates remain future bounded reviews. Next
+integrate CVE/GHSA scanning and policy tests over the existing SBOM; retain
+native/WASM provenance limitations, physical-device release gates and the
+owner-approved changelog/final README ordering. No remote CI is inspected in
+this block; require this commit's own complete six-job acceptance.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1556,7 +1582,9 @@ the twentieth removes the closed R01 resource set. Run 40 accepts both. The
 twenty-first removes only R02's unused reply arrays. The twenty-second implements
 D02 ownership and requests the already-selected Annotation baseline. The twenty-third
 implements D03 without removing the transitively required Room KTX node;
-next inspect the bounded R03 theme/resource candidates.
+the twenty-fourth completes the bounded R03 resource closures, retaining live
+theme consumers. Next integrate vulnerability scanning; retained library and
+repository-origin reviews remain separately scoped.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,

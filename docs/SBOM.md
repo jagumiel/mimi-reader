@@ -151,6 +151,14 @@ retained edge is identical. Only the release/app-unit selected inventories chang
 [D03 artifact/consumer review](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
 Runtime/Rx/coroutine support and the separate build/test inventory remain.
 
+The twenty-fourth cleanup removes only closed legacy theme-resource subtrees
+(R03). Both snapshots remain byte-for-byte unchanged at **150 components / 71
+declarations**; no dependency, bundled Ruffle input or native library is updated.
+See the [resource audit](SETTINGS_RESOURCE_AUDIT.md#twenty-fourth-block-closed-legacy-theme-resource-subtrees-r03).
+The remaining live-library candidates are retained with consumers documented in
+the cleanup inventory. CVE/GHSA scanning is the next separately scoped block,
+not a claim made by these freshness checks. Gradle updates are deferred to 8.0.1.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

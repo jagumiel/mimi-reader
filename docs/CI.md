@@ -36,6 +36,15 @@ Snapshots now contain 150 components / 71 declarations. No workflow, retry or
 skip changes are made, and the preceding remote CI is deliberately not queried
 at the owner's request. See [D03](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
 
+The twenty-fourth cleanup removes R03's closed resource groups and adds one
+mandatory three-theme/card-resource regression: **89 ordinary cases**, still
+three opt-in skips and six separate native cases. It checks style resolution,
+drawable states and four real post layouts across widths, directions and host
+recreation. No workflow, provider, retry, assertion or skip is relaxed. Unit/helper
+counts remain 121 / 59 and SBOM totals 150 / 71. Previous remote CI is not queried;
+this commit requires its own six-job acceptance. Gradle stays unchanged, with
+its update scheduled for 8.0.1. See the [R03 audit](SETTINGS_RESOURCE_AUDIT.md#twenty-fourth-block-closed-legacy-theme-resource-subtrees-r03).
+
 ## Run 25: download cleanup ordering (21 October 2026)
 
 [Run 25](https://github.com/jagumiel/mimi-reader/actions/runs/39573428637)

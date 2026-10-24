@@ -351,3 +351,79 @@ or physical Android 10/32-bit acceptance is claimed. Require the new commit's
 own six-job workflow. Next review D02's dependency declaration ownership;
 leave D03/R03, CVE/GHSA activation, owner-approved 8.0 changelog and final README
 work separately scoped.
+
+## Twenty-fourth block: closed legacy theme-resource subtrees (R03)
+
+Review all source sets in both modules, qualified resources, manifests, binding
+inputs and R8 rules before removal. The following roots have no external
+consumer; the only drawable edges are internal to these two obsolete groups:
+
+| Removed group | Closure and scope |
+| --- | --- |
+| `basic_card_selector_{light,dark,black}` | Three selector XMLs and their six `basic_card_background_*_{pressed,focused}` XMLs. Default backgrounds are shared with retained styles, so are **not** part of this removal. |
+| `ab_background_textured_thememimi{light,dark,black}` | Three bitmap XMLs and both `ab_texture_tile_thememimi{light,dark}` PNGs in mdpi/hdpi/xhdpi/xxhdpi. The black wrapper uses the dark tile; there is no separate black tile. |
+
+This is **20 files / 14 resource names**, not a deletion of all `ab_*` or
+`basic_card_*` assets. Git retains the removed source/binaries; no user data is
+deleted. No main Java/Kotlin name-based lookup, XML reference outside the
+closures, generated binding consumer, manifest entry or resource keep rule
+requires these names. Lint's prior warnings corroborate, rather than establish,
+this reachability analysis. Leave colors untouched: pressed/focused color names
+are also used by retained grid resources and color-state lists.
+
+The three `Theme.Mimi.*.CardBackground` styles still resolve to their original
+`basic_card_background_{light,dark,black}`. Keep the complete theme hierarchy,
+`ActionBar.Transparent.Mimi.Light` / `ab_transparent_thememimilight`, solid action
+bars, grid selectors, third-party notices and all remaining resources. Catalog
+CardViews use `?cardBackgroundSelector`, which resolves through each theme's
+`CardBackgroundSelector` style to `light_item_selector`, `dark_item_selector` or
+`black_item_selector`, **not** the similarly named removed drawable selectors.
+The first/reply-post layouts also consume this style. No production Kotlin/Java,
+layout, style, preference, dependency declaration or R8 rule changes.
+
+Add one mandatory `ThemeResourceCompatibilityTest` case. Before and after host
+recreation it resolves retained plain/grid background styles in all three
+themes, draws normal/pressed/focused drawable states, inflates the four real
+catalog/thread post layouts at 320/480 dp in LTR/RTL, and checks dimensions,
+direction inheritance and catalog click/focus/foreground/color-state behavior.
+Views stay detached, without adapters, remote-media loading or preference
+writes. Existing settings/navigation and media tests remain enabled. This raises
+ordinary instrumentation from 88 to **89** distinct cases, with the same three
+opt-in skips; separate native coverage remains six cases.
+
+### R03 local artifact acceptance and limits
+
+Debug/test APKs and minified release APK/AAB build in **3m24s**. Pass 121 unit
+cases (102 app / 19 library, including unchanged up-to-date library results),
+59 CI-helper cases, independent library dependency-boundary checks, application
+variant guards and SBOM freshness/negative tests: six malformed documents
+rejected, asset hash mismatch rejected, canonical output stable. Both tracked
+snapshots remain unchanged at 150 components / 71 declarations. No toolchain,
+dependency, Ruffle or native input update is made.
+
+App lint has **zero errors, 977 warnings and one hint**, including **454 unused
+resources** (previously 993 warnings / 468 unused resources). Library lint also
+has no errors. Do not translate those remaining findings into a removal list;
+no suppression, baseline or test skip is added. Actual debug/release APK resource
+tables omit every one of the 14 removed names and retain all nine checked live
+plain backgrounds, catalog color selectors and grid selectors. The new test
+class is absent from both release DEX files.
+
+Both APKs pass static ELF/ZIP checks (24 native libraries / four ABIs); release
+also passes JNI seed checks and SDK 16 KB zipalign. Release APK is **41,421,465
+bytes** (previously 41,422,537), AAB **31,149,005 bytes** (previously 31,149,408).
+Small packaging reductions are not startup, memory or security benchmarks. No
+fresh actual-16-KB runtime, minified-release UI or physical Android 10/32-bit
+acceptance is inferred. Require this commit's complete remote workflow;
+previous CI is deliberately not inspected. No public post or live CAPTCHA is
+authorized by this resource cleanup.
+
+The complete Edge 20 / Android 12 suite passes in **1m45s: 89 distinct XML/JUnit
+cases, 86 passed, three existing opt-in skips, zero failures/errors**. The new
+resource case passes (1.382s), including recreation. Do not count the console's
+92 completion events as unique tests. Preserve the XML under the ignored local
+`build/reports/theme-resources/edge20-final/` report directory. The phone remained
+awake/unlocked for the suite, and its original stay-awake **0** was restored and
+verified afterward. No user preferences or public posts are changed by the new
+fixture. Local success does not replace the new remote matrix or the remaining
+physical/human release gates.

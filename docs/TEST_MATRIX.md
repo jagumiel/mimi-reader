@@ -460,6 +460,25 @@ pass. Use XML counts, not 91 console events. Restore/verify stay-awake 0.
 Previous remote CI is deliberately not inspected; new remote matrix and physical
 Android 10/32-bit release acceptance remain separate requirements.
 
+## Twenty-fourth cleanup: retained theme-resource compatibility (R03)
+
+`ThemeResourceCompatibilityTest.retainedCardStylesAndSelectorsRenderAcrossThemesAndRecreation`
+is mandatory in the ordinary API matrix. Before and after host recreation, it
+uses detached real catalog/list/grid and first/reply-post layouts in light,
+dark and black at 320/480 dp in LTR/RTL. Check original background resource IDs,
+normal/pressed/focused drawable rendering and live catalog CardView color states,
+click/focus/foreground behavior, nonzero geometry and direction inheritance.
+No user preference writes, adapters or remote media are involved. Existing
+settings/navigation and posting cases remain enabled. Ordinary coverage becomes
+**89** distinct cases (three existing opt-in skips), with six separate native
+cases; unit/helper counts stay 121 / 59. See the [R03 evidence and local results](SETTINGS_RESOURCE_AUDIT.md#twenty-fourth-block-closed-legacy-theme-resource-subtrees-r03).
+
+Fresh Edge 20 / Android 12 acceptance: **89 unique XML/JUnit cases, 86 passed,
+three existing opt-in skips, zero failures/errors**, in 1m45s; the new mandatory
+case passes. Preserve XML rather than using 92 console completion events as the
+case count. Original stay-awake 0 is restored/verified. No fresh remote matrix,
+physical Android 10/32-bit or actual-16-KB runtime result is claimed.
+
 ## Local device validation
 
 Connect exactly one authorized device or emulator and run:

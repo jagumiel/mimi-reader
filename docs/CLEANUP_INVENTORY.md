@@ -64,7 +64,7 @@ Preference extensions are unused. WorkManager still requires empty Room KTX
 declarations**, with identical retained versions/hashes. Two mandatory offline
 device cases raise ordinary coverage to 88. See the
 [artifact audit](DEPENDENCIES.md#twenty-third-cleanup-optional-ktx-artifacts-and-actual-api-owners-d03).
-Next review R03's style/resource dependencies; do not bulk-delete live themes.
+R03's subsequent closed-resource review is recorded below; live themes remain.
 
 | ID | Evidence at the accepted baseline | Bounded follow-up and acceptance |
 | --- | --- | --- |
@@ -90,8 +90,21 @@ Remove only the unreferenced `reply_entries` / `reply_values` definitions and
 their otherwise-empty XML file. Extend the isolated migration-preservation
 fixture without changing production posting, stored values or migration schema.
 See the [reply-array audit](SETTINGS_RESOURCE_AUDIT.md#twenty-first-block-unused-reply-option-arrays-r02).
-The D02/D03 reviews are recorded above. R03 remains a separate pending decision,
-not approval for bulk removals or a prerequisite to rewrite every live library.
+The D02/D03 reviews are recorded above. R03 is implemented in the twenty-fourth
+block below; this is not approval for bulk removals or a requirement to rewrite
+every live library.
+
+**R03 implemented locally; this commit's remote acceptance remains required.**
+Remove only three unused old card selectors, their six focused/pressed XMLs,
+three textured action-bar wrappers and eight qualified tile PNGs: 20 files / 14
+resource names. Preserve the three shared default card backgrounds, live catalog
+color selectors, grid selectors, transparent/solid action-bar styles, all colors
+and notices. One mandatory three-theme/width/direction/recreation case brings
+ordinary instrumentation to 89 cases. See the [R03 reachability and validation](SETTINGS_RESOURCE_AUDIT.md#twenty-fourth-block-closed-legacy-theme-resource-subtrees-r03).
+SBOM inputs remain 150 components / 71 declarations, without version/hash drift.
+The live-library rows below are retained/deferred with actual consumers; they
+are not unused dependencies awaiting blanket removal. This closes the agreed
+D01–D03 / R01–R03 candidate set, not every lint warning or every legacy update.
 
 | ID | Evidence and caution | Required proof before deletion |
 | --- | --- | --- |
@@ -169,9 +182,12 @@ separately in the nineteenth cleanup linked above.
 
 For each later implementation, record the exact candidate, consumers, changes,
 graph/resource diff, tests and remaining limits in the cleanup history. Require
-that commit's own complete six-job CI. After D01–D03/R01/R02, review R03
-independently; the live-library rows are
-not an unlimited requirement to rewrite every component before security work.
+that commit's own complete six-job CI. D01–D03/R01–R03 are now implemented with
+the bounded evidence linked above. Keep the live-library rows and repository
+origin audit as separately scoped reviews, not an unlimited requirement to
+rewrite every component before security work. No clean-cache repository-origin
+proof, physical-device release acceptance or complete vulnerability clearance
+is inferred from this inventory.
 
 After the agreed bounded cleanup and explicit disposition of remaining
 candidates, enable CVE/GHSA scanning of the existing SBOM with scheduled runs,
