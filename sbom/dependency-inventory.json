@@ -43,16 +43,6 @@
         {
             "configuration": "api",
             "project": ":chanlib",
-            "requested": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
-        },
-        {
-            "configuration": "api",
-            "project": ":chanlib",
-            "requested": "com.squareup.retrofit2:converter-gson:2.11.0"
-        },
-        {
-            "configuration": "api",
-            "project": ":chanlib",
             "requested": "com.squareup.retrofit2:retrofit:2.11.0"
         },
         {
@@ -67,20 +57,10 @@
         },
         {
             "configuration": "api",
-            "project": ":chanlib",
-            "requested": "org.jsoup:jsoup:1.23.2"
-        },
-        {
-            "configuration": "api",
             "project": ":mimi-app",
             "requested": "androidx.databinding:viewbinding:8.13.2"
         },
         {
-            "configuration": "api",
-            "project": ":mimi-app",
-            "requested": "project::chanlib"
-        },
-        {
             "configuration": "coreLibraryDesugaring",
             "project": ":chanlib",
             "requested": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
@@ -89,6 +69,16 @@
             "configuration": "coreLibraryDesugaring",
             "project": ":mimi-app",
             "requested": "com.android.tools:desugar_jdk_libs_nio:2.1.5"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":chanlib",
+            "requested": "com.squareup.retrofit2:adapter-rxjava2:2.11.0"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":chanlib",
+            "requested": "com.squareup.retrofit2:converter-gson:2.11.0"
         },
         {
             "configuration": "implementation",
@@ -98,7 +88,7 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
-            "requested": "androidx.annotation:annotation:1.1.0"
+            "requested": "androidx.annotation:annotation:1.10.0"
         },
         {
             "configuration": "implementation",
@@ -356,6 +346,11 @@
             "requested": "pl.droidsonroids.gif:android-gif-drawable:1.2.32"
         },
         {
+            "configuration": "implementation",
+            "project": ":mimi-app",
+            "requested": "project::chanlib"
+        },
+        {
             "configuration": "kapt",
             "project": ":mimi-app",
             "requested": "androidx.room:room-compiler:2.8.5"
@@ -464,10 +459,6 @@
             {
                 "direct": true,
                 "id": "org.jetbrains.kotlin:kotlin-stdlib:2.3.21"
-            },
-            {
-                "direct": true,
-                "id": "org.jsoup:jsoup:1.23.2"
             }
         ],
         "coreLibraryDesugaring": [

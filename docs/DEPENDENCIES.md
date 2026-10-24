@@ -17,8 +17,8 @@ The thirteenth replaces PercentLayout's sole consumer with a platform weighted r
 
 The canonical release SBOM has **152 top-level components**: 150 Maven components,
 the local `chanlib` module and Ruffle. Ruffle contains seven individually hashed
-files. The inventory records **75 direct declarations** across the two modules;
-repeated declarations and dependency constraints are not 75 distinct libraries.
+files. The inventory records **74 direct declarations** across the two modules;
+repeated declarations and dependency constraints are not 74 distinct libraries.
 See [SBOM generation and scope](SBOM.md) for commands and limitations.
 
 ## First cleanup: removed declarations
@@ -1402,6 +1402,77 @@ zero failures/errors; restore/verify stay-awake 0 again. This documentation-only
 follow-up closes local UI acceptance, not the new commit's own six-job CI or
 physical Android 10/32-bit gates. Do not reuse run 40 as remote validation.
 
+## Twenty-second cleanup: explicit dependency ownership (D02)
+
+Review actual main-source signatures, annotations, internal factory calls,
+resources/manifests and R8 inputs instead of treating repeated declarations as
+duplicate packaged copies. No production Java/Kotlin logic changes in this block.
+
+| Declaration | Decision and consumer evidence |
+| --- | --- |
+| `:chanlib` -> Jsoup | Remove: no library source/signature/resource/reflection consumer. Keep the app's direct Jsoup declaration: `FourChanCommentParser` and `FourChanHtmlParser` parse actual board/post HTML. |
+| Library Retrofit Gson converter / RxJava adapter | Move `api` to `implementation`: only constructed inside `ChanConnectorBuilder.initRetrofit`; no factory type appears in public/protected signatures. Both remain runtime dependencies. |
+| Library Retrofit / OkHttp / RxJava | Keep `api`: connector methods, builder setters/return types and `ResponseAndPojo` expose their types. |
+| Library Gson / Annotation / Kotlin stdlib | Keep `api`: model `@Expose`, public `@NonNull` contracts and Kotlin declarations remain visible. Do not strip metadata dependencies solely for lack of executable calls. |
+| Application -> `:chanlib` | Use `implementation`: the application consumes the library but is not publishing a library API of its own. |
+| Annotation version | Share `annotation_version = 1.10.0` between app, library and guard. The app previously requested 1.1.0 but already selected 1.10.0; no selected release upgrade is introduced. |
+| Other direct app dependencies | Retain actual direct consumers of Retrofit, Gson, RxJava, Jsoup and Kotlin even where the library also uses them. Do not rely on accidental transitive exports. |
+
+The standalone boundary task now checks the six reviewed public declarations
+and presence of the two internal factory declarations. Its five real selected
+graphs must also exclude Jsoup alongside the earlier app-only Core/RxAndroid
+adapters. Extend the existing classpath-absence unit case to require that Jsoup
+is not loadable in library tests. Existing transport tests still exercise Gson
+conversion and lazy Rx adapter creation without network requests. Case counts
+stay **121 app/library / 59 CI-helper / 86 ordinary / six native**.
+
+Four local negative init-script probes reject exporting an internal converter,
+hiding public Retrofit, dropping an internal Rx factory and reintroducing Jsoup.
+These probes/logs live under ignored `build/`; they are not four new CI-helper
+cases or production force/exclusion rules. The normal verification invocation
+then passes without injected declarations.
+
+Reviewed SBOM/inventory diff: **all 152 release component records, versions,
+licenses, artifact hashes and Ruffle files remain identical**. Only the
+library's outgoing Jsoup edge disappears; every other edge, including app root
+edges, stays unchanged. The app still packages its actual Jsoup consumer. Direct
+declarations become **74 instead of 75**, including scope/version corrections.
+Only the inventoried standalone library unit graph changes, **20 -> 19**, by
+removing Jsoup; all other selected application, test, desugaring, processor and
+build-tool graphs remain identical. Annotation alignment and factory scope
+changes do not disappear from the declarations inventory just because the
+runtime component list stays the same.
+
+Local acceptance on 24 October: **121 unit cases** (102 app + 19 library;
+library cases run in the initial targeted invocation and are then up-to-date),
+59 CI-helper cases, normal SBOM freshness/six malformed-input/hash tests,
+variant and five-configuration boundary guards pass. Debug/test APKs, minified
+release APK/AAB and both module lint checks pass; the combined build takes 38s.
+App lint remains zero errors, 993 warnings and one hint, with 468 unused
+resources; the library report has no findings. No suppressions or retry changes.
+
+The full Edge 20 / Android 12 suite passes in **1m40s: 86 distinct XML/JUnit
+cases, 83 passed, three existing opt-in skips, no failures/errors**. Do not count
+89 console completion events as unique tests. Restore and verify original
+stay-awake **0**; no public post or live CAPTCHA acceptance is performed.
+Both APKs pass static ELF/ZIP checks (24 libraries/four ABIs); release also passes
+JNI seed checks and SDK 16 KB zipalign. APK stays **41,422,903 bytes**; AAB is
+**31,141,716 bytes**, versus 31,141,726. No performance gain or fresh native-16-KB
+runtime result is inferred from unchanged native inputs or these sizes.
+
+At this review, run 41 for the earlier `c75a558` is still in progress; run 40
+accepts `62c24c3`, not D02. Record the new commit's own six-job remote acceptance
+separately; local checks do not certify the emulator matrix or physical Android
+10/32-bit release gates.
+
+Next inspect D03's optional Room/Work/Preference KTX declarations against actual
+resolved artifact contents and Kotlin extension ownership. Do not remove
+runtime or Rx adapters, rewrite persistence/reactive APIs, or start the deferred
+CVE/GHSA scan, 8.0 changelog or final README as part of D02. SDK minima, app IDs,
+versions, R8 rules, native binaries, posting behavior and legal notices stay
+unchanged; static ownership review is not an external published-library ABI test
+or physical Android 10/32-bit acceptance. Require the new commit's own six-job CI.
+
 ## Remaining legacy-file review
 
 The current follow-up is the [prioritized cleanup inventory](CLEANUP_INVENTORY.md),
@@ -1410,8 +1481,9 @@ standalone dependency graph from the application's selected versions, bounded
 orphan resource closures and live legacy consumers. D01 (`chanlib` dependency
 ownership/standalone network baseline) is implemented in the nineteenth block;
 the twentieth removes the closed R01 resource set. Run 40 accepts both. The
-twenty-first removes only R02's unused reply arrays; next review D02, not a bulk
-lint deletion or the deferred vulnerability scan.
+twenty-first removes only R02's unused reply arrays. The twenty-second implements
+D02 ownership and requests the already-selected Annotation baseline; next review
+D03, not a bulk lint deletion or the deferred vulnerability scan.
 
 A Git last-touch audit found 534 tracked files last changed in 2016 and 100 in
 2019. Age alone is not a deletion criterion: `BoardConverter`, `PostConverter`,
@@ -1460,7 +1532,9 @@ The old email/logcat feedback path is also removed with its live caller.
    and the twentieth removes R01's four orphan resources. Run 40 for `62c24c3`
    confirms all six jobs for both. The twenty-first removes only R02's unused
    reply arrays and extends isolated value-preservation coverage; require its
-   own workflow. Next review D02, without drafting the 8.0 changelog. Physical Android
+   own workflow. The twenty-second implements D02's consumer-owned declarations
+   without selected release-version changes; next review D03, without drafting
+   the 8.0 changelog. Physical Android
    10/32-bit media and CAPTCHA acceptance remains
    required before release; wrapper versions are not native security provenance.
 5. After posting recovery and the agreed cleanup/refactoring gates, add CVE/GHSA scanning of the

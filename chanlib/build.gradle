@@ -58,17 +58,17 @@ dependencies {
     // Public connector/builder signatures expose OkHttp types. Do not inherit
     // Retrofit's older minimum when this library is built/tested on its own.
     api "com.squareup.okhttp3:okhttp:$okhttp_version"
-    api "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    // These factories are internal builder details, not public signature types.
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     api "com.google.code.gson:gson:$gson_version"
 
-    api "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     api "io.reactivex.rxjava2:rxjava:$rxjava_version"
 
-    api "org.jsoup:jsoup:$jsoup_version"
     // ArchiveConverter exposes @NonNull, but no library code uses AndroidX
     // Core/KTX or Android schedulers. This is the app's existing selection.
-    api 'androidx.annotation:annotation:1.10.0'
+    api "androidx.annotation:annotation:$annotation_version"
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
@@ -77,12 +77,22 @@ def verifyDependencyBoundary = tasks.register('verifyDependencyBoundary') {
     description = 'Check the standalone connector API/runtime graph without application dependency overrides.'
     doLast {
         def expected = ['com.squareup.okhttp3:okhttp': okhttp_version,
-                        'androidx.annotation:annotation': '1.10.0']
+                        'androidx.annotation:annotation': annotation_version]
+        def publicModules = (expected.keySet() + ['com.squareup.retrofit2:retrofit',
+                'com.google.code.gson:gson', 'io.reactivex.rxjava2:rxjava',
+                'org.jetbrains.kotlin:kotlin-stdlib']) as Set
+        def privateModules = ['com.squareup.retrofit2:converter-gson',
+                              'com.squareup.retrofit2:adapter-rxjava2'] as Set
         def forbidden = ['androidx.core:core', 'androidx.core:core-ktx',
-                         'io.reactivex.rxjava2:rxandroid'] as Set
+                         'io.reactivex.rxjava2:rxandroid', 'org.jsoup:jsoup'] as Set
         def exported = configurations.api.dependencies.collect { "$it.group:$it.name".toString() } as Set
-        if (!exported.containsAll(expected.keySet()) || exported.intersect(forbidden)) {
+        if (exported != publicModules) {
             throw new GradleException("Unexpected chanlib API ownership: $exported")
+        }
+        def internal = configurations.implementation.dependencies
+                .collect { "$it.group:$it.name".toString() } as Set
+        if (!internal.containsAll(privateModules)) {
+            throw new GradleException("Missing chanlib internal factories: $internal")
         }
         ['debugCompileClasspath', 'releaseCompileClasspath', 'debugRuntimeClasspath',
          'releaseRuntimeClasspath', 'debugUnitTestRuntimeClasspath'].each { name ->

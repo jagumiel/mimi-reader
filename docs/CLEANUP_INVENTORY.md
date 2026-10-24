@@ -3,7 +3,7 @@
 Reviewed on 24 October 2026 against `268fd5d`. This is a prioritized review of
 the remaining cleanup, not a removal list, a version-upgrade catalogue or a
 vulnerability scan. The initial inventory was documentation-only; the subsequent
-D01, R01 and R02 implementations are recorded below and in the cleanup history.
+D01, D02, R01 and R02 implementations are recorded below and in the cleanup history.
 
 ## Accepted baseline and scope
 
@@ -43,8 +43,18 @@ The standalone unit graph becomes 20 entries instead of the baseline 23; release
 components and declaration totals remain 152 / 75. See the
 [nineteenth cleanup](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary)
 for code adjustments, tests, exact graph scope and limits. R01 is implemented
-below; D02/D03 are still separate pending candidates. The table retains the original
+below; D03 is still a separate pending candidate. The table retains the original
 evidence so the implementation can be compared against its accepted baseline.
+
+**D02 implemented locally in the twenty-second block; remote acceptance pending.**
+Remove the library's unused Jsoup declaration, keep its actual app consumer, make library factories
+internal implementation details and retain real public API dependencies. Share
+Annotation's already-selected 1.10.0 baseline and make the app's local-module
+dependency implementation-scoped. Release components stay 152; declarations
+become 74 and the standalone library unit graph 19. See the
+[ownership audit](DEPENDENCIES.md#twenty-second-cleanup-explicit-dependency-ownership-d02).
+Next inspect D03's actual artifact/extension consumers; no whole-Rx migration
+or automatic scanner activation is implied.
 
 | ID | Evidence at the accepted baseline | Bounded follow-up and acceptance |
 | --- | --- | --- |
@@ -70,8 +80,7 @@ Remove only the unreferenced `reply_entries` / `reply_values` definitions and
 their otherwise-empty XML file. Extend the isolated migration-preservation
 fixture without changing production posting, stored values or migration schema.
 See the [reply-array audit](SETTINGS_RESOURCE_AUDIT.md#twenty-first-block-unused-reply-option-arrays-r02).
-Next review D02's declaration ownership and selected versions, keeping actual
-public/direct consumers. D03/R03 remain separate pending decisions, not approved
+The D02 ownership review is recorded above. D03/R03 remain separate pending decisions, not approved
 bulk removals or a prerequisite to rewrite every live library.
 
 | ID | Evidence and caution | Required proof before deletion |
@@ -150,8 +159,8 @@ separately in the nineteenth cleanup linked above.
 
 For each later implementation, record the exact candidate, consumers, changes,
 graph/resource diff, tests and remaining limits in the cleanup history. Require
-that commit's own complete six-job CI. After D01/R01/R02, review D02 and decide
-D03/R03 independently; the live-library rows are
+that commit's own complete six-job CI. After D01/D02/R01/R02, review D03 and decide
+R03 independently; the live-library rows are
 not an unlimited requirement to rewrite every component before security work.
 
 After the agreed bounded cleanup and explicit disposition of remaining

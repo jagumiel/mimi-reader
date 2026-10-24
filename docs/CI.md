@@ -21,6 +21,14 @@ additional CI-helper cases. See the [D01 evidence and validation limits](DEPENDE
 The change requires its own complete six-job remote acceptance; green run 38
 accepts the earlier `268fd5d`, not this implementation.
 
+The twenty-second cleanup extends the same boundary task to all six reviewed
+public declarations, the two internal factory declarations and exclusion of
+Jsoup from the standalone library. Four local negative probes check factory export, public
+Retrofit hiding, missing Rx factory and Jsoup leakage; CI-helper/test counts
+stay unchanged. Existing CI invokes the task through library unit tests; no
+workflow step, matrix assertion, retry or opt-in changes. The release graph
+remains 152 components, with 74 declarations. See the [D02 scope](DEPENDENCIES.md#twenty-second-cleanup-explicit-dependency-ownership-d02).
+
 ## Run 25: download cleanup ordering (21 October 2026)
 
 [Run 25](https://github.com/jagumiel/mimi-reader/actions/runs/39573428637)

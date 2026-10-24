@@ -139,7 +139,7 @@ def verifyApplicationVariants = tasks.register('verifyApplicationVariants') {
 tasks.named('check') { dependsOn verifyApplicationVariants }
 
 dependencies {
-    api project(':chanlib')
+    implementation project(':chanlib')
     // Lifecycle saved-state uses Serialization transitively; align runtime/test versions.
     implementation platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:$kotlinx_serialization_version")
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs_nio:$desugar_jdk_libs_version"
@@ -170,7 +170,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.14.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation "androidx.annotation:annotation:$annotation_version"
     implementation "androidx.preference:preference:$preference_version"
     implementation "androidx.preference:preference-ktx:$preference_version"
     // Material 1.14.0 already requires 2.2.1; own the gallery's actual baseline.

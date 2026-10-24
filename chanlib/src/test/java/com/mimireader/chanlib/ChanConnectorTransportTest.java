@@ -134,12 +134,14 @@ public class ChanConnectorTransportTest {
     }
 
     @Test
-    public void standaloneClasspathDoesNotAcquireApplicationFrameworkAdapters() {
+    public void standaloneClasspathDoesNotAcquireApplicationOnlyDependencies() {
         assertThrows(ClassNotFoundException.class,
                 () -> Class.forName("androidx.core.content.ContextCompat"));
         assertThrows(ClassNotFoundException.class,
                 () -> Class.forName("androidx.core.content.ContextKt"));
         assertThrows(ClassNotFoundException.class,
                 () -> Class.forName("io.reactivex.android.schedulers.AndroidSchedulers"));
+        assertThrows(ClassNotFoundException.class,
+                () -> Class.forName("org.jsoup.Jsoup"));
     }
 }

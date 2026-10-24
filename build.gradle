@@ -30,6 +30,7 @@ buildscript {
     ext.appcompat_version = '1.8.0'
     ext.fragment_version = '1.9.1'
     ext.preference_version = '1.2.1'
+    ext.annotation_version = '1.10.0'
 
     repositories {
         google()

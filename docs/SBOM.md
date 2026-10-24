@@ -130,6 +130,17 @@ graph changes from 23 to 20 entries and now selects OkHttp 4.12.0 instead of
 unchanged. See [the standalone library boundary and tests](DEPENDENCIES.md#nineteenth-cleanup-standalone-chanlib-dependency-boundary).
 This remains inventory validation, not a vulnerability scan.
 
+The twenty-second cleanup removes unused Jsoup only from `chanlib`, moves its
+internal Retrofit factories to implementation scope, uses implementation scope
+for the application's local module and aligns its Annotation request to the
+already-selected 1.10.0. Totals are now **152 components / 74 declarations**.
+Every release component record/hash and every edge except `chanlib`'s Jsoup edge
+is identical. The standalone library unit graph loses Jsoup (20 -> 19 entries);
+all other inventoried selected configurations remain unchanged. The scope and
+version-request corrections are still recorded in direct declarations. See
+[D02 ownership and tests](DEPENDENCIES.md#twenty-second-cleanup-explicit-dependency-ownership-d02).
+Do not describe this as removing Jsoup from the app or completing CVE scanning.
+
 After a deliberate dependency or vendored runtime update:
 
 ```sh

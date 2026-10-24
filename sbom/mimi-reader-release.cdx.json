@@ -5961,8 +5961,7 @@
                 "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/retrofit@2.11.0?type=jar",
                 "pkg:maven/io.reactivex.rxjava2/rxjava@2.2.21?type=jar",
-                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jsoup/jsoup@1.23.2?type=jar"
+                "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar"
             ],
             "ref": "pkg:generic/mimi-reader/chanlib@1.0"
         },
