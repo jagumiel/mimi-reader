@@ -14,6 +14,11 @@ import android_webview as helper
 
 
 class WebViewPreparationTest(unittest.TestCase):
+    def test_ci_cleanup_targets_the_fork_not_the_personal_legacy_beta(self):
+        self.assertEqual("io.github.jagumiel.mimireader.beta", helper.TEST_APP)
+        self.assertNotEqual("com.emogoth.android.phone.mimi.beta", helper.TEST_APP)
+        self.assertTrue(helper.TEST_CLASS.startswith("com.emogoth.android.phone.mimi."))
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)

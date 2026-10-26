@@ -27,6 +27,7 @@ Version code: `231`. Release preparation only: no public release date, tag, dist
 - System-bar insets, light/dark contrast, rotation and state restoration are handled across tabbed and legacy layouts, settings, filters and the color editor.
 - There is one free application: paid/Amazon variants, residual interleaved-gallery ad insertion, donation entries and obsolete store-rating actions have been removed. This does not attribute the earlier removal of advertising services to this fork.
 - More Info now links to this independent repository and verified credits. The original website is no longer operational and Mimi is no longer available on Google Play.
+- The fork now has its own installation identity, io.github.jagumiel.mimireader (debug: io.github.jagumiel.mimireader.beta), so it can coexist with original Mimi and earlier internally signed builds. The code namespace is unchanged.
 
 ### Fixed
 
@@ -68,6 +69,7 @@ Version code: `231`. Release preparation only: no public release date, tag, dist
 - CAPTCHA acceptance depends on the site's providers, WebView, device and network. A real text reply was verified on Android 12; real attachment/new-thread publication and the remaining manual keyboard/browser-return checks are not claimed as validated. An external browser does not automatically transfer its session into the native form.
 - Vulnerability scans report known findings at scan time, not proof of safety. Native/WASM provenance, generic/GitHub components and build tooling have explicit coverage limits.
 - Preserve existing app data and saved media. Updates require a compatible signing certificate; the internal public test key is not a distribution identity. No uninstall/data-clear workaround is part of this release preparation.
+- The first public fork installs separately, not over the original app or earlier internal packages. Their private bookmarks, history, settings and sessions are not automatically imported; keep those installations and saved media. Later fork updates must retain a compatible fork identity and signing certificate.
 - Version upgrades retain inherited maintenance that clears media cache and normal/archived cached post tables. This is different from manual cache clearing: do not expect every offline post to survive an update. The user's saved Pictures/Mimi media folder is not a cache-cleaning target.
 - Expanded watched-thread and quote notifications are post-8.0 proposals, not new features delivered by this release. The README explains release APK installation, safe updates and building from source.
 

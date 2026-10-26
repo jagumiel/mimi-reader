@@ -121,6 +121,15 @@ class ReleaseNotesTest(unittest.TestCase):
             self.assertIn(text, history)
         self.assertNotIn('href="https://mimireader.com"', self.html)
 
+    def test_fork_install_identity_is_separate_without_renaming_code_namespace(self):
+        build = (ROOT / "mimi-app/build.gradle").read_text(encoding="utf-8")
+        manifest = (ROOT / "mimi-app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
+        self.assertIn('applicationId "io.github.jagumiel.mimireader"', build)
+        self.assertIn("namespace 'com.emogoth.android.phone.mimi'", build)
+        self.assertIn("debug: 'io.github.jagumiel.mimireader.beta'", build)
+        self.assertIn("release: 'io.github.jagumiel.mimireader'", build)
+        self.assertIn('android:authorities="${applicationId}.fileprovider"', manifest)
+
     def test_markdown_requires_one_nonempty_version_entry(self):
         valid = "## [8.0] - Unreleased\n- Example\n"
         for document in ("", "## [8.0] - Unreleased\n", valid + valid):

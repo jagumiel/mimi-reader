@@ -25,7 +25,7 @@ PACKAGE = "com.android.webview"
 TEST_CLASS = "com.emogoth.android.phone.mimi.view.gallery.GalleryPlaybackTest"
 FLAG_FILE = "/data/local/tmp/webview-command-line"
 PINNED_FLAGS = "_ --disable-features=MojoUseBinder --webview-verbose-logging\n"
-TEST_APP = "com.emogoth.android.phone.mimi.beta"
+TEST_APP = "io.github.jagumiel.mimireader.beta"
 
 
 def verify(apk):

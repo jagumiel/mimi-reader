@@ -50,7 +50,9 @@ If Android or Play Protect blocks the file, read the warning and verify the down
 
 ### Already have Mimi installed?
 
-Download the new release APK and open it as above. Android can update an existing app only with a compatible package identity and signing certificate, and an acceptable version code.
+This fork uses `io.github.jagumiel.mimireader`, a different installation identity from original Mimi and the earlier internal test releases. Its first public APK installs as a separate app alongside them, not as an update to their private databases. Bookmarks, history, settings and sessions are not automatically imported. Keep the original installation and your saved media.
+
+For subsequent releases of this fork, download the new APK and open it as above. Android can update it only with the compatible fork package identity/signing certificate and an acceptable version code.
 
 **Do not uninstall the old app, clear its storage, or delete your `Mimi` / `Pictures/Mimi` media folder to fix an installation error.** Back up important data and saved media first. An original upstream installation or an internal test build may use a different certificate from this fork's eventual public release; a direct update is not guaranteed. Keep the old installation and consult the release notes rather than forcing replacement. There is no automatic cross-signature data migration promised here.
 
@@ -95,7 +97,7 @@ On Linux/macOS:
 ./gradlew :mimi-app:assembleDebug
 ```
 
-The debug APK is written to `mimi-app/build/outputs/apk/debug/mimi-app-debug.apk`. It is automatically test-signed and uses `com.emogoth.android.phone.mimi.beta`; it is not a public release. Release uses `com.emogoth.android.phone.mimi`. The tracked legacy test key is public and must not become the distribution identity.
+The debug APK is written to `mimi-app/build/outputs/apk/debug/mimi-app-debug.apk`. It is automatically test-signed and uses `io.github.jagumiel.mimireader.beta`; it is not a public release. Release uses `io.github.jagumiel.mimireader`. The Java/Kotlin namespace remains unchanged; it is not the installation identity. The tracked legacy test key is public and must not become the distribution identity.
 
 For local verification, run the following with `./gradlew` (or `.\gradlew.bat` on Windows):
 
@@ -110,7 +112,7 @@ The helper tests need Python 3; on Windows its command may be `python`. Device/e
 
 - [Changelog](CHANGELOG.md): modernization since the inherited 7.0.1 baseline.
 - [Roadmap](roadmap-2026.md): current status and future work (maintained in Spanish).
-- [Release guide](docs/RELEASING.md) and [physical acceptance](docs/RELEASE_ACCEPTANCE.md).
+- [Release guide](docs/RELEASING.md), [public signing identity](docs/SIGNING_IDENTITY.md) and [physical acceptance](docs/RELEASE_ACCEPTANCE.md).
 - [SBOM](docs/SBOM.md), [dependency audit](docs/DEPENDENCIES.md) and [vulnerability-scanning policy](docs/VULNERABILITY_SCANNING.md). A scan without findings is not a security certification.
 - [Posting/CAPTCHA boundaries](docs/POSTING.md) and [bundled privacy policy](mimi-app/src/main/res/raw/privacypolicy.html): external site/provider connections still apply.
 - [Project history and credits](docs/PROJECT.md): authorship, fork lineage and independent-project status. Use the repository for project information; do not assume an old website, email address or unavailable issue tracker is a current support channel.

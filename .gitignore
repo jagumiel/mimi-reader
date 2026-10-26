@@ -20,6 +20,8 @@ target/
 **/BuildConfig.java
 keystore.properties
 release.keystore
+*.p12
+*.jks
 YouTubeAndroidPlayerApi.jar
 *.apk
 output.json

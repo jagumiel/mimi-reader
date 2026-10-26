@@ -1,5 +1,22 @@
 # Physical release acceptance for the planned 8.0
 
+## Current 8.0 candidate (27 October)
+
+The owner has now approved the independent fork install ID and generated a new
+private signing key outside Git. The signed **8.0 / 231** candidate, certificate,
+APK checksum and checks are in [SIGNING_IDENTITY.md](SIGNING_IDENTITY.md). It
+installs separately as `io.github.jagumiel.mimireader`; no legacy private data is
+imported. Its exact APK passes a fresh-install/cold-start smoke check on Android
+12 and shows the board list below the system status bar. The remaining manual
+flows, Android 10 acceptance and compatible fork-update checks are still pending.
+Protected key backups are an owner action, not yet confirmed.
+
+Everything below records the **older internal 7.0.1 candidate** and its checklist;
+do not transfer that artifact's checksums, signing key or results to the 8.0 APK.
+Statements about no configured publication key describe that historical stage.
+
+## Historical internal candidate and subsequent debug checks
+
 Prepared on **25 October 2026**, using application source commit
 `c3824a78f1aa712058c90f5b4d9b8754b2036aa5`. This is an internal validation package,
 not the public 8.0 release. That archived build's identity is **7.0.1 /

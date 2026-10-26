@@ -33,7 +33,9 @@ android {
         versionCode appVersionCode
         versionName appVersionName
 
-        applicationId "com.emogoth.android.phone.mimi"
+        // Independent fork: coexist with the original app and its signing key.
+        // Keep the Java/Kotlin namespace unchanged; it is not an install identity.
+        applicationId "io.github.jagumiel.mimireader"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -117,18 +119,18 @@ android {
     }
 }
 
-// Product flavors are gone, but existing installations must keep their identity.
+// Keep fork variants separate from legacy apps and their public test key.
 def applicationVariantIds = objects.mapProperty(String, String)
 androidComponents.onVariants(androidComponents.selector().all()) { variant ->
     applicationVariantIds.put(variant.name, variant.applicationId)
 }
 def verifyApplicationVariants = tasks.register('verifyApplicationVariants') {
     group = 'verification'
-    description = 'Verify the single-app debug/release variants retain their existing application IDs.'
+    description = 'Verify the independent fork debug/release installation identities.'
     inputs.property('applicationIds', applicationVariantIds)
     doLast {
-        def expected = [debug: 'com.emogoth.android.phone.mimi.beta',
-                        release: 'com.emogoth.android.phone.mimi']
+        def expected = [debug: 'io.github.jagumiel.mimireader.beta',
+                        release: 'io.github.jagumiel.mimireader']
         def actual = inputs.properties.applicationIds
         if (actual != expected) {
             throw new GradleException("Unexpected application variants/IDs: $actual; expected $expected")
