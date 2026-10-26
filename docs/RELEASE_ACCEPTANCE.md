@@ -24,10 +24,27 @@ fallback and two separate posting-protocol checks pass.
 This is **partial isolated-debug evidence**, not an accepted full suite or the
 minified release in the checklist below. The 26 October follow-up corrects CAPTCHA
 sizing/idle and adds small-window, keyboard and landscape regressions; see the
-device report for separate before/after results. Android 12 must retest these
-changes before completing release acceptance. The archived Android 12 results below
+device report for separate before/after results. The subsequent Android 12 debug
+regression passes as recorded below, but does not complete signed-minified release
+acceptance. The archived Android 12 results farther below
 remain historical; initial statements about Android 10 being unavailable refer
 to that earlier preparation, not the resumed device session.
+
+## Android 12 regression after the correction
+
+On 26 October, source **9898983** runs in a separate `.validation31` debug copy
+on Edge 20 / Android 12, with original WebView 155 unchanged. The full run has
+**93 methods: 91 passed, two opt-in skips, zero failures/errors**, in about
+92 seconds. All eight non-live posting cases, real-IME/landscape and compact
+window checks, six native cases and local Ruffle playback pass. See
+[ANDROID12_VALIDATION.md](ANDROID12_VALIDATION.md) for artifact hashes and scope.
+
+The personal beta's 12 persistent files and all 607 files in `Pictures/Mimi`
+retain their SHA-256 values; both existing apps retain versions/timestamps and
+stay-awake returns to 0. No public post is made. This confirms the debug
+regression only: the signed/minified checklist cells below stay pending, remote
+CI needs independent confirmation, and public signing/update policy still needs
+an owner decision before producing a distribution candidate.
 
 ## Automated baseline accepted for this source
 

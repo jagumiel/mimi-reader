@@ -534,14 +534,26 @@ fallback reachability, preserved draft and recreation. UI changes are tested
 with synthetic input/challenges and intercepted requests, not site solves/posts.
 Local build/lint/unit/SBOM and release APK/AAB checks pass; see the
 [detailed report](ANDROID10_VALIDATION.md) for counts, archived failures and data
-preservation boundaries. A repeated physical Android 12 regression, the new
-commit's remote matrix and exact signed-minified release acceptance remain
-pending. The personal beta is absent in this new device session, so no new beta
+preservation boundaries. The later physical Android 12 regression is recorded
+below; the new commit's remote matrix and exact signed-minified release acceptance
+remain pending. The personal beta is absent in this Android 10 session, so no new beta
 hash comparison is claimed; the previous comparison remains historical evidence.
 The final-source confirmation repeats all **93 methods** in about 182 seconds
 with exactly the same **90 passes / one unsupported-WebView failure / two skips**.
 It also explicitly waits for the compact window's real layout before assertions,
 avoiding a device-speed-dependent assumption about asynchronous resizing.
+
+The subsequent **26 October Edge 20 / Android 12** run uses source **9898983** in
+an isolated `.validation31` copy, with unchanged WebView 155. Its **93 methods**
+finish in about 92 seconds: **91 passed, two opt-in skips, zero failures/errors**.
+Real-IME/landscape and compact-dialog tests, all eight non-live posting cases,
+six native cases and both local SWF playback checks pass. Both optional
+`postingKeyboard=true` and `legacyFlashWebView=true` are enabled. The two remaining
+skips are live CAPTCHA preview and real-board attachment smoke, not layout tests.
+All 12 persistent beta files and 607 protected media files keep their hashes;
+original apps and provider remain unchanged and stay-awake is restored to 0.
+See [Android 12 evidence](ANDROID12_VALIDATION.md). This does not replace the
+Android 10 unsupported-provider result, remote CI or signed-minified acceptance.
 
 The commands below target the normal beta and can mutate its data through normal
 startup/test behavior. On a personal installation, use an explicitly authorized

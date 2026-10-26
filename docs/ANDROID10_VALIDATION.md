@@ -229,9 +229,13 @@ works. Reports from PowerShell are UTF-16; that host encoding is not an app erro
 
 ## Next acceptance step
 
-Repeat the corrected CAPTCHA/posting regressions on the Edge 20 / Android 12,
-then continue acceptance of the exact signed minified 8.0 APK. The 25 October
-block was diagnostic-only; the 26 October follow-up includes production fixes.
+The corrected regressions subsequently pass on the Edge 20 / Android 12:
+[93 methods, 91 passes and two opt-in skips](ANDROID12_VALIDATION.md), including
+actual fixture SWF playback on its unchanged modern WebView. This does not turn
+the Android 10 WebView-74 playback failure into a pass. Next confirm remote CI,
+agree public signing/update policy and continue acceptance of the exact signed
+minified 8.0 APK. The 25 October block was diagnostic-only; the 26 October
+follow-up includes production fixes.
 WebView updating requires a separate owner decision through a supported channel;
 actual SWF rendering still needs that acceptance. Human keyboard/browser-return,
 real CAPTCHA interaction, SAF destination choice and certificate-compatible

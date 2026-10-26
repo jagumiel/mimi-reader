@@ -204,3 +204,10 @@ regression always runs; the IME case is opt-in because hardware-keyboard emulato
 configurations can intentionally suppress software keyboards. No provider or
 owner keyboard setting is replaced, no real CAPTCHA is solved and no public post
 is sent. See [device evidence and remaining acceptance](ANDROID10_VALIDATION.md).
+
+The subsequent [Edge 20 / Android 12 regression](ANDROID12_VALIDATION.md) also
+passes all eight non-live posting cases, including the real-IME/landscape option,
+within a full 93-method run (91 passes, two live opt-in skips, zero failures).
+The personal beta remains untouched with 12 persistent file hashes unchanged.
+Real provider/browser-return and exact signed-minified release acceptance remain
+separate; no additional public reply is sent.
