@@ -9,7 +9,7 @@ A free, open-source Android app for browsing 4chan: find a board, open threads i
 
 [Download / Releases](https://github.com/jagumiel/mimi-reader/releases) · [Installation guide](#download-and-install) · [What's new in 8.0](CHANGELOG.md) · [Build from source](#build-from-source)
 
-**8.0 is being prepared and is not published yet.** Once released, its signed APK will be available under **Assets** on the Releases page above. If there is no installable APK there yet, please wait for the release; a source ZIP or an unsigned CI artifact is not a substitute.
+**Mimi Reader 8.0 is available.** [Download the signed APK](https://github.com/jagumiel/mimi-reader/releases/download/v8.0/mimi-reader-8.0.apk), read the [release notes](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0), then follow the installation guide below. Checksums, the public signing certificate and the matching SBOM are included under **Assets**. A source ZIP, an App Bundle or an unsigned CI artifact is not an installable APK.
 
 This is an independent continuation of Mimi Reader, with one free edition and no interleaved gallery ads. Mimi is **no longer available on Google Play**, and the original project website is no longer operational. Use this repository for this fork's downloads and documentation; it is not an official 4chan app or an endorsed upstream release.
 
@@ -54,7 +54,7 @@ This fork uses `io.github.jagumiel.mimireader`, a different installation identit
 
 For subsequent releases of this fork, download the new APK and open it as above. Android can update it only with the compatible fork package identity/signing certificate and an acceptable version code.
 
-**Do not uninstall the old app, clear its storage, or delete your `Mimi` / `Pictures/Mimi` media folder to fix an installation error.** Back up important data and saved media first. An original upstream installation or an internal test build may use a different certificate from this fork's eventual public release; a direct update is not guaranteed. Keep the old installation and consult the release notes rather than forcing replacement. There is no automatic cross-signature data migration promised here.
+**Do not uninstall the old app, clear its storage, or delete your `Mimi` / `Pictures/Mimi` media folder to fix an installation error.** Back up important data and saved media first. An original upstream installation or an internal test build may use a different certificate from this fork's public release; a direct update is not guaranteed. Keep the old installation and consult the release notes rather than forcing replacement. There is no automatic cross-signature data migration promised here.
 
 The developer build uses a separate `.beta` package and does not automatically share the release app's bookmarks or preferences. Version upgrades may also clear cached posts/media as maintenance; do not rely on the cache as a permanent offline archive.
 

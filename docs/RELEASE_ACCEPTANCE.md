@@ -2,6 +2,14 @@
 
 ## Current 8.0 candidate (27 October)
 
+The owner authorizes [publication as v8.0](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0)
+on 27 October 2026 (Europe/Madrid), with manual coverage limitations disclosed in
+the release notes. The final signed APK is built from `4be402b`, SHA-256
+`ae426ddcf07efba33f5c018a6eb5abff0c8b14fb0e4dd0da2574c05f229abfd5`.
+Android CI 51 passes all six jobs and SBOM security 8 passes both. Publication
+does **not** fill the remaining physical/manual checklist cells. The old internal
+checklist and first signing candidate below must not be confused with this APK.
+
 The owner has now approved the independent fork install ID and generated a new
 private signing key outside Git. The signed **8.0 / 231** candidate, certificate,
 APK checksum and checks are in [SIGNING_IDENTITY.md](SIGNING_IDENTITY.md). It

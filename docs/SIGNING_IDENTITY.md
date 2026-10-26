@@ -1,8 +1,35 @@
 # Fork signing identity and first candidate
 
-Prepared on 26–27 October 2026. **Not a publication, tag or completed release
-acceptance.** This record contains public metadata only, never a private key or
-password.
+Initial signing prepared on 26–27 October 2026. **8.0 was published on 27 October
+2026 (Europe/Madrid)** with the owner's authorization. Publication is not a claim
+that every manual acceptance case passed. This record contains public metadata
+only, never a private key or password.
+
+## Published 8.0 artifact
+
+- [Release v8.0](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0), built
+  from `4be402b076d7f39060fc4243c23bf14a26f307c0` (also embedded in the APK).
+- [Signed APK](https://github.com/jagumiel/mimi-reader/releases/download/v8.0/mimi-reader-8.0.apk),
+  41,540,484 bytes; SHA-256:
+  `ae426ddcf07efba33f5c018a6eb5abff0c8b14fb0e4dd0da2574c05f229abfd5`.
+- Distribution certificate remains the approved RSA-4096 identity below. The
+  public key certificate, matching 150-component SBOM, checksum manifest and
+  frozen English changelog are attached; no private key/password is uploaded.
+- [Android CI 51](https://github.com/jagumiel/mimi-reader/actions/runs/40417876635)
+  passes all six jobs, including API 29/31/34/36 and actual 16 KB native tests.
+  [SBOM security 8](https://github.com/jagumiel/mimi-reader/actions/runs/40417876616)
+  passes both jobs and SARIF, with 148/148 Maven packages recognized and no known
+  findings. Coverage limitations remain, not a security certification.
+- This final candidate is rebuilt after committing the source, then signed and
+  installed over the first fork candidate on Android 12 with the compatible key.
+  Cold start and retained sorting pass; installed APK bytes match the final hash.
+  This is same-version candidate replacement, not a future-version migration.
+- All 12 persistent legacy-beta files and 607 saved media files remain unchanged;
+  original installations/timestamps are preserved and stay-awake restored to 0.
+
+Local archive: `build/release-candidate/8.0-4be402b/`, including exact mapping,
+seeds and verification reports. Only its `public/` assets were uploaded. The
+earlier candidate `79d93d…` below is historical and is **not** the published APK.
 
 ## Installation and update policy
 
@@ -47,7 +74,7 @@ The local `E:` drive alone is not a backup. Do not upload the `.p12` or password
 to the repository, GitHub Actions or a release. Never regenerate/overwrite the
 key to fix an installation problem. See the [interactive signing guide](RELEASING.md#signed-artifacts).
 
-## Frozen first candidate
+## Historical frozen first candidate
 
 Local ignored archive: `build/release-candidate/8.0-signing/`.
 
@@ -109,7 +136,7 @@ timestamps remain unchanged. No old app is uninstalled, cleared or overwritten;
 no public media folder is renamed or deleted. Temporary stay-awake is restored
 to its original **0**. The owner unlocks the secure device manually.
 
-## Remaining release gates
+## Remaining validation and custody tasks
 
 - Confirm private-key/password backups with the owner.
 - Complete physical/manual acceptance of the exact signed APK on Android 10/12,
@@ -117,8 +144,10 @@ to its original **0**. The owner unlocks the secure device manually.
   Android 10 WebView 74 Ruffle failure is not erased by Android 12 success.
 - Validate compatible fork-to-fork updates without claiming migration from
   original Mimi or another certificate.
-- Require fresh Android and security workflows for the eventual release commit.
-- Review final notes/assets/checksums with the owner before assigning the release
-  date, tag or publishing. The README must keep its preparation notice until then.
+- Require fresh Android and security workflows for future release commits; the
+  published 8.0 source is accepted by runs 51 and 8 above.
+- Retain the disclosed manual limits in future release notes. The owner authorized
+  publication despite incomplete manual coverage and will arrange protected key
+  backups; those backups have not been confirmed and are not silently marked done.
 
 No upload, release, tag or push is performed by the local signing helpers.
