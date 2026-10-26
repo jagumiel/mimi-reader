@@ -38,6 +38,7 @@ Version code: `231`. Release preparation only: no public release date, tag, dist
 - Flash-board URL construction: SWF files use their encoded original filename, not the numeric media timestamp. HTTP errors and invalid SWF signatures no longer reach the player as fake movies; missing files show an explicit error and retry action.
 - SWF control layout, load/error reporting and pause/resume behavior across page changes and activity backgrounding.
 - Clarified CAPTCHA completion versus explicit sending: Done completes verification, Get Captcha requests another challenge, and the native Send message action uses the completed verification. Only a confirmed server receipt counts as success.
+- CAPTCHA sizing on small screens: the challenge body scrolls independently, all native actions remain accessible, and the posting sheet no longer enters an Android 10 window-inset/layout loop when opening verification.
 - Posting failures and CAPTCHA expiry preserve the draft and attachment; rotation retains one in-flight attempt, and uncertain delivery after process death does not trigger an automatic duplicate post.
 - PDF viewport positioning, media cleanup races, variable-height thread fast-scrolling and image/cache lifecycle regressions found during modernization.
 
@@ -61,7 +62,7 @@ Version code: `231`. Release preparation only: no public release date, tag, dist
 
 - Minimum Android remains 6.0 (API 23); target/compile SDK is 36. ARMv7, ARM64, x86 and x86_64 are packaged; obsolete MIPS/MIPS64 native binaries are no longer included. The emulator matrix and static checks do not replace physical-device acceptance.
 - Android 12 has physical regression and historical authorized text-reply evidence. The internal 7.0.1/230 minified test APK also passed fresh installation and cold start, preserving all 607 files in the owner's existing Pictures/Mimi folder. This is not acceptance of the new 8.0/231 artifacts or an in-place update.
-- Final physical Android 10/32-bit validation is deferred by the owner, not marked passed. Visual/manual release checks and certificate-compatible update/migration acceptance remain pending; a real pre-v22 database backup is still unavailable.
+- Physical Android 10/32-bit debug validation has resumed and the discovered CAPTCHA sizing/UI-idle regressions are corrected, including local keyboard and landscape checks. Original WebView 74 cannot run bundled Ruffle; visual/manual minified-release checks and certificate-compatible update/migration acceptance remain pending, and a real pre-v22 database backup is still unavailable.
 - SWF support is partial: missing/purged CDN files can return HTTP 404 even while listed, and Ruffle may not support every movie, ActionScript feature or interaction. Live Android 10 and broader ActionScript 3/touch coverage remain pending.
 - The PDF viewer has no gallery password-entry flow for encrypted documents; do not assume every PDF is supported.
 - CAPTCHA acceptance depends on the site's providers, WebView, device and network. A real text reply was verified on Android 12; real attachment/new-thread publication and the remaining manual keyboard/browser-return checks are not claimed as validated. An external browser does not automatically transfer its session into the native form.

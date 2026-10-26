@@ -31,7 +31,7 @@ You only need your Android phone and the release APK. Normal APK installation do
 
 ### Requirements
 
-- **Android 6.0 or later** (API 23 minimum). Android 10 and 12 remain within the intended compatibility range; final physical Android 10/32-bit acceptance for 8.0 is deferred, not marked passed.
+- **Android 6.0 or later** (API 23 minimum). Android 10 and 12 remain within the intended compatibility range. Physical Android 10/32-bit debug checks cover the corrected CAPTCHA layout, keyboard and rotation; final 8.0 minified-release acceptance is not complete. See the [device report](docs/ANDROID10_VALIDATION.md).
 - An internet connection to load boards, media and CAPTCHA challenges. Keep Android System WebView or your device's active WebView provider updated through its supported update channel.
 
 ### Install the release APK

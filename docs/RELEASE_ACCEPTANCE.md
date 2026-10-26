@@ -9,6 +9,26 @@ and marked **Unreleased**. None of this archived artifact's hashes or physical
 results transfer to the new build. Public signing/publication remain separate
 gates. Gradle remains deferred to application version 8.0.1.
 
+## Android 10 validation resumed
+
+The owner reconnects a Moto G 2014 / Android 10 / ARMv7 on 25 October and
+authorizes the beta update followed by a separately isolated test copy. See
+[ANDROID10_VALIDATION.md](ANDROID10_VALIDATION.md): the six personal beta
+database/preferences files remain byte-identical and original Mimi 6.1.2 stays
+installed. Of 84 cases outside posting, 81 pass, one Flash-render case fails
+because WebView 74 is unsupported, and two are opt-in skips; all six native
+PDF/GIF cases pass. The unmodified full run was interrupted by a posting-dialog
+layout failure and a subsequent UI-idle hang. The old-provider explanatory
+fallback and two separate posting-protocol checks pass.
+
+This is **partial isolated-debug evidence**, not an accepted full suite or the
+minified release in the checklist below. The 26 October follow-up corrects CAPTCHA
+sizing/idle and adds small-window, keyboard and landscape regressions; see the
+device report for separate before/after results. Android 12 must retest these
+changes before completing release acceptance. The archived Android 12 results below
+remain historical; initial statements about Android 10 being unavailable refer
+to that earlier preparation, not the resumed device session.
+
 ## Automated baseline accepted for this source
 
 - [Android CI 46](https://github.com/jagumiel/mimi-reader/actions/runs/40137617724):

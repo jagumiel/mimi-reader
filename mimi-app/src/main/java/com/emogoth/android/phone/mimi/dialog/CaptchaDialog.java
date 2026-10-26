@@ -20,9 +20,11 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -42,6 +44,9 @@ public class CaptchaDialog extends DialogFragment {
     private boolean confirming;
     private int generation;
     private String lastStatus;
+    private View actionBar;
+    private final View.OnLayoutChangeListener actionLayoutListener =
+            (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> reserveActionSpace(view);
     public static CaptchaDialog newInstance(String board, long thread) {
         CaptchaDialog dialog = new CaptchaDialog(); Bundle args = new Bundle();
         args.putString("board", PostingProtocol.board(board)); args.putLong("thread", Math.max(0, thread));
@@ -49,28 +54,50 @@ public class CaptchaDialog extends DialogFragment {
     }
     @NonNull @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
         LinearLayout content = new LinearLayout(requireContext()); content.setOrientation(LinearLayout.VERTICAL);
-        // AlertDialog measures its custom panel with wrap-content. A zero-height
-        // weighted WebView otherwise remains invisible even in a tall window.
-        content.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * 0.55));
         int padding = (int) (12 * getResources().getDisplayMetrics().density);
         content.setPadding(padding, padding, padding, padding);
         status = new TextView(requireContext()); status.setText(R.string.captcha_instructions); content.addView(status);
         webView = createCaptchaWebView(); webView.setId(R.id.captch_webview);
-        content.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
-        Button browser = new Button(requireContext()); browser.setText(R.string.captcha_open_browser);
+        // A finite height is important: a zero-height weighted WebView collapses
+        // in AlertDialog's wrap-content panel, while a minimum on the entire
+        // panel pushes the action buttons out of small/IME-resized windows.
+        content.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) (240 * getResources().getDisplayMetrics().density)));
+        Button browser = new Button(requireContext()); browser.setId(R.id.captcha_open_browser);
+        browser.setText(R.string.captcha_open_browser);
         browser.setOnClickListener(view -> {
             try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PostingProtocol.browserUrl(board(), thread())))); }
             catch (android.content.ActivityNotFoundException error) { status.setText(R.string.error_opening_url); }
         }); content.addView(browser);
+        ScrollView scroll = new ScrollView(requireContext());
+        scroll.setId(R.id.captcha_content_scroll);
+        scroll.setFillViewport(true);
+        scroll.addView(content, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
         webView.loadCaptchaPage(board(), thread());
-        return new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.captcha_title).setView(content)
+        return new MaterialAlertDialogBuilder(requireContext())
+                // Material's default 80 dp top/bottom insets on tall displays
+                // persist even when an IME makes the actual window short.
+                .setBackgroundInsetTop(padding).setBackgroundInsetBottom(padding)
+                .setTitle(R.string.captcha_title).setView(scroll)
                 .setPositiveButton(R.string.captcha_send_message, null).setNeutralButton(R.string.captcha_reload, null)
                 .setNegativeButton(android.R.string.cancel, null).create();
     }
     @Override public void onStart() {
         super.onStart(); AlertDialog dialog = (AlertDialog) requireDialog();
-        dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, (int) (getResources().getDisplayMetrics().heightPixels * 0.85));
+        dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                | android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        // The window manager bounds this to the available screen, including IME
+        // resize. Only the custom body scrolls; the native actions stay visible.
+        dialog.getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        // Material wraps its stacking ButtonBarLayout in a ScrollView. Its
+        // default minimum reserves only one action plus a peek at the next.
+        // Reserve the entire measured bar instead: scrolling belongs to the
+        // challenge body, not to the Send / Cancel / Reload actions.
+        actionBar = (View) dialog.getButton(AlertDialog.BUTTON_POSITIVE).getParent();
+        actionBar.addOnLayoutChangeListener(actionLayoutListener);
+        reserveActionSpace(actionBar);
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
             generation++;
             lastStatus = null;
@@ -111,6 +138,18 @@ public class CaptchaDialog extends DialogFragment {
         statusHandler.post(statusCheck);
     }
 
+    private void reserveActionSpace(View actions) {
+        if (actions.getMeasuredHeight() == 0 || !(actions.getParent() instanceof ScrollView)) return;
+        ScrollView actionPanel = (ScrollView) actions.getParent();
+        int requiredHeight = actions.getMeasuredHeight() + actionPanel.getPaddingTop() + actionPanel.getPaddingBottom();
+        if (actionPanel.getMinimumHeight() != requiredHeight) {
+            actionPanel.setMinimumHeight(requiredHeight);
+            // A minimum changed during layout needs another measure outside
+            // that pass; post only when it changes, never on every frame.
+            actionPanel.post(actionPanel::requestLayout);
+        }
+    }
+
     private void checkStatus() {
         if (!statusActive || confirming || webView == null || !isAdded()) return;
         final int checkedGeneration = generation;
@@ -133,6 +172,8 @@ public class CaptchaDialog extends DialogFragment {
         statusActive = false;
         generation++;
         statusHandler.removeCallbacks(statusCheck);
+        if (actionBar != null) actionBar.removeOnLayoutChangeListener(actionLayoutListener);
+        actionBar = null;
         super.onStop();
     }
     private String board() { return requireArguments().getString("board"); }

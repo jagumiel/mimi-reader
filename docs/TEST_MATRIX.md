@@ -506,6 +506,47 @@ See [baseline failures, fixes and remaining remote/physical gates](COMMONS_LANG.
 
 ## Local device validation
 
+On 25 October, physical Android 10/ARMv7 validation resumes on a Moto G 2014 with
+the original WebView 74. [Detailed evidence](ANDROID10_VALIDATION.md) records the
+owner-approved beta update with six persistent files unchanged, followed by an
+isolated `.validation29` copy. An interrupted full run exposes CAPTCHA layout and
+UI-idle problems; the completed 84-method non-posting run has 81 passes, one
+unsupported-WebView Flash failure and two opt-in skips. All six native PDF/GIF
+cases pass. A separate original-provider fallback check passes; two detached
+posting-protocol cases pass with the live CAPTCHA case skipped. This is **not**
+a green full suite or minified-release/update acceptance. Device WebView/settings
+and personal data are preserved; stay-awake returns to 0.
+
+On **26 October**, the corrective CAPTCHA block retains the existing 160 dp
+and nested intercepted-submission checks, fixes the bottom-sheet host and
+scrollable dialog/action sizing, and adds short-window/recreation and optional
+real-IME/landscape regressions. The completed **93-method** physical run has
+**90 passes, one WebView-74 Ruffle playback failure, two opt-in skips**, in about
+190 seconds. It excludes no class and explicitly enables `postingKeyboard=true`
+and `legacyFlashWebView=true`: all eight non-live posting cases and all six native
+cases pass. The unsupported-provider explanation passes, but is not reported as
+successful Flash playback. The full suite is therefore **not green**.
+
+The real-IME case is separately opt-in because hardware-keyboard emulator
+configurations can suppress software IMEs. The deterministic short-window case
+always runs, including native-control clipping/visible-window assertions, browser
+fallback reachability, preserved draft and recreation. UI changes are tested
+with synthetic input/challenges and intercepted requests, not site solves/posts.
+Local build/lint/unit/SBOM and release APK/AAB checks pass; see the
+[detailed report](ANDROID10_VALIDATION.md) for counts, archived failures and data
+preservation boundaries. A repeated physical Android 12 regression, the new
+commit's remote matrix and exact signed-minified release acceptance remain
+pending. The personal beta is absent in this new device session, so no new beta
+hash comparison is claimed; the previous comparison remains historical evidence.
+The final-source confirmation repeats all **93 methods** in about 182 seconds
+with exactly the same **90 passes / one unsupported-WebView failure / two skips**.
+It also explicitly waits for the compact window's real layout before assertions,
+avoiding a device-speed-dependent assumption about asynchronous resizing.
+
+The commands below target the normal beta and can mutate its data through normal
+startup/test behavior. On a personal installation, use an explicitly authorized
+disposable copy/profile instead; do not assume test bodies are all read-only.
+
 Connect exactly one authorized device or emulator and run:
 
 ```powershell

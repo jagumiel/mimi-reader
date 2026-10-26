@@ -183,3 +183,24 @@ failures/errors. This includes all six offline posting-flow tests, the readiness
 button behavior and the corrected multipart assertions. The same run passed all
 94 app unit tests. The stay-awake setting was restored to its original value, 0.
 No more public replies were sent during this regression run.
+
+### Android 10 compact dialog and nested-window regression
+
+On 26 October, physical Moto G 2014 / Android 10 tests correct the small-screen
+CAPTCHA layout and the nested posting form's window-inset/UI-idle loop. The form
+now retains Material's full-size bottom-sheet host; the challenge body scrolls
+independently of its fully reserved native actions, with bounded WebView sizing
+and compact vertical background insets. Pending composer keyboard requests do
+not reopen text entry beneath verification. No security/navigation/posting
+boundary or automatic-send behavior changes.
+
+Existing 160 dp challenge and intercepted one-request/rejected-draft checks are
+retained. New assertions cover actual visible control rectangles, a 380 dp window,
+browser-fallback reachability, recreation and the preserved draft. Optional
+`postingKeyboard=true` additionally taps a synthetic local input, confirms an
+actual IME boundary, checks actions above that boundary, rotates to landscape
+and restores the requested orientation/hides the keyboard. The short-window
+regression always runs; the IME case is opt-in because hardware-keyboard emulator
+configurations can intentionally suppress software keyboards. No provider or
+owner keyboard setting is replaced, no real CAPTCHA is solved and no public post
+is sent. See [device evidence and remaining acceptance](ANDROID10_VALIDATION.md).

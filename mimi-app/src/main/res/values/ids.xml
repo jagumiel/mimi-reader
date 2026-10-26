@@ -4,4 +4,6 @@
     <item type="id" name="gallery2_pager" />
     <item type="id" name="gallery2_grid" />
     <item name="captch_webview" type="id" />
+    <item name="captcha_content_scroll" type="id" />
+    <item name="captcha_open_browser" type="id" />
 </resources>

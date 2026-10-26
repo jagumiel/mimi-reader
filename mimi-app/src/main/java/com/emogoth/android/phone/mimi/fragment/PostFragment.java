@@ -287,7 +287,11 @@ public class PostFragment extends BottomSheetDialogFragment {
 
         commentField = view.findViewById(R.id.comment_input);
         commentField.setOnFocusChangeListener((v, hasFocus) -> commentField.post(() -> {
-            if (getActivity() != null && hasFocus) {
+            // A queued request must not reopen the composer's IME underneath
+            // the child CAPTCHA window (especially during Android 10 insets).
+            if (getActivity() != null && hasFocus && commentField.hasFocus()
+                    && commentField.hasWindowFocus() && commentField.isAttachedToWindow()
+                    && getChildFragmentManager().findFragmentByTag(CAPTCHA_DIALOG_TAG) == null) {
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(commentField, InputMethodManager.SHOW_IMPLICIT);
             }
@@ -519,8 +523,11 @@ public class PostFragment extends BottomSheetDialogFragment {
     public void onResume() {
         super.onResume();
 
-        int deviceWidth = getResources().getDisplayMetrics().widthPixels;
-        getDialog().getWindow().setLayout(deviceWidth - 4, ViewGroup.LayoutParams.WRAP_CONTENT);
+        // Material's bottom sheet needs a full-size host window. Shrinking the
+        // window itself to wrap-content makes its insets/height feed back into
+        // each other when a child CAPTCHA window takes focus on Android 10.
+        // The sheet's own content still determines the visible form height.
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         if (MimiUtil.getInstance().isLoggedIn()) {
             disableCaptcha();
@@ -770,6 +777,11 @@ public class PostFragment extends BottomSheetDialogFragment {
         if (captchaRequired) {
             if (getChildFragmentManager().findFragmentByTag(CAPTCHA_DIALOG_TAG) != null) return;
             try {
+                // The challenge owns the next input focus. Keep the draft, but
+                // do not leave a pending keyboard request on the sheet below it.
+                InputMethodManager input = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (input != null) input.hideSoftInputFromWindow(commentField.getWindowToken(), 0);
+                commentField.clearFocus();
                 createCaptchaDialog(boardName, isNewPost ? 0 : threadId)
                         .show(getChildFragmentManager(), CAPTCHA_DIALOG_TAG);
             } catch (Exception error) { showPostError(getString(R.string.captcha_not_ready)); }

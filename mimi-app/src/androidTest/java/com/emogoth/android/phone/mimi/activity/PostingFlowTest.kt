@@ -1,16 +1,26 @@
 package com.emogoth.android.phone.mimi.activity
 
 import android.content.Intent
+import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
+import android.view.ViewGroup
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
+import android.widget.ScrollView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -135,6 +145,29 @@ class PostingFlowTest {
         scenario.onActivity { (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick() }
     }
 
+    private fun assertFullyVisible(view: View) {
+        val bounds = Rect()
+        val ancestry = generateSequence(view) { it.parent as? View }.joinToString(" -> ") {
+            "${it.javaClass.simpleName}(h=${it.height},measured=${it.measuredHeight},min=${it.minimumHeight})"
+        }
+        assertTrue("${view.resources.getResourceEntryName(view.id)} must be on screen: $ancestry", view.getGlobalVisibleRect(bounds))
+        assertEquals("The control must not be clipped horizontally", view.width, bounds.width())
+        assertEquals("The control must not be clipped vertically", view.height, bounds.height())
+        val frame = Rect()
+        val location = IntArray(2)
+        view.getWindowVisibleDisplayFrame(frame)
+        view.getLocationOnScreen(location)
+        assertTrue("The control must remain inside the visible window: $frame",
+            frame.contains(Rect(location[0], location[1], location[0] + view.width, location[1] + view.height)))
+    }
+
+    private fun assertActionsVisible(dialog: CaptchaDialog) {
+        val alert = dialog.requireDialog() as AlertDialog
+        for (which in listOf(AlertDialog.BUTTON_POSITIVE, AlertDialog.BUTTON_NEUTRAL, AlertDialog.BUTTON_NEGATIVE)) {
+            assertFullyVisible(alert.getButton(which))
+        }
+    }
+
     @Test fun manualAnswerAndExpiryAreReadFromTheWidgetWithoutAnAndroidBridge() {
         val scenario = host()
         lateinit var view: CaptchaWebView
@@ -177,6 +210,13 @@ class PostingFlowTest {
             ready(scenario, view)
             scenario.onActivity { assertTrue("The CAPTCHA must be visible, not just loaded", view.height >= (160 * view.resources.displayMetrics.density).toInt()) }
             scenario.onActivity {
+                assertActionsVisible(dialog)
+                val visible = Rect()
+                assertTrue(view.getGlobalVisibleRect(visible))
+                assertTrue("At least 160 dp of the challenge must actually be visible",
+                    visible.height() >= (160 * view.resources.displayMetrics.density).toInt())
+            }
+            scenario.onActivity {
                 assertFalse((dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled)
                 (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
             }
@@ -193,6 +233,71 @@ class PostingFlowTest {
             val deadline = SystemClock.uptimeMillis() + 2000
             while (results.get() == 0 && SystemClock.uptimeMillis() < deadline) SystemClock.sleep(25)
             assertEquals(1, results.get()) // Only a result listener; there is no production submission here.
+        } finally { scenario.close() }
+    }
+
+    @Test fun nestedCaptchaKeepsActionsAndBrowserReachableInAShortWindowAndAfterRecreation() {
+        val scenario = host()
+        lateinit var dialog: FixtureCaptchaDialog
+        lateinit var view: CaptchaWebView
+        try {
+            scenario.onActivity { activity ->
+                val fragment = FixturePostFragment().apply { arguments = Bundle().apply {
+                    putString(Extras.EXTRAS_BOARD_NAME, "g"); putLong(Extras.EXTRAS_THREAD_ID, 42)
+                    putString(Extras.EXTRAS_POST_COMMENT, "preserved compact-window draft")
+                } }
+                fragment.showNow(activity.supportFragmentManager, "compact-posting-fixture")
+                fragment.requireView().findViewById<View>(R.id.submit_button).performClick()
+                fragment.childFragmentManager.executePendingTransactions()
+                dialog = fragment.childFragmentManager.findFragmentByTag("captcha_dialog") as FixtureCaptchaDialog
+                view = dialog.requireDialog().findViewById(R.id.captch_webview)
+            }
+            ready(scenario, view)
+            val resized = CountDownLatch(1)
+            scenario.onActivity {
+                assertActionsVisible(dialog)
+                // Model the reduced height available with an IME/small window,
+                // without changing the owner's keyboard or display settings.
+                val height = (380 * view.resources.displayMetrics.density).toInt()
+                dialog.requireDialog().window!!.decorView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+                    override fun onLayoutChange(v: View, l: Int, t: Int, r: Int, b: Int, ol: Int, ot: Int, or: Int, ob: Int) {
+                        if (v.height == height) {
+                            v.removeOnLayoutChangeListener(this)
+                            resized.countDown()
+                        }
+                    }
+                })
+                dialog.requireDialog().window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                    height)
+            }
+            assertTrue("The short window must actually finish layout before checking controls", resized.await(5, TimeUnit.SECONDS))
+            scenario.onActivity {
+                assertActionsVisible(dialog)
+                val scroll = dialog.requireDialog().findViewById<ScrollView>(R.id.captcha_content_scroll)
+                scroll.scrollTo(0, scroll.getChildAt(0).height)
+            }
+            scenario.onActivity {
+                assertActionsVisible(dialog)
+                assertFullyVisible(dialog.requireDialog().findViewById(R.id.captcha_open_browser))
+            }
+            scenario.recreate()
+            scenario.onActivity { activity ->
+                val fragment = activity.supportFragmentManager.findFragmentByTag("compact-posting-fixture") as FixturePostFragment
+                dialog = fragment.childFragmentManager.findFragmentByTag("captcha_dialog") as FixtureCaptchaDialog
+                view = dialog.requireDialog().findViewById(R.id.captch_webview)
+                assertEquals("preserved compact-window draft", fragment.saveState().getString(Extras.EXTRAS_POST_COMMENT))
+                assertEquals(0, fragment.requests.get())
+            }
+            ready(scenario, view)
+            scenario.onActivity {
+                assertActionsVisible(dialog)
+                (dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_NEGATIVE).performClick()
+            }
+            scenario.onActivity { activity ->
+                val fragment = activity.supportFragmentManager.findFragmentByTag("compact-posting-fixture") as FixturePostFragment
+                assertEquals("preserved compact-window draft", fragment.saveState().getString(Extras.EXTRAS_POST_COMMENT))
+                assertEquals(0, fragment.requests.get())
+            }
         } finally { scenario.close() }
     }
 
@@ -229,6 +334,101 @@ class PostingFlowTest {
                 assertEquals(View.VISIBLE, fragment.requireView().findViewById<View>(R.id.image_container).visibility)
             }
         } finally { scenario.close(); attachment.delete(); directory.delete() }
+    }
+
+    @Test fun captchaActionsRemainVisibleWithTheKeyboardAndAfterLandscapeRotation() {
+        // Real IME acceptance is explicit: an emulator with a hardware keyboard
+        // may intentionally suppress it. The short-window regression above
+        // always runs and does not depend on an installed/enabled soft keyboard.
+        org.junit.Assume.assumeTrue(InstrumentationRegistry.getArguments().getString("postingKeyboard") == "true")
+        val scenario = host()
+        lateinit var dialog: FixtureCaptchaDialog
+        lateinit var view: CaptchaWebView
+        var originalOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        try {
+            scenario.onActivity { activity ->
+                originalOrientation = activity.requestedOrientation
+                dialog = FixtureCaptchaDialog().apply { arguments = Bundle().apply {
+                    putString("board", "g"); putLong("thread", 42)
+                } }
+                dialog.showNow(activity.supportFragmentManager, "keyboard-captcha-fixture")
+                view = dialog.requireDialog().findViewById(R.id.captch_webview)
+                view.requestFocus()
+            }
+            ready(scenario, view)
+            // Only a synthetic local input: no site challenge is solved/sent.
+            val originalFrame = Rect()
+            scenario.onActivity { view.getWindowVisibleDisplayFrame(originalFrame) }
+            js(scenario, view, "TCaptcha.respNode.style.cssText='position:fixed;top:8px;left:8px;width:180px;height:40px';document.body.appendChild(TCaptcha.respNode)")
+            val point = IntArray(2)
+            scenario.onActivity {
+                dialog.requireDialog().findViewById<ScrollView>(R.id.captcha_content_scroll).scrollTo(0, view.top)
+            }
+            scenario.onActivity {
+                view.getLocationOnScreen(point)
+                point[0] += (30 * view.resources.displayMetrics.density).toInt()
+                point[1] += (25 * view.resources.displayMetrics.density).toInt()
+            }
+            // Chromium requires a user gesture, not evaluateJavascript focus,
+            // to initiate text entry. Tap the synthetic input as a user would.
+            val down = SystemClock.uptimeMillis()
+            for (action in listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP)) {
+                val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action,
+                    point[0].toFloat(), point[1].toFloat(), 0)
+                try { InstrumentationRegistry.getInstrumentation().sendPointerSync(event) } finally { event.recycle() }
+            }
+            val deadline = SystemClock.uptimeMillis() + 5000
+            var keyboardVisible = false
+            val keyboardFrame = Rect()
+            while (!keyboardVisible && SystemClock.uptimeMillis() < deadline) {
+                scenario.onActivity {
+                    view.getWindowVisibleDisplayFrame(keyboardFrame)
+                    // Floating windows on older providers can omit IME insets;
+                    // the visible display frame still reports the IME boundary.
+                    keyboardVisible = ViewCompat.getRootWindowInsets(view)?.isVisible(WindowInsetsCompat.Type.ime()) == true ||
+                        originalFrame.bottom - keyboardFrame.bottom > (100 * view.resources.displayMetrics.density).toInt()
+                }
+                SystemClock.sleep(25)
+            }
+            assertTrue("The local input must actually open the keyboard: $originalFrame -> $keyboardFrame", keyboardVisible)
+            scenario.onActivity { activity ->
+                assertActionsVisible(dialog)
+                (activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(view.windowToken, 0)
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            val rotationDeadline = SystemClock.uptimeMillis() + 5000
+            var landscape = false
+            while (!landscape && SystemClock.uptimeMillis() < rotationDeadline) {
+                scenario.onActivity { activity ->
+                    landscape = activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                }
+                SystemClock.sleep(25)
+            }
+            assertTrue("The activity must actually rotate to landscape", landscape)
+            scenario.onActivity { activity ->
+                dialog = activity.supportFragmentManager.findFragmentByTag("keyboard-captcha-fixture") as FixtureCaptchaDialog
+                view = dialog.requireDialog().findViewById(R.id.captch_webview)
+            }
+            ready(scenario, view)
+            scenario.onActivity {
+                assertActionsVisible(dialog)
+                assertFalse((dialog.requireDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled)
+                val scroll = dialog.requireDialog().findViewById<ScrollView>(R.id.captcha_content_scroll)
+                scroll.scrollTo(0, scroll.getChildAt(0).height)
+            }
+            scenario.onActivity { assertFullyVisible(dialog.requireDialog().findViewById(R.id.captcha_open_browser)) }
+        } finally {
+            scenario.onActivity { activity ->
+                val current = activity.supportFragmentManager.findFragmentByTag("keyboard-captcha-fixture") as? CaptchaDialog
+                current?.dialog?.window?.decorView?.let {
+                    (activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                        .hideSoftInputFromWindow(it.windowToken, 0)
+                }
+                activity.requestedOrientation = originalOrientation
+            }
+            scenario.close()
+        }
     }
 
     @Test fun anInFlightAttemptSurvivesRotationAndRejectsADuplicateSubmission() {
