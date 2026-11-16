@@ -4,6 +4,8 @@ This independent continuation starts from the inherited 7.0.1 code in Blatzar's 
 
 **Publication record:** [Mimi Reader 8.0](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0) was published on **27 October 2026 (Europe/Madrid)** from commit `4be402b`, with a signed APK, checksums, SBOM and public certificate. The entry below is the frozen preparation snapshot shared with the packaged in-app notes; its **Unreleased** wording is historical, not the current download status. Publication does not mark the remaining physical/manual checks as passed. Current artifact identity and limits are in [SIGNING_IDENTITY.md](docs/SIGNING_IDENTITY.md).
 
+**Planning update (16 November 2026):** The Gradle update previously planned for 8.0.1 is deferred to **8.0.2**. Version **8.0.1** is reserved for a different task whose scope the owner has not yet defined. This supersedes the earlier scheduling references below and in historical audits; it does not change the published 8.0 release notes or application version. See the [current roadmap](roadmap-2026.md#propuestas-posteriores-a-la-publicación-de-80).
+
 ## [8.0] - Unreleased
 
 Version code: `231`. Release preparation only: no public release date, tag, distribution signing key or publication is implied.

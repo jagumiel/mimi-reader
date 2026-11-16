@@ -1,6 +1,6 @@
 # Hoja de ruta 2026 de Mimi Reader
 
-Última revisión: 27 de octubre de 2026.
+Última revisión: 16 de noviembre de 2026.
 
 ## Objetivo
 
@@ -38,9 +38,9 @@ La aplicación debe permitir tanto leer como participar: mostrar CAPTCHA que el 
 ### Orden de trabajo inmediato
 
 1. La [ejecución Android 51](https://github.com/jagumiel/mimi-reader/actions/runs/40417876635) de `4be402b` supera los seis trabajos, incluidas API 29/31/34/36 y los seis casos nativos con páginas reales de 16 KB. La [ejecución de seguridad 8](https://github.com/jagumiel/mimi-reader/actions/runs/40417876616) supera sus dos trabajos, reconoce 148/148 paquetes Maven sin hallazgos conocidos y completa SARIF. La identidad independiente y el código publicado quedan aceptados por CI; cada actualización posterior requiere sus propios workflows.
-2. Publicada **8.0 / versionCode 231**, etiqueta `v8.0` en `4be402b`, con autorización del propietario y limitaciones manuales explícitas. La APK definitiva tiene SHA-256 `ae426ddcf07efba33f5c018a6eb5abff0c8b14fb0e4dd0da2574c05f229abfd5`: incorpora esa revisión, firma propia y sustitución compatible de la primera candidata en Android 12. Los 12 archivos persistentes de la beta y 607 multimedia permanecen intactos. Metadatos y límites en [docs/SIGNING_IDENTITY.md](docs/SIGNING_IDENTITY.md). El changelog empaquetado conserva la instantánea previa a publicación; el README, el registro de publicación y la release indican el estado actual. Mantener instalación separada sin importación automática de Mimi original. Próximo bloque de desarrollo propuesto: actualización controlada de Gradle para **8.0.1**, sin iniciarla durante la publicación; conservar como pendientes la aceptación manual restante, Android 10 del APK exacto y las copias protegidas de la clave que hará el propietario.
+2. Publicada **8.0 / versionCode 231**, etiqueta `v8.0` en `4be402b`, con autorización del propietario y limitaciones manuales explícitas. La APK definitiva tiene SHA-256 `ae426ddcf07efba33f5c018a6eb5abff0c8b14fb0e4dd0da2574c05f229abfd5`: incorpora esa revisión, firma propia y sustitución compatible de la primera candidata en Android 12. Los 12 archivos persistentes de la beta y 607 multimedia permanecen intactos. Metadatos y límites en [docs/SIGNING_IDENTITY.md](docs/SIGNING_IDENTITY.md). El changelog empaquetado conserva la instantánea previa a publicación; el README, el registro de publicación y la release indican el estado actual. Mantener instalación separada sin importación automática de Mimi original. Próximo bloque: definir con el propietario la nueva tarea de **8.0.1**; la actualización controlada de Gradle pasa a **8.0.2**. Conservar como pendientes la aceptación manual restante, Android 10 del APK exacto y las copias protegidas de la clave que hará el propietario.
 3. APK release minificada histórica con firma interna autorizada y evidencias de `c3824a7` / 7.0.1: [aceptación](docs/RELEASE_ACCEPTANCE.md). Se conservan los resultados previos de Android 12 y sus 607 archivos `Pictures/Mimi` intactos. El 25 de octubre, en Moto G 2014 / Android 10 ARMv7, se actualiza solo la beta autorizada y sus seis archivos persistentes mantienen sus SHA-256; el primer intento completo se interrumpe por los problemas del CAPTCHA. El 26, tras corregirlos, la copia `.validation29` completa los 93 métodos: **90 correctos, un fallo de Ruffle por WebView 74 incompatible y dos exclusiones optativas**, sin excluir clases. Pasan los ocho casos locales/de teclado de publicación, los seis nativos PDF/GIF y el aviso de Flash incompatible. La beta ya no figura instalada al iniciar esta nueva sesión: no se atribuye una nueva comparación de BD al día 26. Mimi 6.1.2 y `Mimidown` permanecen intactos; WebView sin cambios y pantalla restaurada a `0`. No es una suite completamente verde ni aceptación de release minificada/migración entre firmas; no borrar datos ni repetir publicaciones públicas.
-4. Escaneo CVE/GHSA operativo en `SBOM security`, con política HIGH/CRITICAL, SARIF, ejecución semanal y excepciones exactas con caducidad. La ejecución 8 acepta el SBOM de 8.0/231 con 148/148 Maven y cero hallazgos conocidos, sin excepciones. Mantener explícitos los límites de cobertura nativa/WASM y de componentes genéricos/GitHub; el resultado no certifica ausencia de vulnerabilidades. README en inglés con enlace directo a la APK firmada y sin el aviso de publicación pendiente. Gradle sigue aplazado a **8.0.1**.
+4. Escaneo CVE/GHSA operativo en `SBOM security`, con política HIGH/CRITICAL, SARIF, ejecución semanal y excepciones exactas con caducidad. La ejecución 8 acepta el SBOM de 8.0/231 con 148/148 Maven y cero hallazgos conocidos, sin excepciones. Mantener explícitos los límites de cobertura nativa/WASM y de componentes genéricos/GitHub; el resultado no certifica ausencia de vulnerabilidades. README en inglés con enlace directo a la APK firmada y sin el aviso de publicación pendiente. Gradle queda aplazado a **8.0.2** por decisión del propietario del 16 de noviembre de 2026.
 
 ### 1. Red y compatibilidad con la API
 
@@ -319,9 +319,16 @@ Resolver el CAPTCHA y decidir publicar son acciones del usuario. La respuesta de
 
 Estas propuestas quedan fuera del alcance de 8.0: no implementarlas ahora ni retrasar el release por ellas. Su prioridad y alcance se definirán después de publicar esa versión.
 
-### Versión 8.0.1: actualización controlada de Gradle
+### Versión 8.0.1: nuevo trabajo pendiente de definir
 
-- [ ] Revisar y actualizar el Gradle Wrapper, actualmente en **8.13**, como tarea de **8.0.1**, no de 8.0. Mantener la configuración actual hasta retomar expresamente este bloque.
+Decisión del propietario del **16 de noviembre de 2026**: aplazar a **8.0.2** el trabajo que estaba previsto para 8.0.1 y abordar antes otra tarea. Las referencias anteriores a Gradle para 8.0.1 en auditorías y notas históricas quedan sustituidas por esta planificación; no se modifica la instantánea del changelog publicado de 8.0.
+
+- [ ] Definir con el propietario la nueva tarea de **8.0.1**, su alcance y los criterios de aceptación antes de implementarla. Todavía no se ha especificado qué cambio incluirá.
+- [ ] Mantener la versión publicada **8.0 / versionCode 231** y la configuración de compilación actual hasta iniciar expresamente el bloque correspondiente. Esta reorganización solo cambia la documentación.
+
+### Versión 8.0.2: actualización controlada de Gradle
+
+- [ ] Revisar y actualizar el Gradle Wrapper, actualmente en **8.13**, como tarea de **8.0.2**, no de 8.0.1. Mantener la configuración actual hasta retomar expresamente este bloque.
 - [ ] Comprobar las versiones estables y sus correcciones de seguridad al iniciar la tarea. La candidata identificada el 24 de octubre de 2026 es **8.14.6** dentro de la rama 8.x; volver a verificarla entonces, sin fijar de antemano una versión que pueda haber quedado desactualizada. Referencia: [notas oficiales de Gradle 8.14.6](https://docs.gradle.org/8.14.6/release-notes.html).
 - [ ] Verificar la compatibilidad con Android Gradle Plugin, Kotlin, JDK y CycloneDX, y revisar las advertencias con `--warning-mode all`. No saltar automáticamente a Gradle 9.x ni actualizar AGP, SDK o mínimos Android solo para eliminar el aviso de GitHub.
 - [ ] Actualizar el wrapper y verificar su integridad; regenerar y revisar el inventario/SBOM afectado por las herramientas de compilación, diferenciándolo de las dependencias empaquetadas en la app.
