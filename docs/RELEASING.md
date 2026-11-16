@@ -21,7 +21,7 @@ version code; never uninstall/clear a legacy app to resolve a signature conflict
 
 ## Versioning
 
-The approved 8.0 preparation uses `versionCode 231` and `versionName 8.0`.
+The approved 8.0.1 preparation uses `versionCode 232` and `versionName 8.0.1`.
 Both defaults live in root `gradle.properties` and are read by the app and SBOM
 without separate fallbacks. This identity is not a publication or tag. Build it
 with the defaults, or override both properties together when deliberately
@@ -30,14 +30,16 @@ preparing a different artifact identity:
 ```powershell
 .\gradlew.bat :mimi-app:assembleRelease :mimi-app:bundleRelease
 # Equivalent explicit identity (use these same properties for generateSbom):
-.\gradlew.bat generateSbom '-PmimiVersionCode=231' '-PmimiVersionName=8.0'
+.\gradlew.bat generateSbom '-PmimiVersionCode=232' '-PmimiVersionName=8.0.1'
 ```
 
-`mimiVersionCode` must be a positive integer and must increase for every published update. `231` exceeds the inherited `230`; no greater code appears in the reviewed fork history. `mimiVersionName` is the user-facing release number. Publication must also account for any independently distributed artifact not represented by this repository.
+`mimiVersionCode` must be a positive integer and must increase for every published update. `232` exceeds the published 8.0 code `231`; the inherited 7.0.1 used `230`. `mimiVersionName` is the user-facing release number. Publication must also account for any independently distributed artifact not represented by this repository.
 
-The owner approved the English [CHANGELOG.md](../CHANGELOG.md) and matching
-in-app HTML on 25 October 2026, covering all modernization since the inherited
-7.0.1 baseline. Both say **Unreleased**. See the [history audit](CHANGELOG_AUDIT.md).
+The English [CHANGELOG.md](../CHANGELOG.md) and matching in-app HTML now include
+the bounded 8.0.1 security update. The historical 8.0 entry remains frozen with
+its original **Unreleased** preparation wording; its publication record explains
+that this is not its download status. See the [history audit](CHANGELOG_AUDIT.md)
+and [8.0.1 release preparation](RELEASE_8_0_1.md).
 CI's offline helper tests compare their sections, shared identity and tracked
 SBOM, while document instrumentation checks current and historical notes.
 

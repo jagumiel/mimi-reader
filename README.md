@@ -7,9 +7,9 @@ A free, open-source Android app for browsing 4chan: find a board, open threads i
 [![Android CI](https://github.com/jagumiel/mimi-reader/actions/workflows/android-ci.yml/badge.svg)](https://github.com/jagumiel/mimi-reader/actions/workflows/android-ci.yml)
 [![SBOM security](https://github.com/jagumiel/mimi-reader/actions/workflows/sbom-security.yml/badge.svg)](https://github.com/jagumiel/mimi-reader/actions/workflows/sbom-security.yml)
 
-[Download / Releases](https://github.com/jagumiel/mimi-reader/releases) · [Installation guide](#download-and-install) · [What's new in 8.0](CHANGELOG.md) · [Build from source](#build-from-source)
+[Download / Releases](https://github.com/jagumiel/mimi-reader/releases/latest) · [Installation guide](#download-and-install) · [What's new in 8.0.1](CHANGELOG.md) · [Build from source](#build-from-source)
 
-**Mimi Reader 8.0 is available.** [Download the signed APK](https://github.com/jagumiel/mimi-reader/releases/download/v8.0/mimi-reader-8.0.apk), read the [release notes](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0), then follow the installation guide below. Checksums, the public signing certificate and the matching SBOM are included under **Assets**. A source ZIP, an App Bundle or an unsigned CI artifact is not an installable APK.
+**Download the latest signed APK from [Releases](https://github.com/jagumiel/mimi-reader/releases/latest).** Read that release's notes, expand **Assets**, download the `.apk`, then follow the installation guide below. Checksums, the public signing certificate and the matching SBOM are included alongside the APK. A source ZIP, an App Bundle or an unsigned CI artifact is not an installable APK. Version 8.0.1 is the Guava security maintenance update; see the [changelog](CHANGELOG.md).
 
 This is an independent continuation of Mimi Reader, with one free edition and no interleaved gallery ads. Mimi is **no longer available on Google Play**, and the original project website is no longer operational. Use this repository for this fork's downloads and documentation; it is not an official 4chan app or an endorsed upstream release.
 
@@ -31,7 +31,7 @@ You only need your Android phone and the release APK. Normal APK installation do
 
 ### Requirements
 
-- **Android 6.0 or later** (API 23 minimum). Android 10 and 12 remain within the intended compatibility range. Physical debug checks cover the corrected CAPTCHA layout, keyboard and rotation on both versions; final 8.0 minified-release acceptance is not complete. See the [Android 10](docs/ANDROID10_VALIDATION.md) and [Android 12](docs/ANDROID12_VALIDATION.md) reports.
+- **Android 6.0 or later** (API 23 minimum). Android 10 and 12 remain within the intended compatibility range. Physical debug checks cover the corrected CAPTCHA layout, keyboard and rotation on both versions; physical/manual acceptance of every minified-release interaction is not complete. See the [Android 10](docs/ANDROID10_VALIDATION.md) and [Android 12](docs/ANDROID12_VALIDATION.md) reports and the chosen release's notes.
 - An internet connection to load boards, media and CAPTCHA challenges. Keep Android System WebView or your device's active WebView provider updated through its supported update channel.
 
 ### Install the release APK

@@ -89,15 +89,16 @@ The real local Trivy 0.76.1 scan uses an updated database and reports **149/149*
 Maven packages, **zero known findings and zero blockers**, without exceptions.
 Its ignored evidence is under `build/reports/guava-vulnerabilities/`.
 
-The source commit still requires its own remote Android CI (debug/release,
-lint, unit tests, API 29/31/34/36 instrumentation and native 16 KB job) and
-`SBOM security`, including SARIF publication. Local results do not stand in for
-that remote acceptance or physical-device acceptance. Preserve the documented
-native/WASM and build-tool coverage limitations.
+The source fix `43a34e3` passes all six jobs in [Android CI 55](https://github.com/jagumiel/mimi-reader/actions/runs/43966563766)
+and both in [SBOM security 15](https://github.com/jagumiel/mimi-reader/actions/runs/43966563925),
+including SARIF publication, 149/149 Maven packages and zero known findings
+without exceptions. Remote emulator acceptance is not physical-device acceptance.
+Preserve the documented native/WASM and build-tool coverage limitations.
 
-This is an unreleased source correction. Default version metadata stays 8.0/231
-until the next release is explicitly prepared. The published `v8.0` tag, APK,
-checksums and SBOM asset remain historical and unchanged; updating this branch
-does not fix installed 8.0 APKs. Prepare and validate a separately signed update
-before describing the fix as distributed. The Gradle Wrapper update remains
-scheduled for 8.0.2.
+The source fix initially kept 8.0/231 metadata. The owner subsequently authorizes
+[8.0.1 / 232 release preparation](RELEASE_8_0_1.md), with matching notes and SBOM,
+the existing signing identity and new CI acceptance for its own commit. The
+published `v8.0` tag, APK, checksums and SBOM remain historical and unchanged;
+updating this branch does not fix installed 8.0 APKs. Only the verified signed
+update's actual publication distributes the fix. The Gradle Wrapper update
+remains scheduled for 8.0.2.

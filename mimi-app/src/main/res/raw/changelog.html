@@ -24,6 +24,26 @@
     </style>
 </head>
 <body>
+    <section id="release-8-0-1">
+    <h2>Mimi 8.0.1 — 2026-11-16</h2>
+    <p>Version code: <code>232</code>. Security maintenance update for the independent Mimi Reader fork.</p>
+    <h3>Security</h3>
+    <ul>
+        <li>Update Guava from 33.3.1-android to 33.7.2-android to address CVE-2026-102554, without upgrading Media3 or weakening the vulnerability policy. The issue concerns excessive memory allocation during Java object deserialization; no exploitation against Mimi has been demonstrated. See the <a href="https://github.com/jagumiel/mimi-reader/blob/master/docs/GUAVA_SECURITY.md">security analysis</a>.</li>
+        <li>Regenerate the release SBOM and dependency inventory, including Guava's transitive changes: 151 components, 149 Maven packages and 72 direct declarations. No vulnerability exception is added.</li>
+    </ul>
+    <h3>Verification</h3>
+    <ul>
+        <li>Add four bounded host-JVM deserialization regression tests. Three security assertions fail with the old Guava and all four tests pass with the corrected version, including valid collection round-trips.</li>
+        <li>Retain build, lint, unit, Android 10/12/14/16 instrumentation and native 16 KB CI checks, plus periodic CVE/GHSA scanning and SARIF publication. A passing package scan is not a security certification.</li>
+    </ul>
+    <h3>Compatibility and update notes</h3>
+    <ul>
+        <li>Keep minimum Android 6.0 (API 23), target SDK 36, all four packaged ABIs and the existing fork installation identity. Gradle remains 8.13; its update is deferred to 8.0.2.</li>
+        <li>Install the signed update over this fork's 8.0 without uninstalling it or clearing data. Compatible identity, signing certificate and a higher version code are required; original Mimi and earlier differently signed internal builds remain separate installations.</li>
+        <li>Preserve the existing SWF/WebView, manual physical-device and native/WASM coverage limitations. Build-tool-only Guava selections remain outside the release SBOM scan and require separate review. The historical 8.0 APK and SBOM remain unchanged.</li>
+    </ul>
+    </section>
     <section id="release-8-0">
     <h2>Mimi 8.0 — Unreleased</h2>
     <p>Version code: <code>231</code>. Release preparation only: no public release date, tag, distribution signing key or publication is implied.</p>

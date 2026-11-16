@@ -325,8 +325,9 @@ Decisión del propietario del **16 de noviembre de 2026**: aplazar a **8.0.2** e
 
 - [x] Definir con el propietario el nuevo bloque: corregir `CVE-2026-102554` seleccionando **Guava 33.7.2-android**, sin migrar Media3 ni las herramientas. El escaneo semanal detectó la versión transitiva afectada el 2 de noviembre y repitió el hallazgo los días 9 y 16; el último CI de Android de la base no falló por compilación.
 - [x] Regenerar SBOM/inventario mediante Gradle y revisar el delta transitivo; 151 componentes, 149 Maven y 72 declaraciones. Añadir cuatro regresiones JVM acotadas y documentar los motivos, costes y límites en [docs/GUAVA_SECURITY.md](docs/GUAVA_SECURITY.md). No añadir excepciones CVE ni confundir la corrección runtime con el saneamiento de Guava en las herramientas de compilación.
-- [ ] Confirmar Android CI y `SBOM security` para el commit corregido, con cobertura completa y SARIF, y preparar después la publicación firmada de 8.0.1 con sus propias pruebas y changelog. Conservar los artefactos históricos de 8.0 y los datos del usuario.
-- [ ] Preparar expresamente los metadatos de la siguiente publicación: el parche de código conserva por ahora **8.0 / versionCode 231**, sin sustituir la release existente ni su SBOM histórico. La actualización del Wrapper sigue fuera de este bloque.
+- [x] Confirmar el parche `43a34e3`: Android CI 55 supera los seis trabajos y `SBOM security` 15 los dos, con 149/149 Maven, cero hallazgos conocidos y SARIF. No cambia la cobertura física pendiente ni sanea las herramientas excluidas del escaneo runtime.
+- [x] Preparar **8.0.1 / versionCode 232** con autorización del propietario: changelog inglés raíz y dentro de la app, SBOM coincidente e identidad/clave de publicación conservadas. Guía en [docs/RELEASE_8_0_1.md](docs/RELEASE_8_0_1.md). No sustituir los artefactos históricos de 8.0.
+- [ ] Exigir CI propio del commit de release, construir y verificar su APK exacta, firmar mediante consola local y publicar la actualización en GitHub con checksum, SBOM y certificado público. Conservar datos/descargas y no presentar como realizadas pruebas físicas nuevas. La actualización del Wrapper sigue fuera de este bloque.
 
 ### Versión 8.0.2: actualización controlada de Gradle
 
