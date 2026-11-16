@@ -4,7 +4,9 @@ This independent continuation starts from the inherited 7.0.1 code in Blatzar's 
 
 **Publication record:** [Mimi Reader 8.0](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0) was published on **27 October 2026 (Europe/Madrid)** from commit `4be402b`, with a signed APK, checksums, SBOM and public certificate. The entry below is the frozen preparation snapshot shared with the packaged in-app notes; its **Unreleased** wording is historical, not the current download status. Publication does not mark the remaining physical/manual checks as passed. Current artifact identity and limits are in [SIGNING_IDENTITY.md](docs/SIGNING_IDENTITY.md).
 
-**Planning update (16 November 2026):** The Gradle update previously planned for 8.0.1 is deferred to **8.0.2**. The owner has authorized preparing and publishing the bounded Guava security update as **8.0.1 / 232**. This supersedes the earlier scheduling references below and in historical audits; the frozen 8.0 notes and artifacts remain unchanged. See the [current roadmap](roadmap-2026.md#propuestas-posteriores-a-la-publicación-de-80).
+**8.0.1 publication record:** [Mimi Reader 8.0.1](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0.1) was published on **16 November 2026 (Europe/Madrid)** from `c246ed2`, with the existing signing identity and SHA-256 `525ed8f429752bff4c5e2c7ea4d38dc7d0d96d119ef61682a1c44b0481a133f0`. Its release-source Android CI 56 and SBOM security 16 passed; the public APK download's hash and signature were reverified. Artifact details and unchanged manual-acceptance limits are in the [publication record](docs/RELEASE_8_0_1.md).
+
+**Planning update (16 November 2026):** The Gradle update previously planned for 8.0.1 is deferred to **8.0.2**. The owner authorized the bounded Guava security update published as **8.0.1 / 232**. This supersedes the earlier scheduling references below and in historical audits; the frozen 8.0 notes and artifacts remain unchanged. See the [current roadmap](roadmap-2026.md#propuestas-posteriores-a-la-publicación-de-80).
 
 ## [8.0.1] - 2026-11-16
 

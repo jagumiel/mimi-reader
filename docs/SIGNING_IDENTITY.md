@@ -1,9 +1,22 @@
-# Fork signing identity and first candidate
+# Fork signing identity and releases
 
 Initial signing prepared on 26–27 October 2026. **8.0 was published on 27 October
 2026 (Europe/Madrid)** with the owner's authorization. Publication is not a claim
 that every manual acceptance case passed. This record contains public metadata
 only, never a private key or password.
+
+## Published 8.0.1 security update
+
+Published on **16 November 2026 (Europe/Madrid)** as stable/latest
+[v8.0.1](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0.1), from
+`c246ed245a12a0038e6050cfa3c482c35a6c06b7`, version **8.0.1 / 232**.
+The signed APK retains the package and approved certificate below and has SHA-256
+`525ed8f429752bff4c5e2c7ea4d38dc7d0d96d119ef61682a1c44b0481a133f0`.
+Its public download is verified against that hash/signature; release CI 56 and
+security 16 pass all six/two jobs. See the [exact publication record](RELEASE_8_0_1.md)
+for assets, source, archive and remaining manual-acceptance limits. The 8.0
+record below is historical and its artifacts are not replaced. No new physical
+installation or user-data migration test is claimed for 8.0.1.
 
 ## Published 8.0 artifact
 
@@ -38,7 +51,8 @@ The owner approved a separate independent-fork identity:
 - Release: `io.github.jagumiel.mimireader`.
 - Debug: `io.github.jagumiel.mimireader.beta`.
 - Code namespace remains `com.emogoth.android.phone.mimi`.
-- Version: **8.0 / 231**; minimum API 23, target API 36, four packaged ABIs.
+- Current release: **8.0.1 / 232** (8.0 used 231); minimum API 23, target API 36,
+  four packaged ABIs.
 
 The first fork release coexists with original Mimi, the old beta and previous
 internal packages. It does not import their databases, settings, sessions or

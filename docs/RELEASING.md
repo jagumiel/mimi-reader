@@ -21,7 +21,7 @@ version code; never uninstall/clear a legacy app to resolve a signature conflict
 
 ## Versioning
 
-The approved 8.0.1 preparation uses `versionCode 232` and `versionName 8.0.1`.
+The published 8.0.1 uses `versionCode 232` and `versionName 8.0.1`.
 Both defaults live in root `gradle.properties` and are read by the app and SBOM
 without separate fallbacks. This identity is not a publication or tag. Build it
 with the defaults, or override both properties together when deliberately
@@ -86,7 +86,7 @@ Build the unsigned minified APK normally, with no `keystore.properties` file.
 Inspect the exported **public** certificate with `keytool -printcert -file`,
 record its SHA-256 fingerprint, then run `scripts/release/Sign-MimiApk.ps1` in the
 owner's visible console. Supply absolute input/output/key/SDK paths, the approved
-`-ExpectedCertificateSha256` and `-ExpectedVersionCode 231`. The SDK prompts for
+`-ExpectedCertificateSha256` and `-ExpectedVersionCode 232`. The SDK prompts for
 the password directly; no plaintext-password properties file is needed.
 
 The signer rejects the wrong install ID/version, debug APKs and existing outputs;
