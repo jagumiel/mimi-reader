@@ -263,6 +263,11 @@
         {
             "configuration": "implementation",
             "project": ":mimi-app",
+            "requested": "com.google.guava:guava:33.7.2-android"
+        },
+        {
+            "configuration": "implementation",
+            "project": ":mimi-app",
             "requested": "com.squareup.okhttp3:okhttp:4.12.0"
         },
         {
@@ -635,7 +640,7 @@
             },
             {
                 "direct": true,
-                "id": "org.jspecify:jspecify:1.0.0"
+                "id": "org.jspecify:jspecify:1.0.1"
             }
         ],
         "debugUnitTestRuntimeClasspath": [
@@ -945,19 +950,19 @@
             },
             {
                 "direct": false,
-                "id": "com.google.errorprone:error_prone_annotations:2.48.0"
+                "id": "com.google.errorprone:error_prone_annotations:2.50.0"
             },
             {
                 "direct": false,
-                "id": "com.google.guava:failureaccess:1.0.2"
-            },
-            {
-                "direct": false,
-                "id": "com.google.guava:guava:33.3.1-android"
+                "id": "com.google.guava:failureaccess:1.0.3"
             },
             {
                 "direct": false,
                 "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.google.j2objc:j2objc-annotations:3.1"
             },
             {
                 "direct": false,
@@ -1037,7 +1042,7 @@
             },
             {
                 "direct": false,
-                "id": "org.jspecify:jspecify:1.0.0"
+                "id": "org.jspecify:jspecify:1.0.1"
             },
             {
                 "direct": false,
@@ -1194,6 +1199,10 @@
             {
                 "direct": true,
                 "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.google.guava:guava:33.7.2-android"
             },
             {
                 "direct": true,
@@ -1709,19 +1718,19 @@
             },
             {
                 "direct": false,
-                "id": "com.google.errorprone:error_prone_annotations:2.48.0"
+                "id": "com.google.errorprone:error_prone_annotations:2.50.0"
             },
             {
                 "direct": false,
-                "id": "com.google.guava:failureaccess:1.0.2"
-            },
-            {
-                "direct": false,
-                "id": "com.google.guava:guava:33.3.1-android"
+                "id": "com.google.guava:failureaccess:1.0.3"
             },
             {
                 "direct": false,
                 "id": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+            },
+            {
+                "direct": false,
+                "id": "com.google.j2objc:j2objc-annotations:3.1"
             },
             {
                 "direct": false,
@@ -1789,7 +1798,7 @@
             },
             {
                 "direct": false,
-                "id": "org.jspecify:jspecify:1.0.0"
+                "id": "org.jspecify:jspecify:1.0.1"
             },
             {
                 "direct": false,
@@ -1942,6 +1951,10 @@
             {
                 "direct": true,
                 "id": "com.google.code.gson:gson:2.14.0"
+            },
+            {
+                "direct": true,
+                "id": "com.google.guava:guava:33.7.2-android"
             },
             {
                 "direct": true,

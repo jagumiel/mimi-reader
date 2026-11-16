@@ -192,6 +192,9 @@ dependencies {
     def media3_version = "1.10.1"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
+    // Media3 brings Guava transitively; own the Android security baseline for CVE-2026-102554.
+    // A normal dependency permits future compatible upgrades instead of forcing an old version.
+    implementation 'com.google.guava:guava:33.7.2-android'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     // 5.0.9 requires compileSdk 37; 5.0.7 retains our tested SDK 36 baseline.
     def glide_version = '5.0.7'

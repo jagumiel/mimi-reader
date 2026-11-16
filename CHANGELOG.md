@@ -4,7 +4,14 @@ This independent continuation starts from the inherited 7.0.1 code in Blatzar's 
 
 **Publication record:** [Mimi Reader 8.0](https://github.com/jagumiel/mimi-reader/releases/tag/v8.0) was published on **27 October 2026 (Europe/Madrid)** from commit `4be402b`, with a signed APK, checksums, SBOM and public certificate. The entry below is the frozen preparation snapshot shared with the packaged in-app notes; its **Unreleased** wording is historical, not the current download status. Publication does not mark the remaining physical/manual checks as passed. Current artifact identity and limits are in [SIGNING_IDENTITY.md](docs/SIGNING_IDENTITY.md).
 
-**Planning update (16 November 2026):** The Gradle update previously planned for 8.0.1 is deferred to **8.0.2**. Version **8.0.1** is reserved for a different task whose scope the owner has not yet defined. This supersedes the earlier scheduling references below and in historical audits; it does not change the published 8.0 release notes or application version. See the [current roadmap](roadmap-2026.md#propuestas-posteriores-a-la-publicación-de-80).
+**Planning update (16 November 2026):** The Gradle update previously planned for 8.0.1 is deferred to **8.0.2**. The next block is the bounded Guava security correction below; preparing and distributing 8.0.1 remains separate. This supersedes the earlier scheduling references below and in historical audits; it does not change the published 8.0 release notes or application version. See the [current roadmap](roadmap-2026.md#propuestas-posteriores-a-la-publicación-de-80).
+
+## [Unreleased]
+
+### Security
+
+- Select Guava 33.7.2-android instead of Media3's transitive 33.3.1-android to address CVE-2026-102554. Regenerate the release SBOM and dependency inventory, retain the Android variant and add bounded deserialization regression tests without suppressing the finding. See the [security analysis and validation scope](docs/GUAVA_SECURITY.md).
+- This source correction does not replace the published 8.0 APK or its historical SBOM. A signed update and its release acceptance remain separate steps.
 
 ## [8.0] - Unreleased
 

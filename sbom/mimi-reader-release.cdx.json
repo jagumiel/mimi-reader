@@ -4044,12 +4044,12 @@
             "version": "2.14.0"
         },
         {
-            "bom-ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.48.0?type=jar",
+            "bom-ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar",
             "group": "com.google.errorprone",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "b49c5c958316ed67a09c699dda9aa749caf434d51d863dea599ef36a49b9c855"
+                    "content": "4667724877f1d37a689202da191e23efa7657c62eef93ccdac406eccfe5cdd0a"
                 }
             ],
             "licenses": [
@@ -4067,18 +4067,18 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/com.google.errorprone/error_prone_annotations@2.48.0?type=jar",
+            "purl": "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar",
             "type": "library",
-            "version": "2.48.0"
+            "version": "2.50.0"
         },
         {
-            "bom-ref": "pkg:maven/com.google.guava/failureaccess@1.0.2?type=jar",
+            "bom-ref": "pkg:maven/com.google.guava/failureaccess@1.0.3?type=jar",
             "description": "Contains com.google.common.util.concurrent.internal.InternalFutureFailureAccess and InternalFutures. Most users will never need to use this artifact. Its classes are conceptually a part of Guava, but they're in this separate artifact so that Android libraries can use them without pulling in all of Guava (just as they can use ListenableFuture by depending on the listenablefuture artifact).",
             "group": "com.google.guava",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "8a8f81cf9b359e3f6dfa691a1e776985c061ef2f223c9b2c80753e1b458e8064"
+                    "content": "cbfc3906b19b8f55dd7cfd6dfe0aa4532e834250d7f080bd8d211a3e246b59cb"
                 }
             ],
             "licenses": [
@@ -4096,18 +4096,18 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/com.google.guava/failureaccess@1.0.2?type=jar",
+            "purl": "pkg:maven/com.google.guava/failureaccess@1.0.3?type=jar",
             "type": "library",
-            "version": "1.0.2"
+            "version": "1.0.3"
         },
         {
-            "bom-ref": "pkg:maven/com.google.guava/guava@33.3.1-android?type=jar",
+            "bom-ref": "pkg:maven/com.google.guava/guava@33.7.2-android?type=jar",
             "description": "Guava is a suite of core and expanded libraries that include utility classes, Google's collections, I/O classes, and much more.",
             "group": "com.google.guava",
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "2c3e41d1b380f2044d257947a3aa82dabf3ae4b978622745254aa18b6cf89ab0"
+                    "content": "b949fe975a32421c1a2633c07a4f1578b462f2f467668aa0a4023c5ff7c4a808"
                 }
             ],
             "licenses": [
@@ -4125,9 +4125,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/com.google.guava/guava@33.3.1-android?type=jar",
+            "purl": "pkg:maven/com.google.guava/guava@33.7.2-android?type=jar",
             "type": "library",
-            "version": "33.3.1-android"
+            "version": "33.7.2-android"
         },
         {
             "bom-ref": "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
@@ -4157,6 +4157,45 @@
             "purl": "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
             "type": "library",
             "version": "9999.0-empty-to-avoid-conflict-with-guava"
+        },
+        {
+            "bom-ref": "pkg:maven/com.google.j2objc/j2objc-annotations@3.1?type=jar",
+            "description": "A set of annotations that provide additional information to the J2ObjC translator to modify the result of translation.",
+            "externalReferences": [
+                {
+                    "type": "distribution",
+                    "url": "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                },
+                {
+                    "type": "vcs",
+                    "url": "http://github.com/google/j2objc"
+                }
+            ],
+            "group": "com.google.j2objc",
+            "hashes": [
+                {
+                    "alg": "SHA-256",
+                    "content": "84d3a150518485f8140ea99b8a985656749629f6433c92b80c75b36aba3b099b"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "modified": false,
+            "name": "j2objc-annotations",
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "purl": "pkg:maven/com.google.j2objc/j2objc-annotations@3.1?type=jar",
+            "type": "library",
+            "version": "3.1"
         },
         {
             "bom-ref": "pkg:maven/com.squareup.okhttp3/okhttp@4.12.0?type=jar",
@@ -5160,7 +5199,7 @@
             "version": "1.23.2"
         },
         {
-            "bom-ref": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+            "bom-ref": "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar",
             "description": "An artifact of well-named and well-specified annotations to power static analysis checks",
             "externalReferences": [
                 {
@@ -5172,7 +5211,7 @@
             "hashes": [
                 {
                     "alg": "SHA-256",
-                    "content": "1fad6e6be7557781e4d33729d49ae1cdc8fdda6fe477bb0cc68ce351eafdfbab"
+                    "content": "070d75f261fe4c5b8202508366715f7f2d4660f88c8ef7e6d3575e48c9683b66"
                 }
             ],
             "licenses": [
@@ -5190,9 +5229,9 @@
                     "value": "false"
                 }
             ],
-            "purl": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+            "purl": "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar",
             "type": "library",
-            "version": "1.0.0"
+            "version": "1.0.1"
         },
         {
             "bom-ref": "pkg:maven/org.reactivestreams/reactive-streams@1.0.4?type=jar",
@@ -5303,6 +5342,7 @@
                 "pkg:maven/com.github.martin-stone/hsv-alpha-color-picker-android@3.0.1?type=aar",
                 "pkg:maven/com.google.android.material/material@1.14.0?type=aar",
                 "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar",
+                "pkg:maven/com.google.guava/guava@33.7.2-android?type=jar",
                 "pkg:maven/com.squareup.okhttp3/okhttp@4.12.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/adapter-rxjava2@2.11.0?type=jar",
                 "pkg:maven/com.squareup.retrofit2/converter-gson@2.11.0?type=jar",
@@ -5339,7 +5379,7 @@
                 "pkg:maven/androidx.tracing/tracing@2.0.0?type=pom",
                 "pkg:maven/androidx.viewpager/viewpager@1.0.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.fragment/fragment@1.9.1?type=aar"
         },
@@ -5377,7 +5417,7 @@
                 "pkg:maven/androidx.transition/transition@1.5.0?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar",
                 "pkg:maven/androidx.viewpager2/viewpager2@1.1.0?type=aar",
-                "pkg:maven/com.google.errorprone/error_prone_annotations@2.48.0?type=jar",
+                "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-bom@1.8.22?type=pom"
             ],
             "ref": "pkg:maven/com.google.android.material/material@1.14.0?type=aar"
@@ -5401,7 +5441,7 @@
                 "pkg:maven/androidx.resourceinspection/resourceinspection-annotation@1.0.1?type=jar",
                 "pkg:maven/androidx.savedstate/savedstate@1.4.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.appcompat/appcompat@1.8.0?type=aar"
         },
@@ -5427,7 +5467,7 @@
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.room/room-runtime-android@2.8.5?type=aar"
         },
@@ -5446,7 +5486,7 @@
                 "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.core/core@1.18.0?type=aar"
         },
@@ -5476,7 +5516,7 @@
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.webkit/webkit@1.15.0?type=aar"
         },
@@ -5484,7 +5524,7 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation-experimental@1.5.0?type=aar",
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
-                "pkg:maven/com.google.guava/guava@33.3.1-android?type=jar",
+                "pkg:maven/com.google.guava/guava@33.7.2-android?type=jar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-bom@1.8.22?type=pom"
             ],
             "ref": "pkg:maven/androidx.media3/media3-common@1.10.1?type=aar"
@@ -5522,7 +5562,7 @@
                 "pkg:maven/androidx.profileinstaller/profileinstaller@1.4.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-android@1.9.0?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.lifecycle/lifecycle-runtime-android@2.11.0?type=aar"
         },
@@ -5618,7 +5658,7 @@
                 "pkg:maven/androidx.vectordrawable/vectordrawable-animated@1.1.0?type=aar",
                 "pkg:maven/androidx.vectordrawable/vectordrawable@1.1.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.appcompat/appcompat-resources@1.8.0?type=aar"
         },
@@ -5637,7 +5677,7 @@
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.customview/customview@1.2.0?type=aar"
         },
@@ -5770,7 +5810,7 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.gridlayout/gridlayout@1.1.0?type=aar"
         },
@@ -5908,7 +5948,7 @@
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.lifecycle/lifecycle-common-jvm@2.11.0?type=jar"
         },
@@ -5916,7 +5956,7 @@
             "dependsOn": [
                 "pkg:maven/androidx.annotation/annotation@1.10.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.collection/collection-jvm@1.6.0?type=jar"
         },
@@ -6016,7 +6056,7 @@
                 "pkg:maven/androidx.arch.core/core-runtime@2.2.0?type=aar",
                 "pkg:maven/androidx.lifecycle/lifecycle-common@2.11.0?type=pom",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.lifecycle/lifecycle-livedata-core@2.11.0?type=aar"
         },
@@ -6028,7 +6068,7 @@
                 "pkg:maven/androidx.lifecycle/lifecycle-livedata-core@2.11.0?type=aar",
                 "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.3.21?type=jar",
                 "pkg:maven/org.jetbrains.kotlinx/kotlinx-coroutines-core@1.9.0?type=pom",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.lifecycle/lifecycle-livedata@2.11.0?type=aar"
         },
@@ -6061,7 +6101,7 @@
             "dependsOn": [
                 "pkg:maven/androidx.collection/collection@1.6.0?type=pom",
                 "pkg:maven/androidx.core/core@1.18.0?type=aar",
-                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
             "ref": "pkg:maven/androidx.dynamicanimation/dynamicanimation@1.1.0?type=aar"
         },
@@ -6272,16 +6312,19 @@
         },
         {
             "dependsOn": [
-                "pkg:maven/com.google.errorprone/error_prone_annotations@2.48.0?type=jar"
+                "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar",
+                "pkg:maven/com.google.guava/failureaccess@1.0.3?type=jar",
+                "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar",
+                "pkg:maven/com.google.j2objc/j2objc-annotations@3.1?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
             ],
-            "ref": "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar"
+            "ref": "pkg:maven/com.google.guava/guava@33.7.2-android?type=jar"
         },
         {
             "dependsOn": [
-                "pkg:maven/com.google.guava/failureaccess@1.0.2?type=jar",
-                "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
+                "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar"
             ],
-            "ref": "pkg:maven/com.google.guava/guava@33.3.1-android?type=jar"
+            "ref": "pkg:maven/com.google.code.gson/gson@2.14.0?type=jar"
         },
         {
             "dependsOn": [
@@ -6491,19 +6534,25 @@
             "dependsOn": [
 
             ],
-            "ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.48.0?type=jar"
+            "ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.50.0?type=jar"
         },
         {
             "dependsOn": [
 
             ],
-            "ref": "pkg:maven/com.google.guava/failureaccess@1.0.2?type=jar"
+            "ref": "pkg:maven/com.google.guava/failureaccess@1.0.3?type=jar"
         },
         {
             "dependsOn": [
 
             ],
             "ref": "pkg:maven/com.google.guava/listenablefuture@9999.0-empty-to-avoid-conflict-with-guava?type=jar"
+        },
+        {
+            "dependsOn": [
+
+            ],
+            "ref": "pkg:maven/com.google.j2objc/j2objc-annotations@3.1?type=jar"
         },
         {
             "dependsOn": [
@@ -6551,7 +6600,7 @@
             "dependsOn": [
 
             ],
-            "ref": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
+            "ref": "pkg:maven/org.jspecify/jspecify@1.0.1?type=jar"
         },
         {
             "dependsOn": [
